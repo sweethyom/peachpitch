@@ -19,7 +19,7 @@
         width: 63px;
         min-width: 63px;
         font-weight: 500;
-        font-size: 18px;
+        font-size: 14px;
         color: #A9ABB8;
         cursor: pointer; /* 클릭 가능 */
     }
@@ -33,17 +33,18 @@
 
         /* 푸터 설명 글 */
         &__description {
-            width: 620px;
-            font-weight: 500;
-            font-size: 18px;
+            width: 700px;
+            font-weight: 400;
+            font-size: 14px;
             color: #000;
         }
 
         /* 로고 아이콘 */
         &__icon {
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             max-height: 30px;
+            margin-right: 5px;
             object-fit: contain;
         }
 
@@ -64,7 +65,7 @@
 
     &__copyright {
         font-weight: 400;
-        font-size: 16px;
+        font-size: 14px;
         color: #000;
     }
 }
