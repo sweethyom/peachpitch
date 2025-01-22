@@ -10,20 +10,24 @@
 }
 
 body {
-    font-family: 'Pretendard', sans-serif; /* sans-serif 추가로 fallback */
-    font-weight: 100;
-    // background-color: #bbb;
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 400;
 }
 
-/* Container Styles */
+a {
+    text-decoration: none;
+}
+
 .container {
-    max-width: 1100px; /* 고정된 너비 */
-    margin: 0 auto; /* 중앙 정렬 */
-    background-color: #fff;
+    max-width: 1100px;
+    margin: 0 auto;
 }
 
-button {
-    display: flex; /* 아이콘을 버튼 안에서 중앙 정렬 */
-    align-items: center;
-    justify-content: center;
+.pageColor {
+    background-color: var(--color-white-000);
+    min-height: 100vh; /* 전체 화면 높이를 차지 */
+}
+
+.main-background {
+    background-color: var(--color-white-700) !important; /* 메인 페이지 전용 배경색 */
 }

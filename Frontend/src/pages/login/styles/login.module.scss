@@ -8,35 +8,32 @@
 
     padding-left: 10px;
     padding-right: 10px;
-
-    // background-color: #ddd;
 }
-
 
 .login {
     width: 443px;
     display: flex;
-    // justify-content: center;
     align-items: center;
     flex-direction: column;
 
     &__logo {
         font-weight: 700;
         font-size: 32px;
-        margin-bottom: 15px;
+        margin-bottom: 8px;
     }
 
     &__explain {
         font-weight: 500;
         font-size: 16px;
         margin-bottom: 40px;
-        color: #838383;
+        color: var(--color-white-500);
     }
 
     &__sns {
         font-weight: 400;
         font-size: 18px;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
+        color: var(--color-white-600);
 
         &__item {
             display: flex;
@@ -45,7 +42,7 @@
 
             svg {
                 cursor: pointer;
-                color: #333333;
+                color: var(--color-white-600);
                 transition: transform 0.2s;
 
                 &:hover {
@@ -54,7 +51,6 @@
             }
         }
     }
-
 
     &__divider {
         display: flex;
@@ -65,14 +61,14 @@
         &__line {
             flex: 1;
             height: 1px;
-            background-color: #CDCED6;
+            background-color: var(--color-white-300);
             border: none;
         }
 
         &__text {
-            margin: 0 12px;
+            margin: 0 16px;
             font-size: 14px;
-            color: #A1A1A1;
+            color: var(--color-white-400);
             white-space: nowrap;
         }
     }
@@ -84,26 +80,28 @@
         &__label {
             font-weight: 500;
             font-size: 16px;
-            color: #666666;
-            margin-bottom: 4px;
-
+            color: var(--color-white-500);
+            margin-bottom: 8px;
+            display: block;
         }
 
         &__input {
             width: 100%;
-            padding: 16px 16px;
-            border: 1px solid #cccccc;
+            height: 52px;
+            padding: 0 12px;
+            border: 1px solid var(--color-white-300);
             border-radius: 4px;
             font-size: 14px;
-            color: #333333;
+            color: var(--color-white-600);
+            margin-bottom: 10px;
         }
     }
 
     &__submit {
         width: 100%;
-        height: 44px;
-        background-color: #333333;
-        color: #ffffff;
+        height: 52px;
+        background-color: var(--color-white-600);
+        color: var(--color-white-000);
         border: none;
         border-radius: 4px;
         font-size: 14px;
@@ -112,7 +110,7 @@
         transition: background-color 0.2s;
 
         &:hover {
-            background-color: #444444;
+            background-color: var(--color-white-700);
         }
     }
 
@@ -120,17 +118,14 @@
         font-weight: 500;
         margin-top: 16px;
         font-size: 16px;
-        color: #838383;
+        color: var(--color-white-500);
         text-align: center;
 
         &__btn {
             font-weight: 700;
             color: var(--color-white-700);
-            // color: #000000;
             text-decoration: none;
             font-weight: 500;
         }
     }
-
-
 }

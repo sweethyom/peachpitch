@@ -2,7 +2,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 173px;
+    height: 130px;
 
     padding-left: 10px;
     padding-right: 10px;
@@ -20,23 +20,23 @@
         min-width: 63px;
         font-weight: 500;
         font-size: 14px;
-        color: #A9ABB8;
-        cursor: pointer; /* 클릭 가능 */
+        color: var(--color-white-400);
+        cursor: pointer;
+        /* 클릭 가능 */
     }
 
     &__logo {
         display: flex;
         align-items: center;
         margin-right: 20px;
-        // justify-content: center;
-        // margin-bottom: 10px;
 
         /* 푸터 설명 글 */
         &__description {
-            width: 700px;
+            display: flex;
+            width: 100%;
             font-weight: 400;
             font-size: 14px;
-            color: #000;
+            color: var(--color-white-600);
         }
 
         /* 로고 아이콘 */
@@ -52,6 +52,7 @@
         &__name {
             font-weight: 700;
             font-size: 24px;
+            color: var(--color-white-700);
             margin-right: 20px;
         }
     }
@@ -59,13 +60,44 @@
     &__divider {
         border: 0;
         width: 100%;
-        border-top: 1px solid #000;
+        border-top: 1px solid var(--color-white-600);
         margin: 20px 0;
     }
 
     &__copyright {
         font-weight: 400;
         font-size: 14px;
-        color: #000;
+        color: var(--color-white-600);
     }
+}
+
+/* 다크 테마 */
+.footerDark {
+    background-color: var(--color-white-700);
+    color: var(--color-white-000);
+
+    .footer__logo__description {
+        color: var(--color-white-400);
+    }
+
+    .footer__logo__name {
+        color: var(--color-white-000);
+    }
+
+    .footer__leave {
+        color: var(--color-white-400);
+    }
+}
+
+/* 랜딩 페이지를 위한 기타 테마 */
+.footerGreen {
+    background-color: #ABC8CD;
+}
+
+.footerPink {
+    background-color: #FFD0D5;
+}
+
+.footerYellow {
+    background-color: #FFBC4B;
 }
