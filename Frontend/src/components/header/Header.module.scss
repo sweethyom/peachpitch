@@ -1,0 +1,40 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 90px;
+    background-color: white;
+
+    padding-left: 10px;
+    padding-right: 10px;
+
+    &__logo {
+        display: flex;
+        align-items: center;
+
+        &__icon {
+            width: 35px;
+            height: 35px;
+        }
+
+        &__name{
+            font-weight: 700;
+            font-size: 32px;
+        }
+    }
+
+    &__navi {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+
+        &__item {
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+            font-size: 20px;
+            color: #000;
+        }
+    }
+
+}
