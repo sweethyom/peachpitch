@@ -3,11 +3,17 @@
     flex-direction: column;
     justify-content: center;
     height: 130px;
-
     padding-left: 10px;
     padding-right: 10px;
 
     &__content {
+        max-width: 1100px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    &__box {
+
         display: flex;
         flex-direction: row;
         justify-content: space-between;
@@ -21,8 +27,7 @@
         font-weight: 500;
         font-size: 14px;
         color: var(--color-white-400);
-        cursor: pointer;
-        /* 클릭 가능 */
+        cursor: pointer;/* 클릭 가능 */
     }
 
     &__logo {
@@ -77,7 +82,7 @@
     color: var(--color-white-000);
 
     .footer__logo__description {
-        color: var(--color-white-400);
+        color: var(--color-white-000);
     }
 
     .footer__logo__name {
@@ -86,6 +91,14 @@
 
     .footer__leave {
         color: var(--color-white-400);
+    }
+
+    .footer__divider {
+        color: var(--color-white-000);
+    }
+
+    .footer__copyright {
+        color: var(--color-white-000);
     }
 }
 

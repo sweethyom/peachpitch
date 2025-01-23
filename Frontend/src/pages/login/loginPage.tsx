@@ -13,7 +13,6 @@ function loginPage() {
       <Header />
 
       <div className={styles.page}>
-
         <div className={styles.login}>
 
           <p className={styles.login__logo}>PeachPitch</p>
@@ -25,7 +24,6 @@ function loginPage() {
             <RiKakaoTalkFill style={{ fontSize: '40px' }} />
             <SiNaver style={{ fontSize: '40px' }} />
           </div>
-
 
           <div className={styles.login__divider}>
             <hr className={styles.login__divider__line} />
@@ -42,9 +40,8 @@ function loginPage() {
             <label htmlFor='password' className={styles.login__form__label}>비밀번호</label>
             <input type="password" id="password" name="password" required className={styles.login__form__input} />
           </div>
-
+          
           <button type="submit" className={styles.login__submit}>로그인</button>
-
 
           <div className={styles.login__join}>
             아직 회원이 아니신가요?{' | '}
