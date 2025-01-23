@@ -21,8 +21,8 @@ function loginPage() {
           <p className={styles.login__sns}>다른 서비스로 로그인</p>
           <div className={styles.login__sns__item}>
             <FaGoogle style={{ fontSize: '40px' }} />
-            <RiKakaoTalkFill style={{ fontSize: '40px' }} />
-            <SiNaver style={{ fontSize: '40px' }} />
+            <RiKakaoTalkFill style={{ fontSize: '50px' }} />
+            <SiNaver style={{ fontSize: '36px' }} />
           </div>
 
           <div className={styles.login__divider}>
