@@ -9,8 +9,8 @@ function chatReportPage() {
       <Header />
 
       <div className={styles.page}>
-        <p>main Page</p>
-        <h4>메인인페이지</h4>
+        <p>chat report Page</p>
+        <h4>대화 리포트 페이지</h4>
       </div>
 
       <Footer />
