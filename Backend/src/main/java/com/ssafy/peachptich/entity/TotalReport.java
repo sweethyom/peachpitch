@@ -15,7 +15,7 @@ public class TotalReport {
 
     private Integer totalChatTime;
 
-    private Integer blankTime;
+    //private Integer blankTime;
 
     private Integer questCount;
 
@@ -28,14 +28,12 @@ public class TotalReport {
     /**
      * 장고에서 생성될 예정, 테스트 용으로 남겨둠
      * @param totalChatTime
-     * @param blankTime
      * @param questCount
      * @param ansCount
      */
     @Builder
-    public TotalReport(Integer totalChatTime, Integer blankTime, Integer questCount, Integer ansCount) {
+    public TotalReport(Integer totalChatTime, Integer questCount, Integer ansCount) {
         this.totalChatTime = totalChatTime;
-        this.blankTime = blankTime;
         this.questCount = questCount;
         this.ansCount = ansCount;
     }
