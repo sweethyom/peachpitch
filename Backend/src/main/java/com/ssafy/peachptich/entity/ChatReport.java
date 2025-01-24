@@ -19,9 +19,9 @@ public class ChatReport {
     @Column(name = "chat_time", nullable = false)
     private Integer chatTime;
 
-    @Column(name = "silence_time", nullable = false)
-    @ColumnDefault("0")
-    private Integer silenceTime;
+    //    @Column(name = "silence_time", nullable = false)
+    //    @ColumnDefault("0")
+    //    private Integer silenceTime;
 
     @Column(name = "pros", columnDefinition = "varchar(300)")
     private String pros;
@@ -43,7 +43,6 @@ public class ChatReport {
     /**
      * 생성은 장고에서 하지만 테스트 용으로 남겨둠
      * @param chatTime
-     * @param silenceTime
      * @param pros
      * @param cons
      * @param summary
@@ -51,9 +50,8 @@ public class ChatReport {
      * @param chatHistory
      */
     @Builder
-    public ChatReport(Integer chatTime, Integer silenceTime, String pros, String cons, String summary, User user, ChatHistory chatHistory) {
+    public ChatReport(Integer chatTime, String pros, String cons, String summary, User user, ChatHistory chatHistory) {
         this.chatTime = chatTime;
-        this.silenceTime = silenceTime;
         this.pros = pros;
         this.cons = cons;
         this.summary = summary;
