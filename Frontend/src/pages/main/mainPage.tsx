@@ -3,9 +3,9 @@ import Footer from '../../components/footer/Footer';
 
 import styles from './styles/main.module.scss';
 
-import medal1 from '../../assets/images/medal1.png';
-import medal2 from '../../assets/images/medal2.png';
-import medal3 from '../../assets/images/medal3.png';
+import medal1 from '../../assets/icons/medal1.png';
+import medal2 from '../../assets/icons/medal2.png';
+import medal3 from '../../assets/icons/medal3.png';
 
 function MainPage() {
   return (
