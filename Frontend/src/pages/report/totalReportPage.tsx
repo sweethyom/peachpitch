@@ -2,6 +2,7 @@ import Header from '../../components/header/Header'
 import Footer from '../../components/footer/Footer'
 
 import styles from './styles/total.module.scss'
+import { Link } from 'react-router-dom'
 
 function totalReportPage() {
   return (
@@ -9,7 +10,7 @@ function totalReportPage() {
       <Header />
 
       <div className={styles.page}>
-
+        {/* 목차 */}
         <div className={styles.index}>
           <p className={styles.index__item}>반복되는 단어 습관</p>
           <p className={styles.index__item}>대화 주도권</p>
@@ -63,44 +64,27 @@ function totalReportPage() {
           {/* 대화 리스트 */}
           <div className={styles.report__list}>
             <p className={styles.report__sub}>대화 리스트</p>
-            
+
             <div className={styles.report__list__items}>
 
-            {/* 대화 리스트 필터 */}
-            <div className={styles.report__filter}>
-              <div className={styles.report__filter__drop}>▽ 키워드</div>
-              <div className={styles.report__filter__drop}>▽ 최신순</div>
-            </div>
+              {/* 대화 리스트 필터 */}
+              <div className={styles.report__filter}>
+                <div className={styles.report__filter__drop}>▽ 키워드</div>
+                <div className={styles.report__filter__drop}>▽ 최신순</div>
+              </div>
 
               {/* 대화 리포트들 */}
               <div className={styles.item}>
-                <p className={styles.item__name}>떡볶이 먹는 하마와의 대화</p>
-                <div className={styles.item__keyword}>
-                  <p className={styles.item__keyword__title}>대화 키워드</p>
-                  <div className={styles.item__tag}>
-                    <p className={styles.item__tag__1}>보드 게임</p>
+                <Link to="/report/detail" className={styles.item__link}>
+                  <p className={styles.item__name}>떡볶이 먹는 하마와의 대화</p>
+                  <div className={styles.item__keyword}>
+                    <p className={styles.item__keyword__title}>대화 키워드</p>
+                    <div className={styles.item__tag}>
+                      <p className={styles.item__tag__1}>보드 게임</p>
+                      <p className={styles.item__tag__2}>겨울 스포츠</p>
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className={styles.item}>
-                <p className={styles.item__name}>떡볶이 먹는 하마와의 대화</p>
-                <div className={styles.item__keyword}>
-                  <p className={styles.item__keyword__title}>대화 키워드</p>
-                  <div className={styles.item__tag}>
-                    <p className={styles.item__tag__1}>보드 게임</p>
-                    <p className={styles.item__tag__2}>겨울 스포츠</p>
-                  </div>
-                </div>
-              </div>
-              <div className={styles.item}>
-                <p className={styles.item__name}>떡볶이 먹는 하마와의 대화</p>
-                <div className={styles.item__keyword}>
-                  <p className={styles.item__keyword__title}>대화 키워드</p>
-                  <div className={styles.item__tag}>
-                    <p className={styles.item__tag__1}>보드 게임</p>
-                    <p className={styles.item__tag__2}>겨울 스포츠</p>
-                  </div>
-                </div>
+                </Link>
               </div>
 
               {/* 페이저블, 페이징 - spring으로 구현 가능 */}
