@@ -1,8 +1,15 @@
+import { Link } from 'react-router-dom'
+
 import Header from '../../components/header/Header'
 import Footer from '../../components/footer/Footer'
 
 import styles from './styles/total.module.scss'
-import { Link } from 'react-router-dom'
+
+import HabitsChart from '@/components/chart/Habits'
+import LeadChart from '@/components/chart/Lead'
+import WordCloud from '@/components/chart/WordCloud'
+import WordChart from '@/components/chart/Word'
+
 
 function totalReportPage() {
   return (
@@ -36,30 +43,42 @@ function totalReportPage() {
           {/* 반복되는 단어 습관 */}
           <div className={styles.report__habits}>
             <p className={styles.report__sub}>반복되는 단어 습관</p>
+
+            {/* Pie 차트 */}
             <div className={styles.pie}>
-              <div className={styles.pie__graph}></div>
-              <div className={styles.pie__detail}></div>
+              <div className={styles.pie__graph}>
+                <HabitsChart />
+              </div>
             </div>
           </div>
+
 
           {/* 대화 주도권 */}
           <div className={styles.report__lead}>
             <p className={styles.report__sub}>대화 주도권</p>
             <div className={styles.meter}>
               <p className={styles.meter__label}>질문</p>
-              <div className={styles.meter__graph}></div>
+              <div className={styles.meter__graph}>
+                <LeadChart />
+              </div>
               <p className={styles.meter__label}>답변</p>
             </div>
           </div>
+
 
           {/* 대화 키워드(워드 클라우드) */}
           <div className={styles.report__keyword}>
             <p className={styles.report__sub}>대화 키워드(워드 클라우드)</p>
             <div className={styles.keyword}>
-              <div className={styles.keyword__wordcloud}></div>
-              <div className={styles.keyword__bar}></div>
+              <div className={styles.keyword__wordcloud}>
+                <WordCloud />
+              </div>
+              <div className={styles.keyword__bar}>
+                <WordChart />
+              </div>
             </div>
           </div>
+
 
           {/* 대화 리스트 */}
           <div className={styles.report__list}>
