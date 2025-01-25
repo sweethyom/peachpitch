@@ -151,8 +151,8 @@
     justify-content: space-between;
 
     &__graph {
-        background-color: var(--color-white-200);
-        width: 400px;
+        // background-color: var(--color-white-200);
+        width: 100%;
         height: 400px;
     }
 
@@ -162,6 +162,7 @@
         background-color: var(--color-white-200);
     }
 }
+
 
 .meter {
     display: flex;
@@ -178,11 +179,14 @@
     }
 
     &__graph {
+        padding: 10px 0;
         display: flex;
         width: 100%;
-        background-color: var(--color-white-200);
+        height: auto;
+        // background-color: var(--color-white-200);
     }
 }
+
 
 .keyword {
     display: flex;
@@ -190,17 +194,17 @@
     justify-content: space-between;
 
     &__wordcloud {
-        background-color: var(--color-white-200);
         width: 400px;
         height: 400px;
     }
 
     &__bar {
-        background-color: var(--color-white-300);
+        // background-color: var(--color-white-300);
         width: 400px;
         height: 400px;
     }
 }
+
 
 .item {
     width: 310px;
