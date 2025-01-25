@@ -21,8 +21,8 @@ function App() {
                         <Route path="/main" element={<MainPage />} />
                         <Route path="/login" element={<LoginPage />} />
                         <Route path="/join" element={<JoinPage />} />
-                        <Route path="/voice_chat" element={<VoiceChatPage />} />
-                        <Route path="/video_chat" element={<VideoChatPage />} />
+                        <Route path="/chat/ai" element={<VoiceChatPage />} />
+                        <Route path="/chat/video" element={<VideoChatPage />} />
                         <Route path="/report" element={<TotalReportPage />} />
                         <Route path="/report/detail" element={<ChatReportPage />} />
                     </Routes>
