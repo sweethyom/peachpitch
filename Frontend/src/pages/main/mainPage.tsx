@@ -6,6 +6,7 @@ import styles from './styles/main.module.scss';
 import medal1 from '../../assets/icons/medal1.png';
 import medal2 from '../../assets/icons/medal2.png';
 import medal3 from '../../assets/icons/medal3.png';
+import { Link } from 'react-router-dom';
 
 function MainPage() {
   return (
@@ -19,15 +20,19 @@ function MainPage() {
           </div>
 
           <div className={styles.main__chat}>
-            <div className={styles.main__chat__voice}>
-              <p className={styles.voice}>AI와 스몰토킹</p>
-              <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
-            </div>
+            <Link to="/chat/ai" className={styles.main__link}>
+              <div className={styles.main__chat__voice}>
+                <p className={styles.voice}>AI와 스몰토킹</p>
+                <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
+              </div>
+            </Link>
 
-            <div className={styles.main__chat__video}>
-            <p className={styles.video}>1:1 매칭 스몰토킹</p>
-            <p className={styles.video__description}>사람과의 스몰토킹 너두 할 수 있어!</p>
-            </div>
+            <Link to="/chat/video" className={styles.main__link}>
+              <div className={styles.main__chat__video}>
+                <p className={styles.video}>1:1 매칭 스몰토킹</p>
+                <p className={styles.video__description}>사람과의 스몰토킹 너두 할 수 있어!</p>
+              </div>
+            </Link>
           </div>
 
           <div className={styles.main__keyword}>

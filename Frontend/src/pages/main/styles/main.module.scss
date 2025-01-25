@@ -45,6 +45,11 @@
         }
     }
 
+    &__link {
+        text-decoration: none;
+        color: var(--color-white-700);
+    }
+
     &__chat {
         display: flex;
         justify-content: space-between;
