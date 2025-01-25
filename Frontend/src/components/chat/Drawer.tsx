@@ -1,0 +1,155 @@
+import { useState } from "react";
+import styles from "./styles/Drawer.module.scss";
+
+import openBtn from "@/assets/icons/drawer_open.png";
+import closeBtn from "@/assets/icons/drawer_close.png";
+import settingBtn from "@/assets/icons/drawer_setting.png";
+import timerIcon from "@/assets/icons/drawer_timer.png";
+import hintIcon from "@/assets/icons/drawer_hint.png";
+import chatBtn from "@/assets/icons/drawer_chatting.png";
+
+const Drawer = () => {
+    const [isOpen, setIsOpen] = useState(false);
+
+    // 드로어 토글
+    const toggleDrawer = () => {
+        setIsOpen(!isOpen);
+    };
+
+    // 스위치 토글
+    const [limitOn, setLimitOn] = useState(false);
+    const [hintOn, setHintOn] = useState(false);
+
+    const limitSwitch = () => {
+        setLimitOn(!limitOn);
+    };
+
+    const hintSwitch = () => {
+        setHintOn(!hintOn);
+    };
+
+    // 채팅 토글
+    const [chatOpen, setChatOpen] = useState(false);
+
+    const toggleChat = () => {
+        setChatOpen(!chatOpen);
+    };
+
+    return (
+        <div>
+            {/* 드로어 */}
+            <div className={`${styles.drawer} ${isOpen ? styles.open : styles.closed}`}>
+                {/* 공통 헤더 */}
+                <div className={styles.drawer__header}>
+                    <img src={closeBtn} onClick={toggleDrawer} width={"12px"} height={"23px"} />
+                    <img src={settingBtn} width={"30px"} />
+                </div>
+
+                <hr className={styles.drawer__divider} />
+
+                {/* 키워드 */}
+                <div className={styles.drawer__tag}>
+                    <p className={styles.drawer__tag__1}>보드 게임</p>
+                    <p className={styles.drawer__tag__2}>겨울 스포츠</p>
+                    {limitOn && (
+                        <p className={styles.drawer__tag__limit}>
+                            <strong>10</strong> 회
+                        </p>
+                    )}
+                </div>
+
+                {/* 남은 턴수 */}
+                <div className={styles.drawer__wrapper}>
+                    <img src={timerIcon} width={"30px"} />
+                    <p className={styles.drawer__sub}>남은 턴수</p>
+
+                    {/* 스위치 */}
+                    <div className={styles.drawer__wrapper__switch}>
+                        <p className={styles.switch__label}>OFF</p>
+                        <div className={`${styles.switch} ${limitOn ? styles.on : ""}`} onClick={limitSwitch}>
+                            <div className={`${styles.toggle} ${limitOn ? styles.on : styles.off}`} />
+                        </div>
+                        <p className={styles.switch__label}>ON</p>
+                    </div>
+                </div>
+
+                {/* 힌트 */}
+                <div className={styles.drawer__wrapper}>
+                    <img src={hintIcon} width={"30px"} />
+                    <p className={styles.drawer__sub}>힌트</p>
+
+                    {/* 스위치 */}
+                    <div className={styles.drawer__wrapper__switch}>
+                        <p className={styles.switch__label}>OFF</p>
+                        <div className={`${styles.switch} ${hintOn ? styles.on : ""}`} onClick={hintSwitch}>
+                            <div className={`${styles.toggle} ${hintOn ? styles.on : styles.off}`} />
+                        </div>
+                        <p className={styles.switch__label}>ON</p>
+                    </div>
+                </div>
+
+                {/* 힌트 리스트 */}
+                <div className={styles.drawer__hint}>
+                    <div className={styles.drawer__hint__header}>
+                        <p className={styles.drawer__hint__header__title}>[여행]에 관련하여 아래와 같이 질문해보세요. </p>
+                    </div>
+
+                    <div
+                        className={`${styles.drawer__hint__list} ${!hintOn ? styles["drawer__hint__list--hidden"] : ""
+                            }`}
+                    >
+                        <p className={styles.drawer__hint__item}>1. 혹시 [여행지] 가봤나요? 저는 최근에 [여행지]에 가봤는데 진짜 좋았어요.</p>
+                        <p className={styles.drawer__hint__item}>2. 여행을 떠날 때 꼭 챙겨가는 필수 물품이 있으신가요?</p>
+                        <p className={styles.drawer__hint__item}>3. 여행 계획을 세울 때 가장 중요한 점은 무엇인가요?</p>
+                    </div>
+                </div>
+
+                {/* 채팅 */}
+                <div className={styles.drawer__chatting}>
+                    <div className={styles.drawer__chatting__header} onClick={toggleChat}>
+                        <p className={styles.drawer__sub__chat}>채팅</p>
+                        <img
+                            src={chatBtn}
+                            width={"18px"}
+                            height={"10px"}
+                            className={`${styles.chatBtn} ${chatOpen ? styles.open : styles.closed}`}
+                        />
+                    </div>
+
+                    {/* Prompt 창 */}
+                    {chatOpen && (
+                        <div className={styles.drawer__chatting__prompt}>
+                            <div className={styles.bubble__left}>
+                                여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?
+                            </div>
+                            <div className={styles.bubble__right}>
+                                최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
+                            </div>
+                            <div className={styles.bubble__left}>
+                                맘껏 뛰어다니는 그 기분이 해방되셨을 것 같아요. 그런 순간들이 정말 시원하고 행복하죠.
+                            </div>
+                            <div className={styles.bubble__right}>
+                                정말 재밌는 경험이었다고 생각해. 너도 그런 경험 해봤어?
+                            </div>
+                            <div className={styles.bubble__left}>
+                                네, 해변에서 맨발로 뛰어본 경험이 있어요. 정말 자유롭고 즐거운 기억으로 남아있어요. 친구와의 그런 순간은 정말 소중하죠.
+                            </div>
+                            <div className={styles.bubble__right}>
+                                정말 멋진 추억이 되었겠네요. 그런 경험은 두고두고 떠올리게 되죠. 다음 여행도 기대될 것같아!
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* 열기 버튼 */}
+            {!isOpen && (
+                <button onClick={toggleDrawer} className={styles.drawerToggle}>
+                    <img src={openBtn} width={"40px"} />
+                </button>
+            )}
+        </div>
+    );
+};
+
+export default Drawer;
