@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { RecoilRoot } from 'recoil';
 
+import ScrollToTop from "@/components/ScrollToTop";
+
 import LandingPage from '@pages/landing/landingPage';
 import MainPage from '@pages/main/mainPage';
 import LoginPage from '@pages/login/loginPage';
@@ -16,16 +18,17 @@ function App() {
     return (
         <RecoilRoot>
             <BrowserRouter>
-                    <Routes>
-                        <Route index path="/index" element={<LandingPage />} />
-                        <Route path="/main" element={<MainPage />} />
-                        <Route path="/login" element={<LoginPage />} />
-                        <Route path="/join" element={<JoinPage />} />
-                        <Route path="/chat/ai" element={<VoiceChatPage />} />
-                        <Route path="/chat/video" element={<VideoChatPage />} />
-                        <Route path="/report" element={<TotalReportPage />} />
-                        <Route path="/report/detail" element={<ChatReportPage />} />
-                    </Routes>
+                <ScrollToTop />
+                <Routes>
+                    <Route index path="/index" element={<LandingPage />} />
+                    <Route path="/main" element={<MainPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/join" element={<JoinPage />} />
+                    <Route path="/chat/ai" element={<VoiceChatPage />} />
+                    <Route path="/chat/video" element={<VideoChatPage />} />
+                    <Route path="/report" element={<TotalReportPage />} />
+                    <Route path="/report/detail" element={<ChatReportPage />} />
+                </Routes>
             </BrowserRouter>
         </RecoilRoot>
     );

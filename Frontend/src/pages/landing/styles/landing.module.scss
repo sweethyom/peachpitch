@@ -1,11 +1,110 @@
+body {
+    background-color: #ABC8CD;
+}
+
 .page {
     display: flex;
+    // flex-direction: column;
+    margin: 0 auto;
 
-    width: 100%;
-    min-height: 100vh;
+    width: 1100px;
+    min-height: 90vh;
+    align-items: center;
+    justify-content: space-between;
+}
 
-    padding-left: 10px;
-    padding-right: 10px;
+.landing {
 
-    background-color: #ddd;
+    display: flex;
+    flex-direction: column;
+
+    &__keyword {
+        font-weight: 700;
+        font-size: 16px;
+    }
+
+    &__title {
+        font-weight: 700;
+        font-size: 50px;
+        margin-bottom: 70px;
+    }
+
+    &__button {
+        display: flex;
+        gap: 20px;
+
+        &__start {
+            font-weight: 700;
+            font-size: 27px;
+            padding: 20px 50px;
+            border-radius: 18px;
+
+            background-color: #6CB2BE;
+            color: var(--color-white-000);
+            border: 0;
+
+            cursor: pointer;
+        }
+
+        &__tutorial {
+            font-weight: 700;
+            font-size: 27px;
+            padding: 20px 50px;
+            border-radius: 18px;
+
+            background-color: var(--color-white-000);
+            border: solid #6CB2BE 4px;
+        
+            cursor: pointer;
+        }
+    }
+}
+
+.post {
+    position: relative;
+    width: 472px;
+    height: 472px;
+
+    &__image {
+        position: absolute;
+        bottom: 50%;
+        left: 0;
+        transform: translate(0, 50%);
+        width: 100%;
+        height: auto;
+        // opacity: 0;
+        transition: transform 1s ease, opacity 1s ease;
+
+        &.active {
+            opacity: 1;
+            transform: translate(0, 50%) rotate(0deg);
+            z-index: 3;
+
+            &:nth-child(2) {
+                transform: translate(0, 50%) rotate(0deg);
+                z-index: 2;
+            }
+
+            &:nth-child(3) {
+                transform: translate(0, 50%) rotate(0deg);
+                z-index: 1;
+            }
+        }
+
+        &.exit {
+            opacity: 0;
+            transform: translate(100%, 50%) rotate(0deg);
+            z-index: 1;
+        }
+
+        &:nth-child(2) {
+            transform: translate(0, 50%) rotate(5deg);
+            z-index: 2;
+        }
+
+        &:nth-child(3) {
+            transform: translate(0, 50%) rotate(-5deg);
+            z-index: 1;
+        }
+    }
 }
