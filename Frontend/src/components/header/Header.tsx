@@ -1,8 +1,11 @@
-import { Link } from 'react-router-dom';
-import classNames from 'classnames';
-import styles from './Header.module.scss';
+import { Link } from "react-router-dom";
+import classNames from "classnames";
+import { useState } from "react";
+import styles from "./Header.module.scss";
 
-import logoIcon from '../../assets/icons/logo.png';
+import logoIcon from "@/assets/icons/logo.png";
+import CouponModal from "@/components/modal/Coupon";
+import couponIcon from '@/assets/icons/coupon_icon.png'
 
 interface HeaderProps {
     isDark?: boolean;
@@ -20,6 +23,12 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
         [styles.headerYellow]: isYellow,
     });
 
+    const [isCouponOpen, setIsCouponOpen] = useState(false); // 모달 열림 상태 관리
+
+    const toggleCoupon = () => {
+        setIsCouponOpen(!isCouponOpen);
+    };
+
     return (
         <div className={headerClass}>
             <div className={styles.header__content}>
@@ -34,12 +43,23 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                     <Link to="/report">
                         <span className={styles.header__navi__item}>report</span>
                     </Link>
-                    <span className={styles.header__navi__item}>coupon</span>
+
+                    <div
+                        className={styles.header__navi__coupon}
+                        onClick={toggleCoupon}
+                        style={{ cursor: "pointer" }}>
+                        <img src={couponIcon} width={'30px'} />
+                        <p className={styles.header__navi__item}>1개</p>
+                    </div>
+
                     <Link to="/login">
                         <span className={styles.header__navi__item}>login</span>
                     </Link>
                 </div>
             </div>
+
+            {/* 쿠폰 모달 */}
+            <CouponModal isOpen={isCouponOpen} onClose={toggleCoupon} />
         </div>
     );
 }

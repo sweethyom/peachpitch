@@ -63,11 +63,17 @@
 .header__navi {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 40px;
 
     &__item {
         font-weight: 500;
         font-size: 20px;
         color: var(--color-white-700);
     }
+
+    &__coupon {
+        display: flex;
+        gap: 10px;
+    }
 }
+
