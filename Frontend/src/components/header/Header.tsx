@@ -35,13 +35,22 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 <Link to="/main">
                     <div className={styles.header__logo}>
                         <img src={logoIcon} alt="Logo" className={styles.header__logo__icon} />
-                        <span className={styles.header__logo__name}>PeachPitch</span>
+                        <span
+                            className={styles.header__logo__name}
+                            onClick={() => (document.body.style.backgroundColor = 'var(--color-white-000)')}
+                        >
+                            PeachPitch
+                        </span>
                     </div>
                 </Link>
 
                 <div className={styles.header__navi}>
                     <Link to="/report">
-                        <span className={styles.header__navi__item}>report</span>
+                        <span
+                            className={styles.header__navi__item}
+                            onClick={() => (document.body.style.backgroundColor = 'var(--color-white-000)')}
+                        >report
+                        </span>
                     </Link>
 
                     <div
@@ -53,7 +62,12 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                     </div>
 
                     <Link to="/login">
-                        <span className={styles.header__navi__item}>login</span>
+                        <span
+                            className={styles.header__navi__item}
+                            onClick={() => (document.body.style.backgroundColor = 'var(--color-white-000)')}
+                        >
+                            login
+                        </span>
                     </Link>
                 </div>
             </div>
