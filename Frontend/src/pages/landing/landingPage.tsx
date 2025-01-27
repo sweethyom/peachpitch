@@ -9,8 +9,11 @@ import talk from '@/assets/images/landing_talk.png';
 import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 
+import TutorialModal from '@/components/modal/Tutorial'
+
 function LandingPage() {
-    const [currentStep, setCurrentStep] = useState(0); // 0 → 1 → 2 → 3 순환
+    /* 이미지 애니메이션 */
+    const [currentStep, setCurrentStep] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -44,6 +47,13 @@ function LandingPage() {
         return '';
     };
 
+    /* 튜토리얼 모달창 */
+    const [isTutorialOpen, setIsTutorialOpen] = useState(false); // 모달 열림 상태 관리
+
+    const toggleTutorial = () => {
+        setIsTutorialOpen(!isTutorialOpen);
+    };
+
     return (
         <>
             <Header
@@ -68,7 +78,12 @@ function LandingPage() {
                                 시작하기
                             </button>
                         </Link>
-                        <button className={styles.landing__button__tutorial}>튜토리얼</button>
+                        <button
+                            className={styles.landing__button__tutorial}
+                            onClick={toggleTutorial}
+                        >
+                            튜토리얼
+                        </button>
                     </div>
                 </div>
 
@@ -96,6 +111,9 @@ function LandingPage() {
                 isPink={currentStep === 1}
                 isYellow={currentStep === 2}
             />
+
+            <TutorialModal isOpen={isTutorialOpen} onClose={toggleTutorial} />
+
         </>
     );
 }
