@@ -1,7 +1,9 @@
 import styles from './Footer.module.scss';
 
-import logoIcon from '../../assets/icons/logo.png';
 import classNames from 'classnames';
+import { useState } from 'react';
+
+import AccountRemoveModal from '@/components/modal/AccountRemove'
 
 interface FooterProps {
   isDark?: boolean;
@@ -19,25 +21,38 @@ function Footer({ isDark, isGreen, isPink, isYellow }: FooterProps) {
     [styles.footerYellow]: isYellow,
   });
 
+  const [isRemoveOpen, setIsRemoveOpen] = useState(false); // 모달 열림 상태 관리
+
+  const toggleRemove = () => {
+    setIsRemoveOpen(!isRemoveOpen);
+  };
+
   return (
-    <footer className={footerClass}>
-      <div className={styles.footer__content}>
-        <div className={styles.footer__box}>
-          <div className={styles.footer__logo}>
-            {/* <img src={logoIcon} alt="Logo" className={styles.footer__logo__icon} /> */}
-            <span className={styles.footer__logo__name}>PeachPitch</span>
-            <p className={styles.footer__logo__description}>
-              스몰톡을 연습하고 싶지만, 사람과의 직접적인 대화는 아직 부담스러운 사용자들을 위한 스피킹 티칭 서비스를 제공합니다.
-            </p>
+    <>
+      <footer className={footerClass}>
+        <div className={styles.footer__content}>
+          <div className={styles.footer__box}>
+            <div className={styles.footer__logo}>
+              <span className={styles.footer__logo__name}>PeachPitch</span>
+              <p className={styles.footer__logo__description}>
+                스몰톡을 연습하고 싶지만, 사람과의 직접적인 대화는 아직 부담스러운 사용자들을 위한 스피킹 티칭 서비스를 제공합니다.
+              </p>
+            </div>
+            <p
+              onClick={toggleRemove}
+              className={styles.footer__leave}
+            >회원탈퇴</p>
           </div>
-          <p className={styles.footer__leave}>회원탈퇴</p>
+          <hr className={styles.footer__divider} />
+          <div className={styles.footer__copyright}>
+            Copyright ⓒ 2025 노 피카 킵고잉 x SSAFY
+          </div>
         </div>
-        <hr className={styles.footer__divider} />
-        <div className={styles.footer__copyright}>
-          Copyright ⓒ 2025 노 피카 킵고잉 x SSAFY
-        </div>
-      </div>
-    </footer>
+      </footer>
+
+      {/* 회원탈퇴 모달 */}
+      <AccountRemoveModal isOpen={isRemoveOpen} onClose={toggleRemove} />
+    </>
   );
 }
 
