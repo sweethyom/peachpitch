@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./styles/Drawer.module.scss";
 
 import openBtn from "@/assets/icons/drawer_open.png";
@@ -8,7 +8,11 @@ import timerIcon from "@/assets/icons/drawer_timer.png";
 import hintIcon from "@/assets/icons/drawer_hint.png";
 import chatBtn from "@/assets/icons/drawer_chatting.png";
 
-const Drawer = () => {
+type DrawerProps = {
+    selectedKeyword: string | null;
+};
+
+const Drawer = ({ selectedKeyword }: DrawerProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // 드로어 토글
@@ -35,6 +39,27 @@ const Drawer = () => {
         setChatOpen(!chatOpen);
     };
 
+    // 힌트
+    const [hints, setHints] = useState<string[]>([]);
+
+    useEffect(() => {
+        const loadHints = async () => {
+            try {
+                const response = await fetch("/data/hints.json");
+                const data = await response.json();
+                if (selectedKeyword && data[selectedKeyword]) {
+                    setHints(data[selectedKeyword]);
+                } else {
+                    setHints([]);
+                }
+            } catch (error) {
+                console.error("힌트 데이터를 불러오는 중 오류가 발생했습니다:", error);
+            }
+        };
+
+        loadHints();
+    }, [selectedKeyword]);
+
     return (
         <div>
             {/* 드로어 */}
@@ -47,15 +72,16 @@ const Drawer = () => {
 
                 <hr className={styles.drawer__divider} />
 
-                {/* 키워드 */}
+                {/* 키워드 표시 */}
                 <div className={styles.drawer__tag}>
-                    <p className={styles.drawer__tag__1}>보드 게임</p>
-                    <p className={styles.drawer__tag__2}>겨울 스포츠</p>
+                    <p className={styles.drawer__tag__1}>{selectedKeyword || "여행"}</p>
+                    <p className={styles.drawer__tag__2} style={{ display: "none" }}></p>
                     {limitOn && (
                         <p className={styles.drawer__tag__limit}>
                             <strong>10</strong> 회
                         </p>
                     )}
+
                 </div>
 
                 {/* 남은 턴수 */}
@@ -91,17 +117,15 @@ const Drawer = () => {
                 {/* 힌트 리스트 */}
                 <div className={styles.drawer__hint}>
                     <div className={styles.drawer__hint__header}>
-                        <p className={styles.drawer__hint__header__title}>[여행]에 관련하여 아래와 같이 질문해보세요. </p>
+                        <p className={styles.drawer__hint__header__title}>[{selectedKeyword || "키워드"}]에 관련된 질문</p>
                     </div>
-
-                    <div
-                        className={`${styles.drawer__hint__list} ${!hintOn ? styles["drawer__hint__list--hidden"] : ""
-                            }`}
-                    >
-                        <p className={styles.drawer__hint__item}>1. 혹시 [여행지] 가봤나요? 저는 최근에 [여행지]에 가봤는데 진짜 좋았어요.</p>
-                        <p className={styles.drawer__hint__item}>2. 여행을 떠날 때 꼭 챙겨가는 필수 물품이 있으신가요?</p>
-                        <p className={styles.drawer__hint__item}>3. 여행 계획을 세울 때 가장 중요한 점은 무엇인가요?</p>
-                    </div>
+                    <ul className={`${styles.drawer__hint__list} ${!hintOn ? styles["drawer__hint__list--hidden"] : ""}`}>
+                        {hints.map((hint, index) => (
+                            <li key={index} className={styles.drawer__hint__list__item}>
+                                {hint}
+                            </li>
+                        ))}
+                    </ul>
                 </div>
 
                 {/* 채팅 */}

@@ -73,13 +73,16 @@
             }
         }
 
-        
+
 
         &__voice {
             background-image: url('../../../assets/images/chat_voice.png');
             background-size: 100%;
             background-repeat: no-repeat;
             background-position: center;
+            background-position: top;
+
+            cursor: pointer;
         }
 
         &__video {
@@ -87,6 +90,7 @@
             background-size: 100%;
             background-repeat: no-repeat;
             background-position: center;
+            background-position: bottom;
         }
     }
 
