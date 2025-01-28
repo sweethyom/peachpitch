@@ -1,14 +1,15 @@
-import Header from '../../components/header/Header';
-import Footer from '../../components/footer/Footer';
+import Header from '@/components/header/Header';
+import Footer from '@/components/footer/Footer';
 
 import styles from './styles/main.module.scss';
 
-import medal1 from '../../assets/icons/medal1.png';
-import medal2 from '../../assets/icons/medal2.png';
-import medal3 from '../../assets/icons/medal3.png';
+import medal1 from '@/assets/icons/medal1.png';
+import medal2 from '@/assets/icons/medal2.png';
+import medal3 from '@/assets/icons/medal3.png';
 import { Link } from 'react-router-dom';
 
 function MainPage() {
+
   return (
     <>
       <Header />
@@ -20,6 +21,7 @@ function MainPage() {
           </div>
 
           <div className={styles.main__chat}>
+            {/* AI와 스몰토킹 */}
             <Link to="/chat/ai" className={styles.main__link}>
               <div className={styles.main__chat__voice}>
                 <p className={styles.voice}>AI와 스몰토킹</p>
@@ -27,6 +29,7 @@ function MainPage() {
               </div>
             </Link>
 
+            {/* 1:1 매칭 스몰토킹 */}
             <Link to="/chat/video" className={styles.main__link}>
               <div className={styles.main__chat__video}>
                 <p className={styles.video}>1:1 매칭 스몰토킹</p>

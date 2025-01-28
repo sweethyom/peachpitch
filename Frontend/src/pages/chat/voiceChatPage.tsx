@@ -11,22 +11,39 @@ import Drawer from '@/components/chat/Drawer';
 import { useState } from 'react';
 
 import RoomLeaveModal from '@/components/modal/RoomLeave';
-
+import KeywordModal from '@/components/modal/Keyword';
+import RedAlert from '@/components/alert/redAlert';
 
 function voiceChatPage() {
 
   /* 대화 나가기 모달창 */
   const [isLeaveOpen, setIsLeaveOpen] = useState(false);
+  const toggleLeave = () => setIsLeaveOpen(!isLeaveOpen);
 
-  const toggleLeave = () => {
-    setIsLeaveOpen(!isLeaveOpen);
+  /* 키워드 모달창 */
+  const [isKeywordOpen, setIsKeywordOpen] = useState(true);
+  const toggleKeyword = () => setIsKeywordOpen(!isKeywordOpen);
+
+  /* 키워드 상태 */
+  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
+
+  /* alert 창 */
+  const [showAlert, setShowAlert] = useState(false);
+
+  /* 시작하기 버튼 클릭 시 */
+  const handleStartClick = () => {
+    if (!selectedKeyword) {
+      setShowAlert(true);
+      return;
+    }
+    setIsKeywordOpen(false); // 키워드가 선택된 경우 모달 닫기
   };
 
   return (
     <div className={styles.page}>
 
       <div className={styles.menu}>
-        <Drawer />
+        <Drawer selectedKeyword={selectedKeyword} />
       </div>
 
       <div className={styles.chat}>
@@ -49,7 +66,7 @@ function voiceChatPage() {
           </div>
           <div className={styles.chat__ai__bubble}>
             <div className={styles.bubble__left}>
-              여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?
+              {selectedKeyword || "여행"}에 대해 이야기 나누기 좋아요! 최근에 가장 기억에 남는 일이 있으신가요?
             </div>
           </div>
         </div>
@@ -64,7 +81,6 @@ function voiceChatPage() {
           <div className={styles.chat__user__video}>
             <WebcamComponent />
           </div>
-
         </div>
 
         {/* 음성챗 */}
@@ -77,10 +93,28 @@ function voiceChatPage() {
 
       <Footer />
 
+      {/* 키워드 모달 */}
+      <KeywordModal
+        isOpen={isKeywordOpen}
+        onClose={toggleKeyword}
+        setSelectedKeyword={setSelectedKeyword}>
+        <div className={styles.btn} onClick={handleStartClick}>시작하기</div>
+      </KeywordModal>
+
+      {/* 키워드 선택안했을 경우 뜨는 alert창 */}
+      {showAlert && (
+        <div style={{ zIndex: 9999 }}>
+          <RedAlert
+            message="키워드를 선택해주세요!"
+            onClose={() => setShowAlert(false)}
+          />
+        </div>
+      )}
+
       {/* 대화 나가기 모달 */}
       <RoomLeaveModal isOpen={isLeaveOpen} onClose={toggleLeave} />
     </div>
   )
 }
 
-export default voiceChatPage
+export default voiceChatPage;

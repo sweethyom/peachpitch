@@ -1,3 +1,7 @@
+li {
+    list-style-type: none;
+}
+
 .drawer {
     display: flex;
     flex-direction: column;
@@ -58,6 +62,10 @@
             border-radius: 8px;
             color: var(--color-white-000);
             background-color: var(--color-brown-200);
+        }
+
+        &__limit {
+            margin-left: 10px;
         }
     }
 
