@@ -3,14 +3,25 @@ import Footer from '@/components/footer/Footer';
 import styles from './styles/voice.module.scss'
 
 import leaveBtn from '@/assets/icons/leave.png'
-import { Link } from 'react-router-dom';
 
 import sstBtn from '@/assets/icons/chat_sst.png'
 import Video from '@/components/chat/Video'
 import WebcamComponent from '@/components/chat/WebcamComponent';
 import Drawer from '@/components/chat/Drawer';
+import { useState } from 'react';
+
+import RoomLeaveModal from '@/components/modal/RoomLeave';
+
 
 function voiceChatPage() {
+
+  /* 대화 나가기 모달창 */
+  const [isLeaveOpen, setIsLeaveOpen] = useState(false);
+
+  const toggleLeave = () => {
+    setIsLeaveOpen(!isLeaveOpen);
+  };
+
   return (
     <div className={styles.page}>
 
@@ -23,9 +34,12 @@ function voiceChatPage() {
         {/* 채팅 헤더 부분 */}
         <div className={styles.chat__header}>
           <p className={styles.chat__header__title}>AI와 스몰토크</p>
-          <Link to="/main">
-            <img src={leaveBtn} className={styles.chat__header__img} />
-          </Link>
+
+          {/* 대화 나가기 아이콘 */}
+          <img
+            src={leaveBtn}
+            onClick={toggleLeave}
+            className={styles.chat__header__img} />
         </div>
 
         {/* AI 캐릭터 */}
@@ -62,6 +76,9 @@ function voiceChatPage() {
       </div>
 
       <Footer />
+
+      {/* 대화 나가기 모달 */}
+      <RoomLeaveModal isOpen={isLeaveOpen} onClose={toggleLeave} />
     </div>
   )
 }
