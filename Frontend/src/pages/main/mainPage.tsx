@@ -30,7 +30,7 @@ function MainPage() {
             </Link>
 
             {/* 1:1 매칭 스몰토킹 */}
-            <Link to="/chat/voice" className={styles.main__link}>
+            <Link to="/chat/video" className={styles.main__link}>
               <div className={styles.main__chat__video}>
                 <p className={styles.video}>1:1 매칭 스몰토킹</p>
                 <p className={styles.video__description}>사람과의 스몰토킹 너두 할 수 있어!</p>
