@@ -7,8 +7,41 @@ import medal1 from '@/assets/icons/medal1.png';
 import medal2 from '@/assets/icons/medal2.png';
 import medal3 from '@/assets/icons/medal3.png';
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 function MainPage() {
+  const [randomTalks, setRandomTalks] = useState<string[]>([]);
+  const [currentTalk, setCurrentTalk] = useState('');
+  const [nextTalk, setNextTalk] = useState('');
+  const [rotate, setRotate] = useState(false);
+
+  useEffect(() => {
+    fetch('/data/random_talks.json')
+      .then(response => response.json())
+      .then(data => {
+        setRandomTalks(data.random_talks);
+        if (data.random_talks.length > 0) {
+          setCurrentTalk(data.random_talks[Math.floor(Math.random() * data.random_talks.length)]);
+        }
+      })
+      .catch(error => console.error('Error fetching random talks:', error));
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (randomTalks.length > 0) {
+        setNextTalk(randomTalks[Math.floor(Math.random() * randomTalks.length)]);
+        setRotate(true);
+
+        setTimeout(() => {
+          setCurrentTalk(nextTalk);
+          setRotate(false);
+        }, 600);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [randomTalks, nextTalk]);
 
   return (
     <>
@@ -17,11 +50,12 @@ function MainPage() {
         <div className={styles.main}>
           <div className={styles.main__random}>
             <p className={styles.main__random__title}>오늘의 토킹</p>
-            <p className={styles.main__random__content}>사랑은 머리가 아니라 가슴으로 하는 거거던요...</p>
+            <p className={`${styles.main__random__content} ${rotate ? styles.rotateOut : styles.rotateIn}`}>
+              {currentTalk}
+            </p>
           </div>
 
           <div className={styles.main__chat}>
-            {/* AI와 스몰토킹 */}
             <Link to="/chat/ai" className={styles.main__link}>
               <div className={styles.main__chat__voice}>
                 <p className={styles.voice}>AI와 스몰토킹</p>
@@ -29,7 +63,6 @@ function MainPage() {
               </div>
             </Link>
 
-            {/* 1:1 매칭 스몰토킹 */}
             <Link to="/chat/video" className={styles.main__link}>
               <div className={styles.main__chat__video}>
                 <p className={styles.video}>1:1 매칭 스몰토킹</p>
