@@ -8,6 +8,8 @@ import timerIcon from "@/assets/icons/drawer_timer.png";
 import hintIcon from "@/assets/icons/drawer_hint.png";
 import chatBtn from "@/assets/icons/drawer_chatting.png";
 
+import FeedbackModal from "@/components/modal/Feedback"
+
 type DrawerProps = {
     selectedKeyword: string | null;
 };
@@ -60,6 +62,11 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
         loadHints();
     }, [selectedKeyword]);
 
+    // 피드백 토글
+    const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+
+    const toggleFeedback = () => { setIsFeedbackOpen(!isFeedbackOpen) };
+
     return (
         <div>
             {/* 드로어 */}
@@ -67,6 +74,7 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
                 {/* 공통 헤더 */}
                 <div className={styles.drawer__header}>
                     <img src={closeBtn} onClick={toggleDrawer} width={"12px"} height={"23px"} />
+                    <button onClick={toggleFeedback}>피드백</button>
                     <img src={settingBtn} width={"30px"} />
                 </div>
 
@@ -172,6 +180,9 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
                     <img src={openBtn} width={"40px"} />
                 </button>
             )}
+
+            {/* 피드백 모달 */}
+            <FeedbackModal isOpen={isFeedbackOpen} onClose={toggleFeedback} />
         </div>
     );
 };
