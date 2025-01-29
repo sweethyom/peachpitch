@@ -145,3 +145,22 @@
         text-align: center;
     }
 }
+
+@keyframes rotateOut {
+    0% { transform: rotateX(0); opacity: 1; }
+    100% { transform: rotateX(90deg); opacity: 0; }
+  }
+  
+  @keyframes rotateIn {
+    0% { transform: rotateX(-90deg); opacity: 0; }
+    100% { transform: rotateX(0); opacity: 1; }
+  }
+  
+  .rotateOut {
+    animation: rotateOut 0.6s ease forwards;
+  }
+  
+  .rotateIn {
+    animation: rotateIn 0.6s ease forwards;
+  }
+  
