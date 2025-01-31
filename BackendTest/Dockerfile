@@ -1,0 +1,13 @@
+FROM openjdk:17-jdk
+
+# UTF-8 로케일 설정
+ENV LANG=ko_KR.UTF-8
+ENV LANGUAGE=ko_KR:ko
+ENV LC_ALL=ko_KR.UTF-8
+
+WORKDIR /spring-boot
+
+# 애플리케이션 복사 및 실행 설정
+COPY build/libs/*SNAPSHOT.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "/spring-boot/app.jar"]

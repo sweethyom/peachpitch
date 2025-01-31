@@ -1,0 +1,52 @@
+version: '3'
+services: # 컨테이너
+  db:
+    image: mysql
+    container_name: peachpitchmysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=pikapikapika1234
+      - MYSQL_DATABASE=root
+    ports:
+      - "13306:3306"
+    networks:
+      - app-network
+    volumes:
+      # 데이터 베이스 초기화(init.sql)
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql_data:/var/lib/mysql  # MySQL 데이터 디렉터리를 외부로 마운트
+
+  spring-boot-app:
+    image: spring-boot
+    container_name: spring-boot-container
+    ports:
+      - "8080:8080"
+    links:
+      - db
+    depends_on:
+      - db # spring-boot-app
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/test?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
+    restart: always
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:latest
+    container_name: nginx-container
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro  # nginx.conf 마운트
+    depends_on:
+      - spring-boot-app
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql_data: # Docker 볼륨 선언
