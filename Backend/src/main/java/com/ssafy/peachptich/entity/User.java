@@ -11,18 +11,19 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    // @NotNull과 @NotEmpty가 deprecated된 것 같음..
+    @Setter
     @Column(unique = true, length = 40, nullable = false)
     private String email;
 
-    @Column(length = 40, nullable = false)
+    @Setter
+    @Column(length = 1000, nullable = false)
     private String password;
 
     @Column(length = 40)
@@ -31,10 +32,14 @@ public class User {
     @Column(length = 100)
     private String snsType;
 
+    @Setter
     private LocalDate birth;
 
     @ColumnDefault("1")
     private Boolean status;
+
+    @Setter
+    private String role;
 
     @Builder
     public User(String email, String password, LocalDate birth) {
@@ -42,5 +47,13 @@ public class User {
         this.birth = birth;
         this.password = password;
     }
+
+    /*
+        ## password와 role 필드에 @Setter를 적용한 이유
+
+        - 어차피 setPassword(), setRole() 메소드를 public으로 따로 생성해줄 것이라면
+        @Setter를 사용하여 자동으로 set 메소드가 생성되도록 하는 것과 별반 차이가 없음
+        -> 코드 간소화를 위해 @Setter를 적용함
+     */
 
 }
