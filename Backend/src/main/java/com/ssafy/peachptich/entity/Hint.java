@@ -6,7 +6,6 @@ import lombok.*;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class Hint {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
