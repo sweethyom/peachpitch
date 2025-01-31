@@ -1,7 +1,7 @@
 services: # 컨테이너
   db:
     image: mysql
-    container_name: peachpitchmysql
+    container_name: mysql-container
     environment:
       - MYSQL_ROOT_PASSWORD=pikapikapika1234
       - MYSQL_DATABASE=root
