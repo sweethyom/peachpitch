@@ -1,18 +1,18 @@
 services: # 컨테이너
-  db:
-    image: mysql
-    container_name: mysql-container
-    environment:
-      - MYSQL_ROOT_PASSWORD=pikapikapika1234
-      - MYSQL_DATABASE=root
-    ports:
-      - "13306:3306"
-    networks:
-      - app-network
-    volumes:
-      # 데이터 베이스 초기화(init.sql)
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - mysql_data:/var/lib/mysql  # MySQL 데이터 디렉터리를 외부로 마운트
+#  db:
+#    image: mysql
+#    container_name: mysql-container
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=pikapikapika1234
+#      - MYSQL_DATABASE=root
+#    ports:
+#      - "13306:3306"
+#    networks:
+#      - app-network
+#    volumes:
+#      # 데이터 베이스 초기화(init.sql)
+#      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+#      - mysql_data:/var/lib/mysql  # MySQL 데이터 디렉터리를 외부로 마운트
 
   spring-boot-app:
     image: spring-boot
@@ -25,7 +25,7 @@ services: # 컨테이너
     depends_on:
       - db # spring-boot-app
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/test?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+      - SPRING_DATASOURCE_URL=jdbc:mysql://43.201.5.129:13306/test?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
     restart: always
