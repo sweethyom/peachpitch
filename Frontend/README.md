@@ -1,50 +1,59 @@
-# React + TypeScript + Vite
+# PeachPitch
+React Project - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<br>
 
-Currently, two official plugins are available:
+<center>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+<img src="https://shields.io/badge/React-18.3.1-61DAFB">
+<img src="https://shields.io/badge/Vite-6.0.5-646CFF">
+<img src="https://shields.io/badge/Typescript-5.6.2-3178C6">
 
-## Expanding the ESLint configuration
+</center>
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+<br>
+<br>
 
-- Configure the top-level `parserOptions` property like this:
+## Installation
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+1. 레포지토리 클론
+
+```console
+git clone https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201.git
+cd Frontend
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+2. 패키지 설치
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+```console
+npm install --legacy-peer-deps
 ```
+
+3. 개발 서버 실행
+
+```console
+npm run dev
+```
+
+<br>
+
+## Getting Started
+
+1. 환경 변수 설정: .env 파일을 생성하여 필요한 환경 변수를 설정하세요.
+2. AI 서비스 활성화: AI 기능을 사용하려면 API 키를 발급받아 .env에 추가하세요.
+3. WebRTC 설정: 화상 채팅 기능을 위해 WebRTC 서버 설정이 필요합니다.
+4. 빌드 및 배포:
+```console
+npm run build
+npm run preview
+```
+
+<br>
+<br>
+
+## Checklist
+
+
+
+<br>
+<br>
