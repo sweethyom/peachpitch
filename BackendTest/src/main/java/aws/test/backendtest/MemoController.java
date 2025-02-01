@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 @RestController
-@RequestMapping("/memo")
 public class MemoController {
 
     private final Logger logger = LoggerFactory.getLogger(MemoController.class);
@@ -18,6 +17,11 @@ public class MemoController {
 
     public MemoController(MemoRepository memoRepository) {
         this.memoRepository = memoRepository;
+    }
+
+    @GetMapping("/health-check")
+    public String healthCheck() {
+        return "OK";
     }
 
     // id를 동적으로 받도록 변경
