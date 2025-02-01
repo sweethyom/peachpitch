@@ -19,7 +19,7 @@ services: # 컨테이너
     build: .
     container_name: spring-boot-container
     ports:
-      - "8080:8080"
+      - "8081:8083"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://43.201.5.129:13306/test?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
       - SPRING_DATASOURCE_USERNAME=root
