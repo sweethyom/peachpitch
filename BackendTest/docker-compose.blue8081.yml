@@ -1,1 +1,12 @@
-8081
+version: '3.1'
+
+services:
+  api:
+    image: yuseon7129/peachpitch:blue8081
+    container_name: blue-8081
+    environment:
+      - TZ=Asia/Seoul
+      - LANG=ko_KR.UTF-8
+      - HTTP_PORT=8081
+    ports:
+      - '8081:8081'
