@@ -33,6 +33,7 @@ do
     echo "서버 응답 확인하는중~(${cnt}/10)";
     UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/health-check)
     if [ "${UP}" != "OK" ]; then
+        echo "${UP}"
         sleep 10
         continue
     else
