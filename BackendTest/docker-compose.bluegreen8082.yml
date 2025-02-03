@@ -7,7 +7,6 @@ services:
     environment:
       - TZ=Asia/Seoul
       - LANG=ko_KR.UTF-8
-      - HTTP_PORT=8082
       - SPRING_DATASOURCE_URL=jdbc:mysql://43.201.5.129:13306/test?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
