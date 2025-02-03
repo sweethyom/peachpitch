@@ -31,7 +31,7 @@ echo "${AFTER_COLOR} server up(port:${AFTER_PORT})"
 for cnt in `seq 1 10`;
 do
     echo "서버 응답 확인하는중~(${cnt}/10)";
-    UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/api/health-check)
+    UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/health-check)
     if [ "${UP}" != "OK" ]; then
         sleep 10
         continue
