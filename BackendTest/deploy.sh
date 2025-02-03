@@ -2,8 +2,8 @@
 
 #0
 # 이미지 갱신
-sudo docker compose -p blue-8081 -f /home/ubuntu/docker-compose.blue8081.yml pull
-sudo docker compose -p green-8082 -f /home/ubuntu/docker-compose.green8082.yml pull
+sudo docker compose -p blue-8081 -f ./docker-compose.blue8081.yml pull
+sudo docker compose -p green-8082 -f ./docker-compose.green8082.yml pull
 
 #1
 EXIST_GITCHAN=$(sudo docker compose -p blue-8081 -f docker-compose.blue8081.yml ps | grep Up)
