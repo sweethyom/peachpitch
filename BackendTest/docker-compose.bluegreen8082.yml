@@ -2,8 +2,8 @@ version: '3.1'
 
 services:
   api:
-    image: yuseon7129/peachpitch:green8082
-    container_name: green-8082
+    image: yuseon7129/peachpitch:bluegreen8082
+    container_name: bluegreen-8082
     environment:
       - TZ=Asia/Seoul
       - LANG=ko_KR.UTF-8
