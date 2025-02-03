@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 @RestController
+@RequestMapping("/api")
 public class MemoController {
 
     private final Logger logger = LoggerFactory.getLogger(MemoController.class);
