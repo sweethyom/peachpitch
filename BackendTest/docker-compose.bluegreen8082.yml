@@ -13,3 +13,7 @@ services:
       - SPRING_JPA_HIBERNATE_DDL-AUTO=update
     ports:
       - '8082:8081'
+
+networks:
+  my-network:
+    external: true  # 기존 네트워크를 사용
