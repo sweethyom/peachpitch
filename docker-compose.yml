@@ -1,3 +1,5 @@
+version: '3.8'
+
 networks:
   my-network:
     driver: bridge
@@ -20,63 +22,3 @@ services:
 
 volumes:
   mysql-data:
-
-
-services:
-  springboot:
-    image: yuseon7129/peachpitch
-    build:
-      context: ./BackendTest
-    ports:
-      - "8081:8081"
-    networks:
-      - my-network
-    environment:
-      - TZ=Asia/Seoul
-      - LANG=ko_KR.UTF-8
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:13306/test?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
-      - SPRING_JPA_HIBERNATE_DDL-AUTO=update
-    # depends_on:
-    #   - mysql
-      # - redis
-
-
-  # django:
-    # image: django-image
-    # build:
-    #   context: ./AITest
-    # ports:
-    #   - "8000:8000"
-    # networks:
-    #   - my-network
-    # depends_on:
-    #   - mysql
-    #   - redis
-  
-
-  # react:
-  #   image: react-image
-  #   build:
-  #     context: ./test
-  #   ports:
-  #     - "3000:3000"
-  #   networks:
-  #     - my-network
-
-   # MySQL 서비스
-  # mysql:
-  #   image: mysql:latest
-  #   environment:
-  #     MYSQL_ROOT_PASSWORD: pikapikapika1234
-  #     MYSQL_DATABASE: test
-  #   networks:
-  #     - my-network
-
-  # Redis 서비스
-  # redis:
-  #   image: redis:latest
-  #   networks:
-  #     - app-network
-
