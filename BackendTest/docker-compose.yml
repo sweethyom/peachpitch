@@ -1,9 +1,10 @@
-version: '3.1'
+version: '3.8'
 
 services:
-  api:
-    image: yuseon7129/peachpitch:bluegreen8081
-    container_name: bluegreen-8081
+  springboot:
+    build: .
+    ports:
+      - "8081:8081"
     environment:
       - TZ=Asia/Seoul
       - LANG=ko_KR.UTF-8
@@ -11,9 +12,12 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
       - SPRING_JPA_HIBERNATE_DDL-AUTO=update
-    ports:
-      - '8081:8081'
+    networks:
+      - my-network
+    # depends_on:
+    #   - mysql
+    #   - redis
 
 networks:
   my-network:
-    external: true  # 기존 네트워크를 사용
+    external: true
