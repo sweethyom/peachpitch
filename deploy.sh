@@ -56,13 +56,13 @@ fi
 
 # 3. Nginx 설정 파일 수정 (포트 변경)
 echo "Nginx 설정 파일 업데이트..."
-sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/service-url.inc
+sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/default.inc
 sudo nginx -s reload
 echo "배포 완료!"
 
 # 4. 이전 환경(블루 서버) 중지
 echo "${BEFORE_COLOR} 서버 중지 (포트: ${BEFORE_PORT})"
-sudo docker compose -p bluegreen-${BEFORE_COLOR} -f docker-compose.bluegreen${BEFORE_COLOR}.yml down
+sudo docker compose -p bluegreen-${BEFORE_COLOR} -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen${BEFORE_COLOR}.yml down
 
 # 5. 사용되지 않는 Docker 이미지 정리
 echo "사용되지 않는 Docker 이미지 삭제 중..."
