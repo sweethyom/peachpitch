@@ -15,9 +15,6 @@ public class HintServiceImpl implements HintService {
 
     @Override
     public List<HintResponseDto> getHints(Long keywordId) {
-        return hintRepository.findByKeyword_KeywordId(keywordId).stream().map(hint ->
-                HintResponseDto.builder().hint(hint.getHint())
-                        .build())
-                .collect(Collectors.toList());
+        return hintRepository.findByKeywordId(keywordId);
     }
 }

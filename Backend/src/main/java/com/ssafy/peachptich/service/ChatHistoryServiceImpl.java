@@ -39,4 +39,21 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
         chatHistoryRepository.save(chatHistory);
         return chatHistory.getHistoryId();
     }
+
+    @Override
+    public void updateKeywordByUserId(Long historyId, Long userId, Long keywordId) {
+        //historyId로 해당 history를 찾음
+        //userId로 해당 history에서 1인지 2인지 찾음
+        //1이면 keyword1에 업데이트, 2면 keyword2에 업데이트
+        int updatedRows = 0;
+
+        if (chatHistoryRepository.updateUser1Keyword(historyId, userId, keywordId) > 0) {
+            updatedRows++;
+        } else if (chatHistoryRepository.updateUser2Keyword(historyId, userId, keywordId) > 0) {
+            updatedRows++;
+        }
+        if (updatedRows == 0) {
+            throw new IllegalArgumentException("유효하지 않은 userId 또는 historyId");
+        }
+    }
 }
