@@ -15,5 +15,5 @@ services:
       - '8081:8081'
 
 networks:
-  my-network:
-    external: true  # 기존 네트워크를 사용
+  bridge:
+    external: true
