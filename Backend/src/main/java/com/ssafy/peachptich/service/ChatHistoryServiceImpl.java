@@ -56,4 +56,19 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
             throw new IllegalArgumentException("유효하지 않은 userId 또는 historyId");
         }
     }
+
+    @Override
+    public void updateFeedbackByUserId(Long historyId, Long userId, String feedback) {
+        int updatedRows = 0;
+
+        if(chatHistoryRepository.updateUser1Feedback(historyId, userId, feedback) > 0) {
+            updatedRows++;
+        }
+        if(chatHistoryRepository.updateUser2Feedback(historyId, userId, feedback) > 0) {
+            updatedRows++;
+        }
+        if (updatedRows == 0) {
+            throw new IllegalArgumentException("유효하지 않은 userId 또는 historyId");
+        }
+    }
 }

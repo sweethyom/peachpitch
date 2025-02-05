@@ -19,4 +19,16 @@ public interface ChatHistoryRepository extends JpaRepository<ChatHistory, Long> 
     @Transactional
     @Query("UPDATE ChatHistory c SET c.keyword2Id = :keywordId WHERE c.historyId = :historyId AND c.user2Id = :userId")
     int updateUser2Keyword(@Param("historyId") Long historyId, @Param("userId") Long userId, @Param("keywordId") Long keywordId);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE ChatHistory c SET c.user1Feedback = :feedback WHERE c.historyId = :historyId AND c.user1Id = :userId")
+    int updateUser1Feedback(@Param("historyId") Long historyId, @Param("userId") Long userId, @Param("feedback") String feedback);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE ChatHistory c SET c.user2Feedback = :feedback WHERE c.historyId = :historyId AND c.user2Id = :userId")
+    int updateUser2Feedback(@Param("historyId") Long historyId, @Param("userId") Long userId, @Param("feedback") String feedback);
+
 }
+
