@@ -57,6 +57,10 @@ public class ChatHistory {
     public void sendUser2Keyword2(Long keyword2Id) {
         this.keyword2Id = keyword2Id;
     }
+    public void setUser2(Long user2Id, String user2Name) {
+        this.user2Id = user2Id;
+        this.user2Name = user2Name;
+    }
 
     /**
      * AI와 대화
@@ -69,32 +73,11 @@ public class ChatHistory {
      */
     @Builder
     public ChatHistory(Long user1Id, Long keyword1Id, LocalDateTime createdAt, boolean status, String user1Name) {
-        System.out.println("Builder constructor called with keyword1Id: " + keyword1Id); // 디버깅 로그 추가
         this.user1Id = user1Id;
         this.keyword1Id = keyword1Id;
         this.createdAt = createdAt;
         this.status = status;
         this.user1Name = user1Name;
-    }
-
-    /**
-     * 1:1 대화
-     *
-     * @param user1Id
-     * @param user2Id
-     * @param createdAt
-     * @param status
-     * @param user1Name
-     * @param user2Name
-     */
-    @Builder(builderMethodName = "createForVideoChat")
-    public ChatHistory(Long user1Id, Long user2Id, LocalDateTime createdAt, boolean status, String user1Name, String user2Name) {
-        this.user1Id = user1Id;
-        this.user2Id = user2Id;
-        this.createdAt = createdAt;
-        this.status = status;
-        this.user1Name = user1Name;
-        this.user2Name = user2Name;
     }
 
 }
