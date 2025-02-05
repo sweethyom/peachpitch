@@ -1,5 +1,6 @@
 package com.ssafy.peachptich.controller;
 
+import com.ssafy.peachptich.dto.request.FeedbackRequestDto;
 import com.ssafy.peachptich.dto.request.VideoChatRequestDto;
 import com.ssafy.peachptich.dto.response.*;
 import com.ssafy.peachptich.service.ChatHistoryService;
@@ -40,12 +41,6 @@ public class VideoChatController {
                 result));
     }
 
-    /**
-     *
-     * @param userId
-     * @param videoChatRequestDto historyId, keywordId
-     * @return chatResponseDto historyId, List<HintResponseDto>
-     */
     @PostMapping("/keywords")
     public ResponseEntity<ResponseDto<ChatResponseDto>> requestVideoChatKeywords(
             @RequestHeader(value = "userId", required = false) Long userId,
@@ -69,4 +64,16 @@ public class VideoChatController {
                 .build();
         return ResponseEntity.ok(ResponseDto.of("Keyword added successfully", chatResponseDto));
     }
+
+    @PostMapping("/feedback")
+    public ResponseEntity<ResponseDto<Void>> requestVideoChatFeedback(
+            @RequestHeader(value = "userId", required = false) Long userId,
+            @RequestBody FeedbackRequestDto feedbackRequestDto)
+    {
+        Long historyId = feedbackRequestDto.getHistoryId();
+        String feedback = feedbackRequestDto.getFeedback();
+        chatHistoryService.updateFeedbackByUserId(historyId, userId, feedback);
+        return ResponseEntity.ok(ResponseDto.of("Successfully saved feedback", null));
+    }
+
 }
