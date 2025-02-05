@@ -51,12 +51,6 @@ public class ChatHistory {
     @Column(name = "user2_feedback", columnDefinition = "varchar(20)")
     private String user2Feedback;
 
-    public void sendUser1Keyword1(Long keyword1Id) {
-        this.keyword1Id = keyword1Id;
-    }
-    public void sendUser2Keyword2(Long keyword2Id) {
-        this.keyword2Id = keyword2Id;
-    }
     public void setUser2(Long user2Id, String user2Name) {
         this.user2Id = user2Id;
         this.user2Name = user2Name;

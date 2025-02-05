@@ -1,12 +1,16 @@
 package com.ssafy.peachptich.repository;
 
+import com.ssafy.peachptich.dto.response.HintResponseDto;
 import com.ssafy.peachptich.entity.Hint;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface HintRepository extends JpaRepository<Hint, Long> {
-    List<Hint> findByKeyword_KeywordId(Long keywordId);
+    @Query("SELECT new com.ssafy.peachptich.dto.response.HintResponseDto(h.hint) FROM Hint h WHERE h.keyword.keywordId = :keywordId")
+    List<HintResponseDto> findByKeywordId(@Param("keywordId") Long keywordId);
 }
