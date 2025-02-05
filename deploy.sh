@@ -8,7 +8,7 @@ sudo docker compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/BackendTest/doc
 #sudo docker compose -p bluegreen-react -f /home/ubuntu/S12P11D201/test/docker-compose.react.yml pull
 
 # 1. 실행 중인 컨테이너 확인
-EXIST_GITCHAN=$(sudo docker compose -p blue-8081 -f docker-compose.bluegreen8081.yml ps | grep Up)
+EXIST_GITCHAN=$(sudo docker compose -p blue-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml ps | grep Up)
 
 # 8081(블루 환경) 또는 8082(그린 환경)가 실행 중인지 확인
 if [ -z "$EXIST_GITCHAN" ]; then
