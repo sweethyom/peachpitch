@@ -1,7 +1,7 @@
 package com.ssafy.peachptich.controller;
 
 import com.ssafy.peachptich.dto.request.AudioChatRequestDto;
-import com.ssafy.peachptich.dto.response.AudioChatResponseDto;
+import com.ssafy.peachptich.dto.response.ChatResponseDto;
 import com.ssafy.peachptich.dto.response.HintResponseDto;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.RandomName;
@@ -26,7 +26,7 @@ public class AudioChatController {
     private final RandomName randomName;
 
     @PostMapping("/api/chat/ai/keywords")
-    public ResponseEntity<ResponseDto<AudioChatResponseDto>> createChat(
+    public ResponseEntity<ResponseDto<ChatResponseDto>> createChat(
             @RequestHeader(value = "userId", required = false) Long userId,
             @RequestBody AudioChatRequestDto audioChatRequestDto) {
         // userId 있으면 대화내역에 추가 -> 추후 jwt 토큰으로 변경
@@ -43,10 +43,10 @@ public class AudioChatController {
             // 유저가 고른 키워드 추가
             userKeywordService.saveOrUpdate(userId, keywordId);
         }
-        AudioChatResponseDto audioChatResponseDto = AudioChatResponseDto.builder()
+        ChatResponseDto chatResponseDto = ChatResponseDto.builder()
                 .hints(hints)
                 .historyId(historyId)
                 .build();
-        return ResponseEntity.ok(ResponseDto.of("Keyword added and create AI room successfully", audioChatResponseDto));
+        return ResponseEntity.ok(ResponseDto.of("Keyword added and create AI room successfully", chatResponseDto));
     }
 }
