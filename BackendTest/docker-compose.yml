@@ -13,11 +13,11 @@ services:
       - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
       - SPRING_JPA_HIBERNATE_DDL-AUTO=update
     networks:
-      - bridge
+      - peachpitch-network
     # depends_on:
     #   - mysql
     #   - redis
 
 networks:
-  bridge:
+  peachpitch-network:
     external: true
