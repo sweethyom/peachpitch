@@ -1,24 +1,15 @@
-# version: '3.8'
+version: '3.8'
 
-# networks:
-#   bridge:
-#     external: true
-
-# services:
-#   mysql:
-#     image: mysql:latest
-#     environment:
-#       MYSQL_ROOT_PASSWORD: pikapikapika1234
-#       MYSQL_DATABASE: test
-#     networks:
-#       - bridge
-#     volumes:
-#       - mysql-data:/var/lib/mysql
-
-#   redis:
-#     image: redis:latest
-#     networks:
-#       - my-network
-
-# volumes:
-#   mysql-data:
+services:
+  react:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    network:
+      - peachpitch-network
+      
+networks:
+  peachpitch-network:
+    external: true
