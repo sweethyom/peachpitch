@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class AudioChatResponseDto {
+public class ChatResponseDto {
     private Long historyId; // 로그인 하지 않은 유저는 null 반환
     private List<HintResponseDto> hints;
 }
