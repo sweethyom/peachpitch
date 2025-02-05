@@ -14,8 +14,8 @@ services:
     ports:
       - '8082:8081'
     networks:
-      - bridge
+      - peachpitch-network
 
 networks:
-  bridge:
+  peachpitch-network:
     external: true
