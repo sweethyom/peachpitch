@@ -1,24 +1,24 @@
-version: '3.8'
+# version: '3.8'
 
-networks:
-  my-network:
-    driver: bridge
+# networks:
+#   bridge:
+#     external: true
 
-services:
-  mysql:
-    image: mysql:latest
-    environment:
-      MYSQL_ROOT_PASSWORD: pikapikapika1234
-      MYSQL_DATABASE: test
-    networks:
-      - my-network
-    volumes:
-      - mysql-data:/var/lib/mysql
+# services:
+#   mysql:
+#     image: mysql:latest
+#     environment:
+#       MYSQL_ROOT_PASSWORD: pikapikapika1234
+#       MYSQL_DATABASE: test
+#     networks:
+#       - bridge
+#     volumes:
+#       - mysql-data:/var/lib/mysql
 
-  redis:
-    image: redis:latest
-    networks:
-      - my-network
+#   redis:
+#     image: redis:latest
+#     networks:
+#       - my-network
 
-volumes:
-  mysql-data:
+# volumes:
+#   mysql-data:
