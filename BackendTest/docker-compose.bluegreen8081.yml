@@ -11,6 +11,7 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
       - SPRING_JPA_HIBERNATE_DDL-AUTO=update
+      - SERVER_PORT=8081
     ports:
       - '8081:8081'
     networks:
