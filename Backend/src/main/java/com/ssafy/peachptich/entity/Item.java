@@ -15,6 +15,9 @@ public class Item {
     @Column(length = 40, nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private Integer price;
+
     @Builder
     public Item(String name) {
         this.name = name;
