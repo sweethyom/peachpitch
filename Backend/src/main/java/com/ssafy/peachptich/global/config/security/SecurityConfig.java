@@ -1,22 +1,25 @@
 package com.ssafy.peachptich.global.config.security;
 
+import com.ssafy.peachptich.global.config.jwt.CustomLogoutFilter;
 import com.ssafy.peachptich.global.config.jwt.TokenProvider;
 import com.ssafy.peachptich.global.config.jwt.JwtFilter;
-import com.ssafy.peachptich.global.config.jwt.LoginFilter;
+import com.ssafy.peachptich.global.config.jwt.CustomLoginFilter;
+import com.ssafy.peachptich.repository.RefreshRepository;
+import com.ssafy.peachptich.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -29,6 +32,8 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final TokenProvider tokenProvider;
+    private final RefreshRepository refreshRepository;
+    private final UserRepository userRepository;
 
 
 //    @Bean
@@ -51,11 +56,27 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, TokenProvider tokenProvider,
+                                           RefreshRepository refreshRepository,
+                                           AuthenticationConfiguration authenticationConfiguration) throws Exception {
+//        http
+//                .authorizeHttpRequests((auth) -> auth
+//                        .requestMatchers("/api/main").permitAll()
+//                        .requestMatchers("/api/index", "/api/users/login", "/api/users/signup").permitAll()
+//                        .anyRequest().authenticated());
+
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/login", "/join").permitAll()
-                        .anyRequest().authenticated());
+                        .requestMatchers("/api/main", "/api/index", "/api/users/login", "/api/users/signup").permitAll()
+                        .anyRequest().authenticated()
+//                                .anyRequest().permitAll()
+                )
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            System.out.println("Requested URL: " + request.getRequestURI());
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+                        })
+                );
 
         http
                 .httpBasic((auth) -> auth.disable());
@@ -85,14 +106,20 @@ public class SecurityConfig {
                     }
                 })));
 
+        AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
+
         // JWTFilter 등록
         http
-                .addFilterBefore(new JwtFilter(tokenProvider), LoginFilter.class);
+                .addFilterBefore(new JwtFilter(tokenProvider, userRepository), CustomLoginFilter.class);
+
+        // CustomLogoutFilter 등록
+        http
+                .addFilterBefore(new CustomLogoutFilter(tokenProvider, refreshRepository), LogoutFilter.class);
 
         //필터 추가 LoginFilter()는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         // AuthenticationManager()와 JWTUtil 인수 전달
         http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), tokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), tokenProvider, userRepository, refreshRepository, authManager), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .sessionManagement((session) -> session
