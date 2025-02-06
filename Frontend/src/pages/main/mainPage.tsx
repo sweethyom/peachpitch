@@ -9,11 +9,69 @@ import medal3 from '@/assets/icons/medal3.png';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+// 핑거프린트 로직 추가
+import FingerprintJS from '@fingerprintjs/fingerprintjs';
+import axios from 'axios';
+// 페이지 이동을 위한 React Router의 navigate 훅 import
+import { useNavigate } from 'react-router-dom';
+
 function MainPage() {
   const [randomTalks, setRandomTalks] = useState<string[]>([]);
   const [currentTalk, setCurrentTalk] = useState('');
   const [nextTalk, setNextTalk] = useState('');
   const [rotate, setRotate] = useState(false);
+
+  // 핑거프린트
+  const navigate = useNavigate();
+  // 브라우저 핑거프린트를 저장할 상태 변수
+  const [fingerprint, setFingerprint] = useState<string | null>(null);
+
+  // 컴포넌트가 처음 렌더링될 때 핑거프린트 생성
+  useEffect(() => {
+    const generateFingerprint = async () => {
+      try {
+        const fp = await FingerprintJS.load();
+        const result = await fp.get();
+        setFingerprint(result.visitorId);
+      } catch (error) {
+        console.error('Fingerprint generation failed:', error);
+      }
+    };
+    generateFingerprint();
+  }, []);
+
+  // AI 채팅 버튼 클릭 시 실행되는 핸들러 함수
+  const handleAIChatClick = async (e: React.MouseEvent) => {
+    // 기본 링크 클릭 이벤트 방지
+    e.preventDefault();
+
+    // 핑거프린트가 생성되지 않았다면 함수 종료
+    if (!fingerprint) {
+      console.error('Fingerprint not generated');
+      return;
+    }
+
+    try {
+      // 서버에 핑거프린트를 보내서 무료 체험 가능 여부 확인
+      const response = await axios.post('/api/trial/check', {
+        fingerprint: fingerprint
+      });
+
+      // 서버 응답에 따른 처리
+      if (response.data.canAccess) {
+        // 무료 체험 가능하면 AI 채팅 페이지로 이동
+        navigate('/chat/ai');
+      } else {
+        // 이미 무료 체험을 사용했다면 로그인 페이지로 이동
+        alert('무료 체험은 1회만 가능합니다. 로그인해주세요.');
+        navigate('/login');
+      }
+    } catch (error) {
+      // 서버 통신 중 오류 발생 시 에러 처리
+      console.error('Trial check failed:', error);
+      alert('서비스 이용에 문제가 발생했습니다.');
+    }
+  };
 
   useEffect(() => {
     fetch('/data/random_talks.json')
@@ -56,12 +114,12 @@ function MainPage() {
           </div>
 
           <div className={styles.main__chat}>
-            <Link to="/chat/ai" className={styles.main__link}>
+            <div onClick={handleAIChatClick} className={styles.main__link}>
               <div className={styles.main__chat__voice}>
                 <p className={styles.voice}>AI와 스몰토킹</p>
                 <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
               </div>
-            </Link>
+            </div>
 
             <Link to="/chat/video" className={styles.main__link}>
               <div className={styles.main__chat__video}>
@@ -75,7 +133,7 @@ function MainPage() {
             <p className={styles.main__keyword__title}>🔥 현재 가장 인기 있는 키워드 🔥</p>
             <div className={styles.main__keyword__list}>
               <div className={styles.item}>
-                <img className={styles.item__medal} src={medal1} />
+                <img className={styles.item__medal} src={medal1}/>
                 <p className={styles.item__keyword}>취미</p>
               </div>
               <div className={styles.item}>
