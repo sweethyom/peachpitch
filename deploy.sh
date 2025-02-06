@@ -4,8 +4,9 @@
 echo "새로운 이미지를 가져옵니다..."
 sudo docker compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml pull
 sudo docker compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8082.yml pull
-#sudo docker compose -p bluegreen-django -f /home/ubuntu/S12P11D201/AITest/docker-compose.django.yml pull
-#sudo docker compose -p bluegreen-react -f /home/ubuntu/S12P11D201/test/docker-compose.react.yml pull
+#sudo docker compose -p bluegreen-django-8081 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8081.yml pull
+#sudo docker compose -p bluegreen-django-8082 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8082.yml pull
+sudo docker compose -p my-react -f /home/ubuntu/S12P11D201/test/docker-compose.yml pull
 
 # 1. 실행 중인 컨테이너 확인
 EXIST_GITCHAN=$(sudo docker compose -p blue-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml ps | grep Up)
@@ -14,6 +15,7 @@ EXIST_GITCHAN=$(sudo docker compose -p blue-8081 -f /home/ubuntu/S12P11D201/Back
 if [ -z "$EXIST_GITCHAN" ]; then
         echo "8081(블루) 환경이 실행되지 않음. 8081 환경 실행..."
         sudo docker compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml up -d --force-recreate
+        # sudo docker compose -p bluegreen-django-8081 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8081.yml up -d --force-recreate
         BEFORE_COLOR="8082"
         AFTER_COLOR="8081"
         BEFORE_PORT=8082
@@ -21,16 +23,16 @@ if [ -z "$EXIST_GITCHAN" ]; then
 else
         echo "8082(그린) 환경이 실행되지 않음. 8082 환경 실행..."
         sudo docker compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8082.yml up -d --force-recreate
+        # sudo docker compose -p bluegreen-django-8082 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8082.yml up -d --force-recreate
         BEFORE_COLOR="8081"
         AFTER_COLOR="8082"
         BEFORE_PORT=8081
         AFTER_PORT=8082
 fi
 
-# Django와 React도 실행
-#echo "Django 및 React 서버 실행..."
-#sudo docker compose -p bluegreen-django -f /home/ubuntu/S12P11D201/AITest/docker-compose.django.yml up -d --force-recreate
-#sudo docker compose -p bluegreen-react -f /home/ubuntu/S12P11D201/test/docker-compose.react.yml up -d --force-recreate
+# React 서버 실행
+echo "React 서버 실행..."
+sudo docker compose -p my-react -f /home/ubuntu/S12P11D201/test/docker-compose.yml up -d --force-recreate
 
 
 echo "${AFTER_COLOR} 서버가 실행되었습니다 (포트: ${AFTER_PORT})"
