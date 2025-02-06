@@ -16,6 +16,9 @@ public class Purchase {
     private Long purchaseId;
 
     @Column(nullable = false)
+    private String orderId;        // partner_order_id 저장용
+
+    @Column(nullable = false)
     private LocalDateTime paymentTime;
 
     @Column(nullable = false)
@@ -23,6 +26,9 @@ public class Purchase {
 
     @Column(nullable = false)
     private String method;
+
+    @Column(nullable = false)
+    private Integer totalPrice;
 
     @ManyToOne
     @JoinColumn(name="user_id", nullable = false)
@@ -33,10 +39,12 @@ public class Purchase {
     private Item item;
 
     @Builder
-    public Purchase(LocalDateTime paymentTime, Integer ea, String method, User user, Item item) {
+    public Purchase(String orderId, LocalDateTime paymentTime, Integer ea, String method, Integer totalPrice, User user, Item item) {
+        this.orderId = orderId;
         this.paymentTime = paymentTime;
         this.ea = ea;
         this.method = method;
+        this.totalPrice = totalPrice;
         this.user = user;
         this.item = item;
     }
