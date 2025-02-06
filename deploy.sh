@@ -4,8 +4,8 @@
 echo "새로운 이미지를 가져옵니다..."
 sudo docker compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml pull
 sudo docker compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8082.yml pull
-#sudo docker compose -p bluegreen-django-8081 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8081.yml pull
-#sudo docker compose -p bluegreen-django-8082 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8082.yml pull
+sudo docker compose -p bluegreen-django-8081 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8081.yml pull
+sudo docker compose -p bluegreen-django-8082 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8082.yml pull
 sudo docker compose -p my-react -f /home/ubuntu/S12P11D201/test/docker-compose.yml pull
 
 # 1. 실행 중인 컨테이너 확인 및 중복 제거
@@ -22,26 +22,30 @@ function remove_existing_container() {
 }
 
 # Blue-Green 환경에 따라 컨테이너 이름 설정
-BLUE_CONTAINER="bluegreen-8081"
-GREEN_CONTAINER="bluegreen-8082"
+BLUE_S_CONTAINER="bluegreen-8081"
+GREEN_S_CONTAINER="bluegreen-8082"
+BLUE_D_CONTAINER="bluegreen-django-8081"
+GREEN_D_CONTAINER="bluegreen-django-8082"
 
 # Blue-Green 배포 환경 전환
 EXIST_GITCHAN=$(sudo docker compose -p blue-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml ps | grep Up)
 
 if [ -z "$EXIST_GITCHAN" ]; then
     echo "8081(블루) 환경이 실행되지 않음. 8081 환경 실행..."
-    remove_existing_container $BLUE_CONTAINER
+    remove_existing_container $BLUE_S_CONTAINER
+    remove_existing_container $BLUE_D_CONTAINER
     sudo docker compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml up -d --force-recreate --remove-orphans
-    # sudo docker compose -p bluegreen-django-8081 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8081.yml up -d --force-recreate
+    sudo docker compose -p bluegreen-django-8081 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8081.yml up -d --force-recreate --remove-orphans
     BEFORE_COLOR="8082"
     AFTER_COLOR="8081"
     BEFORE_PORT=8082
     AFTER_PORT=8081
 else
     echo "8082(그린) 환경이 실행되지 않음. 8082 환경 실행..."
-    remove_existing_container $GREEN_CONTAINER
+    remove_existing_container $GREEN_S_CONTAINER
+    remove_existing_container $GREEN_D_CONTAINER
     sudo docker compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8082.yml up -d --force-recreate --remove-orphans
-    # sudo docker compose -p bluegreen-django-8082 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8082.yml up -d --force-recreate
+    sudo docker compose -p bluegreen-django-8082 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8082.yml up -d --force-recreate --remove-orphans
     BEFORE_COLOR="8081"
     AFTER_COLOR="8082"
     BEFORE_PORT=8081
@@ -81,10 +85,11 @@ if [ $cnt -eq 10 ]; then
 fi
 
 # 3. Nginx 설정 파일 수정 (포트 변경)
-# echo "Nginx 설정 파일 업데이트..."
+echo "Nginx 설정 파일 업데이트..."
 # sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/default.inc
 # sudo nginx -s reload
 # echo "배포 완료!"
+sudo docker restart my-nginx
 
 # 4. 이전 환경(블루 서버) 중지 및 정리 (중복 방지)
 echo "${BEFORE_COLOR} 서버 중지 (포트: ${BEFORE_PORT})"
