@@ -1,10 +1,9 @@
-import Footer from '../../components/footer/Footer';
+import Footer from '@/components/footer/Footer';
 
 import styles from './styles/video.module.scss'
 
-import leaveBtn from '../../assets/icons/leave.png'
-
-import sstBtn from '../../assets/icons/chat_sst.png'
+import leaveBtn from '@/assets/icons/leave.png'
+import sstBtn from '@/assets/icons/chat_stt.png'
 import WebcamComponent from '@/components/chat/WebcamComponent';
 
 import Drawer from '@/components/chat/Drawer';
