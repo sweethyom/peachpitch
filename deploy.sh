@@ -44,6 +44,11 @@ do
         sleep 10
         continue
     else
+        echo "peachpitch api health check"
+        UP2=$(curl -s https://peachpitch.site/api/health-check)
+        if [ "${UP2}" != "OK" ]; then
+        sleep 5
+        fi
         break
     fi
 done
