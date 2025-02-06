@@ -1,3 +1,4 @@
+
 package com.ssafy.peachptich.controller.users;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,3 +14,4 @@ public class AdminController {
         return "admin Controller";
     }
 }
+
