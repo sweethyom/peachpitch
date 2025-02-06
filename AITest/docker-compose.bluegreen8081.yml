@@ -2,6 +2,7 @@ version: '3.1'
 
 services:
   blue-django:
+    image: yuseon7129/django:bluegreen8081
     container_name: bluegreen-django-8081
     environment:
       - TZ=Asia/Seoul
