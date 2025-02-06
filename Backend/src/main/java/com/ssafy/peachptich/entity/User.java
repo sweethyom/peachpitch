@@ -35,7 +35,9 @@ public class User {
     @Setter
     private LocalDate birth;
 
-    @ColumnDefault("1")
+    @ColumnDefault("true")
+    @Column(columnDefinition = "TINYINT(1)")
+    @Setter
     private Boolean status;
 
     @Setter
