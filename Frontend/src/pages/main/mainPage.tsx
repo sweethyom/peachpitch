@@ -53,7 +53,7 @@ function MainPage() {
 
     try {
       // 서버에 핑거프린트를 보내서 무료 체험 가능 여부 확인
-      const response = await axios.post('/api/trial/check', {
+      const response = await axios.post('http://localhost:8080/api/trial/check', {
         fingerprint: fingerprint
       });
 
@@ -72,6 +72,31 @@ function MainPage() {
       alert('서비스 이용에 문제가 발생했습니다.');
     }
   };
+
+  // 프론트엔드 실행 코드
+  async function startTrial() {
+    try {
+      const result = await checkTrialEligibility();
+      if (result.canAccess) {
+        // AI 스피킹 연습 컴포넌트 표시
+        showSpeakingPractice();
+      } else {
+        // 로그인 유도 메시지 표시
+        showLoginPrompt();
+      }
+    } catch (error) {
+      showErrorMessage();
+    }
+  }
+
+  // function handleTrialError(error) {
+  //   if (error.response?.status === 403) {
+  //     showMessage('이미 체험을 사용하셨습니다. 로그인해주세요.');
+  //   } else {
+  //     showMessage('일시적인 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+  //   }
+  // }
+
 
   useEffect(() => {
     fetch('/data/random_talks.json')
