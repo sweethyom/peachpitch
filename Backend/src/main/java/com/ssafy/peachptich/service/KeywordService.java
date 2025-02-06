@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface KeywordService {
     List<KeywordResponseDto> getRandomKeywords();
+    String getKeyword(Long keywordId);
 }

@@ -7,7 +7,6 @@ import com.ssafy.peachptich.repository.KeywordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class KeywordServiceImpl implements KeywordService {
     private final KeywordRepository keywordRepository;
-
 
     @Override
     public List<KeywordResponseDto> getRandomKeywords() {
@@ -25,5 +23,11 @@ public class KeywordServiceImpl implements KeywordService {
                         .keyword(keyword.getKeyword())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getKeyword(Long keywordId) {
+        Keyword keyword = keywordRepository.findById(keywordId).orElseThrow(()-> new IllegalArgumentException("Keyword not found"));
+        return keyword.getKeyword();
     }
 }

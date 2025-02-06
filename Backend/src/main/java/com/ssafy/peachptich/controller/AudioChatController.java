@@ -7,6 +7,7 @@ import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.RandomName;
 import com.ssafy.peachptich.service.ChatHistoryService;
 import com.ssafy.peachptich.service.HintService;
+import com.ssafy.peachptich.service.KeywordService;
 import com.ssafy.peachptich.service.UserKeywordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class AudioChatController {
     private final ChatHistoryService chatHistoryService;
     private final UserKeywordService userKeywordService;
     private final RandomName randomName;
+    private final KeywordService keywordService;
 
     @PostMapping("/api/chat/ai/keywords")
     public ResponseEntity<ResponseDto<ChatResponseDto>> createChat(
@@ -33,6 +35,7 @@ public class AudioChatController {
         // 키워드 id가지고 hint를 찾음
         // 힌트 리스트 조회
         Long keywordId = audioChatRequestDto.getKeywordId();
+        String keyword = keywordService.getKeyword(keywordId);
         List<HintResponseDto> hints = hintService.getHints(keywordId);
 
         Long historyId = null; //기본적으로  null
@@ -45,6 +48,7 @@ public class AudioChatController {
         }
         ChatResponseDto chatResponseDto = ChatResponseDto.builder()
                 .hints(hints)
+                .keyword(keyword)
                 .historyId(historyId)
                 .build();
         return ResponseEntity.ok(ResponseDto.of("Keyword added and create AI room successfully", chatResponseDto));
