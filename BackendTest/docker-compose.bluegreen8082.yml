@@ -1,7 +1,7 @@
 version: '3.1'
 
 services:
-  api:
+  springboot-app:
     image: yuseon7129/peachpitch:bluegreen8082
     container_name: bluegreen-8082
     environment:

@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  react:
+  react-app:
     build: .
     container_name: my-react
     ports:
