@@ -1,9 +1,8 @@
 version: '3.1'
 
 services:
-  api:
-    image: yuseon7129/peachpitch:bluegreen8082
-    container_name: bluegreen-8082
+  green-django:
+    container_name: bluegreen-django-8082
     environment:
       - TZ=Asia/Seoul
       - LANG=ko_KR.UTF-8
@@ -15,7 +14,7 @@ services:
       - SPRING_REDIS_HOST=43.201.5.129
       - SPRING_REDIS_PORT=6379
     ports:
-      - '8082:8083'
+      - '8082:8084'
     networks:
       - peachpitch-network
 
