@@ -43,10 +43,10 @@ do
     if [ "${UP}" != "OK" ]; then
         sleep 10
         echo "peachpitch api health check"
-            UP2=$(curl -s https://peachpitch.site/api/health-check)
-            if [ "${UP2}" != "OK" ]; then
-                break
-            fi
+        UP2=$(curl -s https://peachpitch.site/api/health-check)
+        if [ "${UP2}" == "OK" ]; then
+            break
+        fi
         continue
     else
         break
