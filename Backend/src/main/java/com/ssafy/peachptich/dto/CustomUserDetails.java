@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -30,15 +31,23 @@ public class CustomUserDetails implements UserDetails {
         return userEntity.getEmail();
     }
 
+    public Long getUserId() {
+        return userEntity.getUserId();
+    }
+
     // UserDetails 인터페이스를 상속받아야 해서 무조건 Overriding 해야 함
     @Override
     public String getUsername(){
-        return "ok";
+        return userEntity.getEmail();
     }
 
     @Override
     public String getPassword(){
         return userEntity.getPassword();
+    }
+
+    public String getBirth(){
+        return userEntity.getBirth().toString();
     }
 
     @Override
