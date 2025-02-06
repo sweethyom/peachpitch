@@ -81,10 +81,10 @@ if [ $cnt -eq 10 ]; then
 fi
 
 # 3. Nginx 설정 파일 수정 (포트 변경)
-echo "Nginx 설정 파일 업데이트..."
-sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/default.inc
-sudo nginx -s reload
-echo "배포 완료!"
+# echo "Nginx 설정 파일 업데이트..."
+# sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/default.inc
+# sudo nginx -s reload
+# echo "배포 완료!"
 
 # 4. 이전 환경(블루 서버) 중지 및 정리 (중복 방지)
 echo "${BEFORE_COLOR} 서버 중지 (포트: ${BEFORE_PORT})"
