@@ -3,10 +3,7 @@ package com.ssafy.peachptich.controller;
 import com.ssafy.peachptich.dto.request.FeedbackRequestDto;
 import com.ssafy.peachptich.dto.request.VideoChatRequestDto;
 import com.ssafy.peachptich.dto.response.*;
-import com.ssafy.peachptich.service.ChatHistoryService;
-import com.ssafy.peachptich.service.HintService;
-import com.ssafy.peachptich.service.UserKeywordService;
-import com.ssafy.peachptich.service.VideoChatService;
+import com.ssafy.peachptich.service.*;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +21,7 @@ public class VideoChatController {
     private final HintService hintService;
     private final UserKeywordService userKeywordService;
     private final ChatHistoryService chatHistoryService;
+    private final KeywordService keywordService;
 
     @PostMapping("/request")
     public ResponseEntity<ResponseDto<RoomResponseDto>> requestVideoChatRoom(
@@ -53,13 +51,16 @@ public class VideoChatController {
         Long keywordId = videoChatRequestDto.getKeywordId();
         Long historyId = videoChatRequestDto.getHistoryId();
 
+        String keyword = keywordService.getKeyword(keywordId);
         // user가 고른 키워드로 힌트 반환
         List<HintResponseDto> hints = hintService.getHints(keywordId);
         // 유저가 고른 키워드 추가
         userKeywordService.saveOrUpdate(userId, keywordId);
+        // 대화 내역에 유저가 한 피드백 업데이트
         chatHistoryService.updateKeywordByUserId(historyId, userId, keywordId);
         ChatResponseDto chatResponseDto = ChatResponseDto.builder()
                 .hints(hints)
+                .keyword(keyword)
                 .historyId(historyId)
                 .build();
         return ResponseEntity.ok(ResponseDto.of("Keyword added successfully", chatResponseDto));
