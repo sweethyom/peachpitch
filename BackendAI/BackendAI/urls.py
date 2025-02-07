@@ -19,6 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('chatbotAPI.urls')),  # 추가된 부분
+    path('ai/', include('chatbotAPI.urls')),  # 추가된 부분
 ]
 
