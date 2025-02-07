@@ -91,7 +91,17 @@ echo "Nginx 설정 파일 업데이트..."
 # echo "배포 완료!"
 
 # Nginx 설정 파일 경로
-NGINX_CONF_PATH="/home/ubuntu/nginx_conf/default.conf"
+# NGINX_CONF_PATH="/home/ubuntu/nginx_conf/default.conf"
+NGINX_CONF_DIR="/home/ubuntu/nginx_conf"
+NGINX_CONF_PATH="${NGINX_CONF_DIR}/default.conf"
+
+if [ "$AFTER_COLOR" == "8081" ]; then
+    echo "Blue 환경(8081)으로 Nginx 설정 파일 교체..."
+    sudo cp ${NGINX_CONF_DIR}/default8081.conf $NGINX_CONF_PATH
+else
+    echo "Green 환경(8082)으로 Nginx 설정 파일 교체..."
+    sudo cp ${NGINX_CONF_DIR}/default8082.conf $NGINX_CONF_PATH
+fi
 
 # 기존 포트를 새로운 포트로 교체
 sudo sed -i "s/server 172.20.0.1:${BEFORE_PORT};/server 172.20.0.1:${AFTER_PORT};/" $NGINX_CONF_PATH
@@ -103,6 +113,7 @@ sudo docker restart my-nginx
 # 4. 이전 환경(블루 서버) 중지 및 정리 (중복 방지)
 echo "${BEFORE_COLOR} 서버 중지 (포트: ${BEFORE_PORT})"
 sudo docker compose -p bluegreen-${BEFORE_COLOR} -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen${BEFORE_COLOR}.yml down
+sudo docker compose -p bluegreen-django-${BEFORE_COLOR} -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen${BEFORE_COLOR}.yml down
 
 # 5. 사용되지 않는 Docker 이미지 정리
 echo "사용되지 않는 Docker 이미지 삭제 중..."
