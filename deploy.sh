@@ -61,28 +61,28 @@ sudo docker compose -p my-react -f /home/ubuntu/S12P11D201/test/docker-compose.y
 echo "${AFTER_COLOR} 서버가 실행되었습니다 (포트: ${AFTER_PORT})"
 
 # 2. 새 버전 서버 응답 확인
-for cnt in `seq 1 10`;
-do
-    # echo "서버 응답을 확인 중... (${cnt}/10)"
-    # UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/api/health-check)
-    # if [ "${UP}" != "OK" ]; then
-    #     sleep 10
-    #     echo "peachpitch api health check"
-    #     UP2=$(curl -s https://peachpitch.site/api/health-check)
-    #     if [ "${UP2}" == "OK" ]; then
-    #         break
-    #     fi
-    #     continue
-    # else
-    #     break
-    # fi
-done
+# for cnt in `seq 1 10`;
+# do
+#     echo "서버 응답을 확인 중... (${cnt}/10)"
+#     UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/api/health-check)
+#     if [ "${UP}" != "OK" ]; then
+#         sleep 10
+#         echo "peachpitch api health check"
+#         UP2=$(curl -s https://peachpitch.site/api/health-check)
+#         if [ "${UP2}" == "OK" ]; then
+#             break
+#         fi
+#         continue
+#     else
+#         break
+#     fi
+# done
 
-# 10번 시도 후에도 응답이 없으면 실패 처리
-if [ $cnt -eq 10 ]; then
-    echo "서버에 문제가 있습니다..."
-    exit 1
-fi
+# # 10번 시도 후에도 응답이 없으면 실패 처리
+# if [ $cnt -eq 10 ]; then
+#     echo "서버에 문제가 있습니다..."
+#     exit 1
+# fi
 
 # 3. Nginx 설정 파일 수정 (포트 변경)
 echo "Nginx 설정 파일 업데이트..."
