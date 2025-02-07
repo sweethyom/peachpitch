@@ -7,7 +7,7 @@ import lombok.ToString;
 @Builder
 @Getter
 @ToString
-public class RoomResponseDto {
+public class RoomResponse {
     private String token;
     private String status;
     private Long historyId;

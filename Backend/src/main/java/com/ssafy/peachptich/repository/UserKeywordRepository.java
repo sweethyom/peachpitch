@@ -1,6 +1,5 @@
 package com.ssafy.peachptich.repository;
 
-import com.ssafy.peachptich.dto.response.RankResponseDto;
 import com.ssafy.peachptich.entity.UserKeyword;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

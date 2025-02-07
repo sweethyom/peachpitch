@@ -1,12 +1,11 @@
 package com.ssafy.peachptich.controller;
 
 
-import com.ssafy.peachptich.dto.response.KeywordListResponseDto;
-import com.ssafy.peachptich.dto.response.KeywordResponseDto;
+import com.ssafy.peachptich.dto.response.KeywordListResponse;
+import com.ssafy.peachptich.dto.response.KeywordResponse;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.service.KeywordService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,9 +24,9 @@ public class KeywordController {
      * @return
      */
     @GetMapping(value = {"/api/chat/video/keywords/add", "/api/chat/ai/keywords/add"})
-    public ResponseEntity<ResponseDto<KeywordListResponseDto>> addKeyword() {
-        List<KeywordResponseDto> keywords = keywordService.getRandomKeywords();
-        KeywordListResponseDto responseDto = KeywordListResponseDto.builder()
+    public ResponseEntity<ResponseDto<KeywordListResponse>> addKeyword() {
+        List<KeywordResponse> keywords = keywordService.getRandomKeywords();
+        KeywordListResponse responseDto = KeywordListResponse.builder()
                 .keywords(keywords)
                 .build();
         return ResponseEntity.ok(ResponseDto.of(

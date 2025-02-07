@@ -1,7 +1,7 @@
 package com.ssafy.peachptich.service;
 
 
-import com.ssafy.peachptich.dto.response.KeywordResponseDto;
+import com.ssafy.peachptich.dto.response.KeywordResponse;
 import com.ssafy.peachptich.entity.Keyword;
 import com.ssafy.peachptich.repository.KeywordRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,9 @@ public class KeywordServiceImpl implements KeywordService {
     private final KeywordRepository keywordRepository;
 
     @Override
-    public List<KeywordResponseDto> getRandomKeywords() {
+    public List<KeywordResponse> getRandomKeywords() {
         return keywordRepository.findRandomKeyword().stream()
-                .map(keyword -> KeywordResponseDto.builder()
+                .map(keyword -> KeywordResponse.builder()
                         .keywordId(keyword.getKeywordId())
                         .keyword(keyword.getKeyword())
                         .build())
