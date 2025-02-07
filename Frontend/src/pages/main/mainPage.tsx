@@ -114,12 +114,12 @@ function MainPage() {
           </div>
 
           <div className={styles.main__chat}>
-            <div onClick={handleAIChatClick} className={styles.main__link}>
-              <div className={styles.main__chat__voice}>
+          <Link to="/chat/ai" className={styles.main__link}>
+          <div className={styles.main__chat__voice}>
                 <p className={styles.voice}>AI와 스몰토킹</p>
                 <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
               </div>
-            </div>
+            </Link>
 
             <Link to="/chat/video" className={styles.main__link}>
               <div className={styles.main__chat__video}>
