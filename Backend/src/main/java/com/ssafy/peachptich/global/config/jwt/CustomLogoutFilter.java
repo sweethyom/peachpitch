@@ -1,7 +1,7 @@
 package com.ssafy.peachptich.global.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssafy.peachptich.dto.response.ApiResponse;
+import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.repository.RefreshRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -96,7 +96,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         cookie.setPath("/");
 
         // JSON 응답 생성
-        ApiResponse<Void> apiResponse = ApiResponse.<Void>builder()
+        ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
                         .message("User logout success")
                         .data(null)
                         .build();
@@ -108,6 +108,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
         response.setStatus(HttpServletResponse.SC_OK);
 
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(response.getWriter(), apiResponse);
+        objectMapper.writeValue(response.getWriter(), responseDto);
     }
 }
