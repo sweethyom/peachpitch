@@ -6,4 +6,5 @@ import io.openvidu.java.client.OpenViduJavaClientException;
 
 public interface VideoChatService {
     RoomResponseDto handleVideoChat(Long userId) throws OpenViduHttpException, OpenViduJavaClientException;
+    void handleVideoChatWebSocket(Long userId) throws OpenViduHttpException, OpenViduJavaClientException;
 }
