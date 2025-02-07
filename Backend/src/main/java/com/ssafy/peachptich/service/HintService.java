@@ -1,9 +1,9 @@
 package com.ssafy.peachptich.service;
 
-import com.ssafy.peachptich.dto.response.HintResponseDto;
+import com.ssafy.peachptich.dto.response.HintResponse;
 
 import java.util.List;
 
 public interface HintService {
-    List<HintResponseDto> getHints(Long keywordId);
+    List<HintResponse> getHints(Long keywordId);
 }

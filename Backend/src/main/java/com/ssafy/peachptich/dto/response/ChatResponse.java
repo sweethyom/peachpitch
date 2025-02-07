@@ -9,8 +9,8 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ChatResponseDto {
+public class ChatResponse {
     private Long historyId; // 로그인 하지 않은 유저는 null 반환
     private String keyword;
-    private List<HintResponseDto> hints;
+    private List<HintResponse> hints;
 }

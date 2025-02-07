@@ -1,8 +1,8 @@
 package com.ssafy.peachptich.controller;
 
-import com.ssafy.peachptich.dto.request.AudioChatRequestDto;
-import com.ssafy.peachptich.dto.response.ChatResponseDto;
-import com.ssafy.peachptich.dto.response.HintResponseDto;
+import com.ssafy.peachptich.dto.request.AudioChatRequest;
+import com.ssafy.peachptich.dto.response.ChatResponse;
+import com.ssafy.peachptich.dto.response.HintResponse;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.RandomName;
 import com.ssafy.peachptich.service.ChatHistoryService;
@@ -28,15 +28,15 @@ public class AudioChatController {
     private final KeywordService keywordService;
 
     @PostMapping("/api/chat/ai/keywords")
-    public ResponseEntity<ResponseDto<ChatResponseDto>> createChat(
+    public ResponseEntity<ResponseDto<ChatResponse>> createChat(
             @RequestHeader(value = "userId", required = false) Long userId,
-            @RequestBody AudioChatRequestDto audioChatRequestDto) {
+            @RequestBody AudioChatRequest audioChatRequest) {
         // userId 있으면 대화내역에 추가 -> 추후 jwt 토큰으로 변경
         // 키워드 id가지고 hint를 찾음
         // 힌트 리스트 조회
-        Long keywordId = audioChatRequestDto.getKeywordId();
+        Long keywordId = audioChatRequest.getKeywordId();
         String keyword = keywordService.getKeyword(keywordId);
-        List<HintResponseDto> hints = hintService.getHints(keywordId);
+        List<HintResponse> hints = hintService.getHints(keywordId);
 
         Long historyId = null; //기본적으로  null
         if (userId != null) {
@@ -46,11 +46,11 @@ public class AudioChatController {
             // 유저가 고른 키워드 추가
             userKeywordService.saveOrUpdate(userId, keywordId);
         }
-        ChatResponseDto chatResponseDto = ChatResponseDto.builder()
+        ChatResponse chatResponse = ChatResponse.builder()
                 .hints(hints)
                 .keyword(keyword)
                 .historyId(historyId)
                 .build();
-        return ResponseEntity.ok(ResponseDto.of("Keyword added and create AI room successfully", chatResponseDto));
+        return ResponseEntity.ok(ResponseDto.of("Keyword added and create AI room successfully", chatResponse));
     }
 }

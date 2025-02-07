@@ -7,7 +7,7 @@ import lombok.Getter;
 @Builder
 @Getter
 @AllArgsConstructor
-public class VideoChatRequestDto {
+public class VideoChatRequest {
     private Long historyId;
     private Long keywordId;
 }

@@ -9,7 +9,7 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class RankResponseDto {
+public class RankResponse {
     private List <KeywordRankResponseItem> rank;
 
     @Getter

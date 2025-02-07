@@ -1,6 +1,6 @@
 package com.ssafy.peachptich.controller;
 
-import com.ssafy.peachptich.dto.response.RankResponseDto;
+import com.ssafy.peachptich.dto.response.RankResponse;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.service.UserKeywordService;
 import lombok.RequiredArgsConstructor;
@@ -17,10 +17,10 @@ public class RankController {
     private final UserKeywordService userKeywordService;
 
     @GetMapping("/api/main/rank")
-    public ResponseEntity<ResponseDto<RankResponseDto>> getRank() {
-        List<RankResponseDto.KeywordRankResponseItem> rank = userKeywordService.rank();
+    public ResponseEntity<ResponseDto<RankResponse>> getRank() {
+        List<RankResponse.KeywordRankResponseItem> rank = userKeywordService.rank();
         return ResponseEntity.ok(ResponseDto.of(
-                "Rank successfully", RankResponseDto.builder().rank(rank).build()
+                "Rank successfully", RankResponse.builder().rank(rank).build()
         ));
     }
 }

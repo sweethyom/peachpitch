@@ -2,10 +2,9 @@ package com.ssafy.peachptich.controller.purchase;
 
 import com.ssafy.peachptich.dto.response.ApproveResponse;
 import com.ssafy.peachptich.dto.response.ReadyResponse;
-import com.ssafy.peachptich.entity.Item;
 import com.ssafy.peachptich.entity.Purchase;
 import com.ssafy.peachptich.service.PurchaseService;
-import com.ssafy.peachptich.util.SessionUtils;
+import com.ssafy.peachptich.global.util.SessionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,8 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /**
  * 카카오페이 단건결제 API이용

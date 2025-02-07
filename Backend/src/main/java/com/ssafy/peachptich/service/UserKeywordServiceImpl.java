@@ -1,6 +1,6 @@
 package com.ssafy.peachptich.service;
 
-import com.ssafy.peachptich.dto.response.RankResponseDto;
+import com.ssafy.peachptich.dto.response.RankResponse;
 import com.ssafy.peachptich.entity.Keyword;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.entity.UserKeyword;
@@ -40,13 +40,13 @@ public class UserKeywordServiceImpl implements UserKeywordService {
         }
     }
 
-    public List<RankResponseDto.KeywordRankResponseItem> rank() {
+    public List<RankResponse.KeywordRankResponseItem> rank() {
         List<Object[]> result = userKeywordRepository.findTop3KeywordsByCount();
-        List<RankResponseDto.KeywordRankResponseItem> items = new ArrayList<>();
+        List<RankResponse.KeywordRankResponseItem> items = new ArrayList<>();
         for(Object[] obj : result) {
             String keyword = (String) obj[0];
             Integer count =Integer.parseInt(String.valueOf(obj[1]));
-            items.add(RankResponseDto.KeywordRankResponseItem.builder()
+            items.add(RankResponse.KeywordRankResponseItem.builder()
                     .keyword(keyword)
                     .count(count)
                     .build());
