@@ -1,11 +1,13 @@
 package com.ssafy.peachptich.dto.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 // DTO for APIResponse
 @Getter
 @AllArgsConstructor
+@Builder
 public class ApiResponse<T> {
     private String message;
     private T data;
