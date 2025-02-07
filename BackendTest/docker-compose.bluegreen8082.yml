@@ -15,7 +15,7 @@ services:
       - SPRING_REDIS_HOST=43.201.5.129
       - SPRING_REDIS_PORT=6379
     ports:
-      - '8082:8083'
+      - '8083'
     networks:
       - peachpitch-network
 
