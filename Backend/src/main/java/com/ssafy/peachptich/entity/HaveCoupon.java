@@ -15,13 +15,11 @@ public class HaveCoupon {
     private Integer ea;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    @Column(nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "item_id")
-    @Column(nullable = false)
+    @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
    @Builder

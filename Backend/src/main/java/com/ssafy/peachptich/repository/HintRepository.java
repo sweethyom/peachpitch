@@ -11,6 +11,6 @@ import java.util.List;
 
 @Repository
 public interface HintRepository extends JpaRepository<Hint, Long> {
-    @Query("SELECT new com.ssafy.peachptich.dto.response.HintResponseDto(h.hint) FROM Hint h WHERE h.keyword.keywordId = :keywordId")
+    @Query("SELECT new com.ssafy.peachptich.dto.response.HintResponse(h.hint) FROM Hint h WHERE h.keyword.keywordId = :keywordId")
     List<HintResponse> findByKeywordId(@Param("keywordId") Long keywordId);
 }
