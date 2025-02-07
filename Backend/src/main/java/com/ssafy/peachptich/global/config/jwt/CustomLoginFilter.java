@@ -3,6 +3,7 @@ package com.ssafy.peachptich.global.config.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.LoginRequest;
+import com.ssafy.peachptich.dto.response.ApiResponse;
 import com.ssafy.peachptich.entity.Refresh;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.repository.RefreshRepository;
@@ -16,6 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -119,48 +121,52 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     @ResponseBody
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authentication){
-        //TODO
-        // authentication.getEmail()로 바꿀 필요 없을 것 같은데..?
-        CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-        String userEmail = customUserDetails.getUserEmail();
-        Long userId = customUserDetails.getUserId();
+        try{
+            //TODO
+            // authentication.getEmail()로 바꿀 필요 없을 것 같은데..?
+            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
+            String userEmail = customUserDetails.getUserEmail();
+            Long userId = customUserDetails.getUserId();
 
-        // 사용자의 role 데이터 추출
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
-        GrantedAuthority auth = iterator.next();
+            // 사용자의 role 데이터 추출
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
+            GrantedAuthority auth = iterator.next();
 
-        String role = auth.getAuthority();
+            String role = auth.getAuthority();
 
-        // 토큰 생성
-        String access = tokenProvider.createJwt("access", userEmail, role, 600000L);
-        String refresh = tokenProvider.createJwt("refresh", userEmail, role, 86400000L);
+            // 토큰 생성
+            String access = tokenProvider.createJwt("access", userEmail, role, 600000L);
+            String refresh = tokenProvider.createJwt("refresh", userEmail, role, 86400000L);
 
-        try {
-            // refresh Token 서버 저장
-            addRefresh(userEmail, refresh, 86400000L);
-        } catch (Exception e) {
-            throw new TokenStorageException("Failed to store refresh token: " + e.getMessage());
-        }
+            try {
+                // refresh Token 서버 저장
+                addRefresh(userEmail, refresh, 86400000L);
+            } catch (Exception e) {
+                throw new TokenStorageException("Failed to store refresh token: " + e.getMessage());
+            }
 
-        // JSON 응답 생성
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("message", "User login success");
-        responseBody.put("data", Map.of("userId", userId));
+            // JSON 응답 생성
+            Map<String, Long> responseData = Map.of("userId", userId);
+            ApiResponse<Map<String, Long>> apiResponse = ApiResponse.<Map<String, Long>>builder()
+                    .message("User login success!")
+                    .data(responseData)
+                    .build();
 
-        try {
-            // 응답 설정
+            // 응답 설정 및 전송
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.setStatus(HttpStatus.OK.value());
+            response.setHeader("access", access);
+            response.addCookie(createCookie("refresh", refresh));
+            response.setStatus(HttpServletResponse.SC_OK);
 
-            // JSON 응답 반환
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.writeValue(response.getWriter(), responseBody);
-        } catch (IOException e) {
-            throw new ResponseWriteException("Failed to write response: " + e.getMessage());
-        }
+            objectMapper.writeValue(response.getWriter(), apiResponse);
 
+        } catch (Exception e){
+            log.error("Unexpected error during authentication", e);
+            throw new AuthenticationServiceException("Authentication proceessing failed", e);
+        }
     }
 
     private Cookie createCookie(String key, String value){
