@@ -7,7 +7,6 @@ import lombok.Getter;
 @Builder
 @Getter
 @AllArgsConstructor
-public class FeedbackRequestDto {
-    private Long historyId;
-    private String feedback;
+public class AudioChatRequest {
+    private Long keywordId;
 }

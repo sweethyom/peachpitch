@@ -1,7 +1,7 @@
 package com.ssafy.peachptich.service;
 
 import com.ssafy.peachptich.dto.response.ResponseDto;
-import com.ssafy.peachptich.dto.response.RoomResponseDto;
+import com.ssafy.peachptich.dto.response.RoomResponse;
 import com.ssafy.peachptich.entity.RandomName;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
@@ -44,7 +44,7 @@ public class VideoChatServiceImpl implements VideoChatService {
 
     //대기큐 방식
     @Override //token, history id 반환
-    public RoomResponseDto handleVideoChat(Long userId) throws OpenViduHttpException, OpenViduJavaClientException {
+    public RoomResponse handleVideoChat(Long userId) throws OpenViduHttpException, OpenViduJavaClientException {
         if (waitingUserId == null) {
             //첫번째 사용자가 요청하면 대기상태로 저장,
             String sessionId = "session_" + userId;
@@ -57,7 +57,7 @@ public class VideoChatServiceImpl implements VideoChatService {
             waitingUserId = userId;
             waitingSessionId = sessionId; // 세션 ID 저장
 
-            return RoomResponseDto.builder()
+            return RoomResponse.builder()
                     .status("waiting")
                     .token(token)  // 첫 번째 사용자에게도 토큰 제공
                     .historyId(null)  // 대화 내역 ID는 아직 없음
@@ -79,7 +79,7 @@ public class VideoChatServiceImpl implements VideoChatService {
             waitingUserId = null;
             waitingSessionId = null;
 
-            return RoomResponseDto.builder()
+            return RoomResponse.builder()
                     .status("matched")
                     .token(token)
                     .historyId(historyId)
@@ -94,7 +94,7 @@ public class VideoChatServiceImpl implements VideoChatService {
         if (waitingUsers.isEmpty()) {
             //첫번째 사용자 대기열에 추가
             waitingUsers.add(userId);
-            RoomResponseDto waitingResponse = RoomResponseDto.builder()
+            RoomResponse waitingResponse = RoomResponse.builder()
                     .status("waiting")
                     .build();
             //messagingTemplate.convertAndSendToUser(String.valueOf(userId), "/sub/call", waitingResponse);
@@ -118,7 +118,7 @@ public class VideoChatServiceImpl implements VideoChatService {
             String userName = randomName.getRandomName(); //늦게 들어온 사람 이름
             Long historyId = chatHistoryService.addVideoChatHistory(matchedUserId, userId, matchedUserName, userName);
 
-            RoomResponseDto user1Response = RoomResponseDto.builder()
+            RoomResponse user1Response = RoomResponse.builder()
                     .token(token1)
                     .status("matched")
                     .historyId(historyId)
@@ -126,7 +126,7 @@ public class VideoChatServiceImpl implements VideoChatService {
                     .matchedUserName(userName)
                     .build();
 
-            RoomResponseDto user2Response = RoomResponseDto.builder()
+            RoomResponse user2Response = RoomResponse.builder()
                     .token(token2)
                     .status("matched")
                     .historyId(historyId)

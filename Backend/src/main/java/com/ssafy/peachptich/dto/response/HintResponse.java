@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 @Data
 @AllArgsConstructor
-public class HintResponseDto {
+public class HintResponse {
     String hint;
 }
