@@ -86,9 +86,18 @@ fi
 
 # 3. Nginx 설정 파일 수정 (포트 변경)
 echo "Nginx 설정 파일 업데이트..."
-# sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/default.inc
+# sudo sed -i "s/${BEFORE_PORT}/${AFTER_PORT}/" /etc/nginx/conf.d/default.conf
 # sudo nginx -s reload
 # echo "배포 완료!"
+
+# Nginx 설정 파일 경로
+NGINX_CONF_PATH="/home/ubuntu/nginx_conf/default.conf"
+
+# 기존 포트를 새로운 포트로 교체
+sudo sed -i "s/server 172.20.0.1:${BEFORE_PORT};/server 172.20.0.1:${AFTER_PORT};/" $NGINX_CONF_PATH
+
+# Nginx 컨테이너에 업데이트된 설정 파일 복사
+sudo docker cp $NGINX_CONF_PATH my-nginx:/etc/nginx/conf.d/default.conf
 sudo docker restart my-nginx
 
 # 4. 이전 환경(블루 서버) 중지 및 정리 (중복 방지)
