@@ -13,6 +13,4 @@ WORKDIR /spring-boot
 # 애플리케이션 복사 및 실행 설정
 COPY build/libs/*SNAPSHOT.jar app.jar
 
-EXPOSE 8083
-
 ENTRYPOINT ["sh", "-c", "java", "-jar", "app.jar", "--server.port=${SERVER_PORT}"]
