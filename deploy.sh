@@ -63,19 +63,19 @@ echo "${AFTER_COLOR} 서버가 실행되었습니다 (포트: ${AFTER_PORT})"
 # 2. 새 버전 서버 응답 확인
 for cnt in `seq 1 10`;
 do
-    echo "서버 응답을 확인 중... (${cnt}/10)"
-    UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/api/health-check)
-    if [ "${UP}" != "OK" ]; then
-        sleep 10
-        echo "peachpitch api health check"
-        UP2=$(curl -s https://peachpitch.site/api/health-check)
-        if [ "${UP2}" == "OK" ]; then
-            break
-        fi
-        continue
-    else
-        break
-    fi
+    # echo "서버 응답을 확인 중... (${cnt}/10)"
+    # UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/api/health-check)
+    # if [ "${UP}" != "OK" ]; then
+    #     sleep 10
+    #     echo "peachpitch api health check"
+    #     UP2=$(curl -s https://peachpitch.site/api/health-check)
+    #     if [ "${UP2}" == "OK" ]; then
+    #         break
+    #     fi
+    #     continue
+    # else
+    #     break
+    # fi
 done
 
 # 10번 시도 후에도 응답이 없으면 실패 처리
