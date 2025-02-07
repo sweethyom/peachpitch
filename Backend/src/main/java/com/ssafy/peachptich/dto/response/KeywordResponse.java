@@ -2,13 +2,11 @@ package com.ssafy.peachptich.dto.response;
 
 import lombok.*;
 
-import java.util.List;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class KeywordResponseDto {
+public class KeywordResponse {
    Long keywordId;
    String keyword;
 }

@@ -9,6 +9,6 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class KeywordListResponseDto {
-    private List<KeywordResponseDto> keywords;
+public class KeywordListResponse {
+    private List<KeywordResponse> keywords;
 }
