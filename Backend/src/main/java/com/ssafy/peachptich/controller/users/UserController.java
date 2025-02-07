@@ -1,17 +1,14 @@
 package com.ssafy.peachptich.controller.users;
 
-import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.JoinRequest;
-import com.ssafy.peachptich.dto.response.ApiResponse;
+import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.service.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -30,7 +27,7 @@ public class UserController {
     }
 
     @PostMapping("/api/users/signup")
-    public ResponseEntity<ApiResponse<Map<String, Long>>> joinProcess(@RequestBody JoinRequest joinRequest){
+    public ResponseEntity<ResponseDto<Map<String, Long>>> joinProcess(@RequestBody JoinRequest joinRequest){
         log.info("회원 가입 시도");
         return userServiceimpl.joinProcess(joinRequest)
                 .map(user -> {
@@ -38,11 +35,11 @@ public class UserController {
                     Map<String, Long> responseData = new HashMap<>();
                     responseData.put("userId", user.getUserId());
 
-                    // ApiResponse 객체 생성 및 반환
-                    return ResponseEntity.ok(new ApiResponse<>(
+                    // ResponseDto 생성 후 ResponseEntity로 래핑하여 반환
+                    return ResponseEntity.ok(new ResponseDto<Map<String, Long>>(
                             "User register Success!", responseData));
                 })
-                .orElseThrow(() -> new ApiResponse.DuplicateEmailException("Email already exists"));
+                .orElseThrow(() -> new ResponseDto.DuplicateEmailException("Email already exists"));
     }
 
     //TODO
@@ -55,8 +52,8 @@ public class UserController {
     // 회원 탈퇴 기능 구현
     @GetMapping("/api/users/delete")
 //    public ResponseEntity<String> withdrawProcess(@AuthenticationPrincipal CustomUserDetails userDetails){
-        public ResponseEntity<ApiResponse<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
-                                                      Authentication authentication){
+        public ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
+                                                                                Authentication authentication){
         return userServiceimpl.withdrawProcess(request, response, authentication);
     }
 }
