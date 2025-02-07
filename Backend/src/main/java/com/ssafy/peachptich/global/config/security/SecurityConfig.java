@@ -67,7 +67,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/main", "/api/index", "/api/users/login", "/api/users/signup", "/api/trial/check", "/api/pay/ready", "/api/pay/completed").permitAll()    // 임시로 api/trial/check,"/api/pay/ready", "/api/pay/completed" 추가
+                        .requestMatchers("/api/main", "/api/index", "/api/users/login", "/api/users/signup", "/api/pay/ready", "/api/pay/completed").permitAll()
                         .anyRequest().authenticated()
 //                                .anyRequest().permitAll()
                 )
