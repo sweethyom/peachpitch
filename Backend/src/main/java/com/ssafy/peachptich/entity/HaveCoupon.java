@@ -10,16 +10,18 @@ import lombok.*;
 public class HaveCoupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_coupon_id;
+    private Long haveCouponId;
 
     private Integer ea;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @Column(nullable = false)
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "item_id")
+    @Column(nullable = false)
     private Item item;
 
    @Builder

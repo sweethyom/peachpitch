@@ -4,10 +4,13 @@ import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.JoinRequest;
 import com.ssafy.peachptich.dto.response.ApiResponse;
 import com.ssafy.peachptich.service.UserServiceImpl;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,13 +54,9 @@ public class UserController {
     //TODO
     // 회원 탈퇴 기능 구현
     @GetMapping("/api/users/delete")
-    public ResponseEntity<String> withdrawProcess(@AuthenticationPrincipal CustomUserDetails userDetails){
-        if (userDetails == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
-        }
-
-        userServiceimpl.withdrawProcess(userDetails);
-
-        return ResponseEntity.ok("Successfully deleted!");
+//    public ResponseEntity<String> withdrawProcess(@AuthenticationPrincipal CustomUserDetails userDetails){
+        public ResponseEntity<ApiResponse<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
+                                                      Authentication authentication){
+        return userServiceimpl.withdrawProcess(request, response, authentication);
     }
 }
