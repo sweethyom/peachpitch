@@ -66,6 +66,8 @@
     &__list {
 
         &__items {
+            position: relative;
+
             width: 855px;
             height: 550px;
             background-color: var(--color-white-100);
@@ -205,6 +207,11 @@
     }
 }
 
+.report__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
 
 .item {
     width: 310px;
@@ -263,4 +270,42 @@
             background-color: var(--color-brown-200);
         }
     }
+}
+
+.report__paging {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    position: absolute; // ✅ 부모 요소(.report__list__items) 기준으로 위치 조정
+    bottom: 20px; // ✅ 하단에서 20px 위에 위치
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 100%;
+    padding: 10px 0;
+}
+
+.report__paging__button, 
+.report__paging__number {
+    background: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 16px;
+    color: var(--color-white-700);
+    transition: color 0.2s ease-in-out;
+}
+
+.report__paging__button:hover, 
+.report__paging__number:hover {
+    color: var(--color-red-200);
+}
+
+.report__paging__number.active {
+    font-weight: bold;
+    color: var(--color-red-200);
 }

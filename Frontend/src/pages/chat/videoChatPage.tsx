@@ -80,7 +80,6 @@ function videoChatPage() {
           <div className={styles.chat__user__video}>
             <WebcamComponent />
           </div>
-
         </div>
 
         {/* 음성챗 */}
