@@ -3,21 +3,17 @@ package com.ssafy.peachptich.global.config.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.LoginRequest;
-import com.ssafy.peachptich.dto.response.ApiResponse;
+import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.Refresh;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.repository.RefreshRepository;
 import com.ssafy.peachptich.repository.UserRepository;
 import io.micrometer.common.util.StringUtils;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -148,7 +144,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
             // JSON 응답 생성
             Map<String, Long> responseData = Map.of("userId", userId);
-            ApiResponse<Map<String, Long>> apiResponse = ApiResponse.<Map<String, Long>>builder()
+            ResponseDto<Map<String, Long>> responseDto = ResponseDto.<Map<String, Long>>builder()
                     .message("User login success!")
                     .data(responseData)
                     .build();
@@ -161,7 +157,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             response.setStatus(HttpServletResponse.SC_OK);
 
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.writeValue(response.getWriter(), apiResponse);
+            objectMapper.writeValue(response.getWriter(), responseDto);
 
         } catch (Exception e){
             log.error("Unexpected error during authentication", e);
