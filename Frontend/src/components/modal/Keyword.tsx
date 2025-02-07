@@ -3,6 +3,8 @@ import styles from "./styles/Keyword.module.scss";
 
 import closeBtn from "@/assets/icons/modal__close.png";
 
+import axios from "axios";
+
 type ModalProps = {
     isOpen: boolean; // 모달 열림 상태
     onClose: () => void; // 닫기 버튼 클릭 이벤트
@@ -20,19 +22,21 @@ function Keyword({ isOpen, onClose, children, setSelectedKeyword }: ModalProps) 
     useEffect(() => {
         const fetchKeywords = async () => {
             try {
-                const response = await fetch("/data/keywords.json");
+                const response = await fetch("/data/keywords.json"); // ✅ 올바른 경로 사용
                 const data = await response.json();
 
-                // 랜덤한 15개 키워드 선택
-                const shuffledKeywords = data.keywords.sort(() => 0.5 - Math.random());
-                setKeywords(shuffledKeywords.slice(0, 15));
+                if (data.keywords && data.keywords.length > 0) {
+                    const shuffledKeywords = [...data.keywords].sort(() => 0.5 - Math.random()); // ✅ Shuffle keywords
+                    setKeywords(shuffledKeywords.slice(0, 15)); // ✅ Select exactly 15 keywords
+                }
             } catch (error) {
-                console.error("키워드 로딩 중 오류 발생:", error);
+                console.error("키워드 로딩 오류:", error);
             }
         };
 
         fetchKeywords();
     }, []);
+
 
     const handleAddKeyword = () => {
         setVisibleCount((prev) => Math.min(prev + 5, 15)); // 5개씩 추가 표시, 최대 15개까지
