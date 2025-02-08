@@ -6,7 +6,7 @@ ENV LANGUAGE=ko_KR:ko
 ENV LC_ALL=ko_KR.UTF-8
 
 # Spring Boot 포트 설정 (필요 시 오버라이드 가능)
-ENV SERVER_PORT=8083
+ENV SERVER_PORT=8081
 
 WORKDIR /spring-boot
 
