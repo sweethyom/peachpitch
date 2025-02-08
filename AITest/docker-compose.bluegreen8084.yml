@@ -2,8 +2,8 @@ version: '3.1'
 
 services:
   django-app:
-    image: yuseon7129/peachpitch:bluegreen8081d
-    container_name: bluegreen-django-8081
+    image: yuseon7129/peachpitch:bluegreen8084
+    container_name: bluegreen-8084
     environment:
       - TZ=Asia/Seoul
       - LANG=ko_KR.UTF-8
@@ -11,11 +11,12 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
       - SPRING_JPA_HIBERNATE_DDL-AUTO=update
-      - SERVER_PORT=8084
       - SPRING_REDIS_HOST=43.201.5.129
       - SPRING_REDIS_PORT=6379
     networks:
       - peachpitch-network
+    ports:
+      - "8084:8084"
 
 networks:
   peachpitch-network:
