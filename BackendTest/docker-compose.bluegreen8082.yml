@@ -11,12 +11,13 @@ services:
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
       - SPRING_JPA_HIBERNATE_DDL-AUTO=update
+      - SERVER_PORT=8081
       - SPRING_REDIS_HOST=43.201.5.129
       - SPRING_REDIS_PORT=6379
     networks:
       - peachpitch-network
     ports:
-      - "8082:8082"
+      - "8082:8081"
 
 networks:
   peachpitch-network:

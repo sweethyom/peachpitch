@@ -28,7 +28,7 @@ BLUE_D_CONTAINER="bluegreen-8083"
 GREEN_D_CONTAINER="bluegreen-8084"
 
 # Blue-Green 배포 환경 전환
-EXIST_GITCHAN=$(sudo docker compose -p blue-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml ps | grep Up)
+EXIST_GITCHAN=$(sudo docker compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml ps | grep Up)
 
 if [ -z "$EXIST_GITCHAN" ]; then
     echo "8081(블루) 환경이 실행되지 않음. 8081 환경 실행..."
