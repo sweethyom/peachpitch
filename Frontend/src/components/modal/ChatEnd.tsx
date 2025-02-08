@@ -32,8 +32,8 @@ function ChatEnd({ isOpen, onClose }: ModalProps) {
 
                 <div className={styles.modal__contents}>
                     <p className={styles.modal__sub}>AI와의 대화가 종료되었습니다.</p>
-                    <p className={styles.modal__sub}>
-                        [다른 대화 진행하기] 버튼을 클릭하면 새로운 키워드로 AI와 대화를 시작할 수 있습니다.
+                    <p className={styles.modal__description}>
+                        [다른 대화 진행하기] 버튼을 클릭하면 새로운 키워드로 <br/> AI와 대화를 시작할 수 있습니다.
                     </p>
                 </div>
 

@@ -44,7 +44,7 @@
       justify-content: center;
       font-weight: 700;
       font-size: 32px;
-      margin-bottom: 35px;
+      margin-bottom: 5px;
     }
   }
 
@@ -61,6 +61,11 @@
     font-size: 24px;
   }
 
+  &__description {
+    font-weight: 500;
+    font-size: 24px;
+  }
+
   &__btn {
     display: flex;
     justify-content: center;
@@ -72,8 +77,8 @@
       justify-content: center;
       align-items: center;
 
-      width: 135px;
-      height: 52px;
+      width: 160px;
+      height: 60px;
       background-color: var(--color-white-600);
       color: var(--color-white-000);
       font-weight: 500;
@@ -83,13 +88,13 @@
       cursor: pointer;
     }
 
-    &__leave {
+    &__end {
       display: flex;
       justify-content: center;
       align-items: center;
 
-      width: 135px;
-      height: 52px;
+      width: 160px;
+      height: 60px;
       background-color: var(--color-white-000);
       border: solid var(--color-white-600) 1px;
       color: var(--color-white-600);
