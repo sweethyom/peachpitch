@@ -11,6 +11,8 @@ ENV SERVER_PORT=8081
 WORKDIR /spring-boot
 
 # 애플리케이션 복사 및 실행 설정
-COPY build/libs/*SNAPSHOT.jar app.jar
+COPY build/libs/*SNAPSHOT.jar app.jar4
+
+EXPOSE 8081
 
 ENTRYPOINT ["sh", "-c", "java", "-jar", "app.jar", "--server.port=${SERVER_PORT}"]
