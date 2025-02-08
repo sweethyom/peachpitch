@@ -19,7 +19,7 @@ public class RankController {
     @GetMapping("/api/main/rank")
     public ResponseEntity<ResponseDto<RankResponse>> getRank() {
         List<RankResponse.KeywordRankResponseItem> rank = userKeywordService.rank();
-        return ResponseEntity.ok(ResponseDto.of(
+        return ResponseEntity.ok(new ResponseDto<>(
                 "Rank successfully", RankResponse.builder().rank(rank).build()
         ));
     }
