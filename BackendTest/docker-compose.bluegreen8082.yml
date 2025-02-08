@@ -5,6 +5,7 @@ services:
     image: yuseon7129/peachpitch:bluegreen8082
     container_name: bluegreen-8082
     build:
+      context: .
       dockerfile: Dockerfile8082
     environment:
       - TZ=Asia/Seoul
