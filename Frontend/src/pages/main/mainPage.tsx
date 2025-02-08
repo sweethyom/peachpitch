@@ -9,7 +9,6 @@ import medal3 from '@/assets/icons/medal3.png';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-// 핑거프린트 로직 추가
 import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -38,6 +37,36 @@ function MainPage() {
     }
   };
 
+  // ✅ "오늘의 토킹" 데이터를 불러오기
+  useEffect(() => {
+    fetch('/data/random_talks.json')
+      .then(response => response.json())
+      .then(data => {
+        setRandomTalks(data.random_talks);
+        if (data.random_talks.length > 0) {
+          setCurrentTalk(data.random_talks[Math.floor(Math.random() * data.random_talks.length)]);
+        }
+      })
+      .catch(error => console.error('Error fetching random talks:', error));
+  }, []);
+
+  // ✅ 5초마다 "오늘의 토킹" 변경
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (randomTalks.length > 0) {
+        setNextTalk(randomTalks[Math.floor(Math.random() * randomTalks.length)]);
+        setRotate(true);
+
+        setTimeout(() => {
+          setCurrentTalk(nextTalk);
+          setRotate(false);
+        }, 600);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [randomTalks, nextTalk]);
+
   // ✅ 최초 실행 시 핑거프린트 생성 및 결제 성공 메시지 감지
   useEffect(() => {
     generateFingerprint();
@@ -45,8 +74,9 @@ function MainPage() {
     const handlePaymentMessage = (event: MessageEvent) => {
       console.log("📩 결제 완료 메시지 수신:", event.data, "from:", event.origin);
 
-      if (event.origin !== "http://localhost:8080") return;
-      
+      const allowedOrigins = ["http://localhost:8080", "http://localhost:5173"];
+      if (!allowedOrigins.includes(event.origin)) return;
+
       if (event.data === 'paymentSuccess') {
         setShowCompletePay(true);
         localStorage.removeItem('paymentSuccess');
@@ -106,6 +136,7 @@ function MainPage() {
       <Header />
       <div className={styles.page}>
         <div className={styles.main}>
+          {/* ✅ 오늘의 토킹 섹션 */}
           <div className={styles.main__random}>
             <p className={styles.main__random__title}>오늘의 토킹</p>
             <p className={`${styles.main__random__content} ${rotate ? styles.rotateOut : styles.rotateIn}`}>
@@ -113,6 +144,7 @@ function MainPage() {
             </p>
           </div>
 
+          {/* ✅ AI 채팅 & 1:1 매칭 */}
           <div className={styles.main__chat}>
             <Link to="/chat/ai" className={styles.main__link}>
               <div className={styles.main__chat__voice}>
@@ -129,6 +161,7 @@ function MainPage() {
             </Link>
           </div>
 
+          {/* ✅ 인기 키워드 섹션 */}
           <div className={styles.main__keyword}>
             <p className={styles.main__keyword__title}>🔥 현재 가장 인기 있는 키워드 🔥</p>
             <div className={styles.main__keyword__list}>
@@ -149,6 +182,7 @@ function MainPage() {
         </div>
       </div>
       <Footer />
+      
       {/* ✅ 결제 완료 모달 */}
       {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />}
     </>
