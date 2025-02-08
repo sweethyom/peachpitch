@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-sll3pq1+c38$87nifs))**p%^h0wt*cf3ydbmg9i^*&y2xe@21
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['peachpitch.site', '127.0.0.1', 'localhost', '172.20.0.1']
 
 
 # Application definition
