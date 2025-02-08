@@ -94,7 +94,7 @@ const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
                     {limitOn && (
                         <p className={styles.drawer__tag__limit}>
                             {turnCount > 0 ? (
-                                <>남은 턴: <strong>{turnCount}</strong> 회</>
+                                <><strong>{turnCount}</strong> 회</>
                             ) : (
                                 <><strong style={{ color: "red" }}>0</strong> 회</>
                             )}
@@ -168,7 +168,7 @@ const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
                     {/* Prompt 창 */}
                     {chatOpen && (
                         <div className={styles.drawer__chatting__prompt}>
-                            {chatHistory.length > 0 ? (
+                            {chatHistory && chatHistory.length > 0 ? ( // ✅ chatHistory가 undefined/null인지 체크
                                 chatHistory.map((msg, index) => (
                                     <div key={index} className={msg.role === "ai" ? styles.bubble__left : styles.bubble__right}>
                                         {msg.message}
@@ -179,6 +179,7 @@ const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
                             )}
                         </div>
                     )}
+
                 </div>
             </div>
 
