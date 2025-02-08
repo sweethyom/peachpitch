@@ -10,7 +10,13 @@ import leaveBtn from '@/assets/icons/leave.png';
 import sttBtn from '@/assets/icons/chat_stt.png';
 import sttBtnActive from '@/assets/icons/chat_stt_active.png';
 
+/* AI 영상 */
 import Video from '@/components/chat/Video';
+import Video_AI_1 from '@/assets/videos/ai_1.mp4';
+import Video_AI_2 from '@/assets/videos/ai_2.mp4';
+import Video_AI_3 from '@/assets/videos/ai_3.mp4';
+import Video_AI_4 from '@/assets/videos/ai_4.mp4';
+
 import WebcamComponent from '@/components/chat/WebcamComponent';
 import Drawer from '@/components/chat/Drawer';
 import ChatEnd from "@/components/modal/ChatEnd";
@@ -42,10 +48,9 @@ function VoiceChatPage() {
 
   useEffect(() => {
     if (listening && transcript !== currentMessage) {
-      setCurrentMessage(transcript);
+      setCurrentMessage(addQuestionMark(transcript));
     }
   }, [transcript, listening, currentMessage]);
-
 
 
   /* 브라우저 지원 여부 확인 */
@@ -65,45 +70,113 @@ function VoiceChatPage() {
       const response = await axios.post('http://127.0.0.1:8000/ai/start/', {
         keyword: selectedKeyword,
       });
-      setMessageHistory(prev => [...prev, { role: 'ai', message: response.data.message }]);
+      const aiResponse = response.data.message;
+      setMessageHistory(prev => [...prev, { role: 'ai', message: aiResponse }]);
+      // setMessageHistory(prev => [...prev, { role: 'ai', message: response.data.message }]);
+      playTTS(aiResponse); // 구글 tts 재생
     } catch (error) {
       console.error('Error starting conversation:', error);
     }
   };
 
+  // 구글 tts api 이용
+  const GOOGLE_TTS_API_KEY = import.meta.env.VITE_GOOGLE_TTS_API_KEY;
+
+  /* ✅ Google TTS 요청 함수 */
+  const playTTS = async (text: string) => {
+    try {
+      const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_API_KEY}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          input: { text },
+          voice: { languageCode: "ko-KR", ssmlGender: "FEMALE" }, // ✅ 한국어 여성 음성
+          audioConfig: { audioEncoding: "MP3" },
+        }),
+      });
+
+      const data = await response.json();
+      if (data.audioContent) {
+        const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+
+        // ✅ 음성이 시작되면 타이핑 효과 시작
+        setIsTyping(true);
+        setIsWaiting(false);
+        if (text.length > 0) {
+          setAiMessage(text[0]); // 첫 글자 즉시 표시
+        }
+        // setAiMessage('');
+        let index = 0;
+
+        const typingEffect = setInterval(() => {
+          if (index < text.length) {
+            setAiMessage(prev => prev + text[index]);
+            index++;
+          } else {
+            clearInterval(typingEffect);
+            setIsTyping(false);
+            setLastAiMessage(text);
+          }
+        }, 50); // 글자당 50ms 간격 (속도 조절 가능)
+
+        audio.play(); // ✅ 음성 재생
+      }
+    } catch (error) {
+      console.error("Google TTS 오류:", error);
+    }
+  };
+
+  /* AI 응답이 발생할 때 새로운 영상으로 전환 */
+  const handleNewAIResponse = (aiResponse: string) => {
+    console.log("🚀 handleNewAIResponse 실행됨!");
+
+    let randomVideo;
+    do {
+      randomVideo = videos[Math.floor(Math.random() * videos.length)];
+    } while (randomVideo === currentVideo); // ✅ 같은 비디오 반복 방지
+
+    console.log(`🎥 새로운 비디오 설정: ${randomVideo}`);
+
+    setNextVideo(randomVideo);
+  };
+
+
+
   /* 사용자가 메시지를 보낼 때 API 호출 */
   const handleUserMessage = async () => {
     if (!currentMessage.trim()) return;
 
-    // ✅ 사용자의 메시지를 저장
-    setMessageHistory((prev) => [...prev, { role: "user", message: currentMessage }]);
+    const modifiedMessage = addQuestionMark(currentMessage);
+    setMessageHistory((prev) => [...prev, { role: "user", message: modifiedMessage }]);
+    setLastUserMessage(modifiedMessage);
 
-    // ✅ AI의 응답을 12번까지 받도록 함
+    setAiMessage("");
+    setAiResponseBuffer("");
+
     if (turnCount > 0) {
       try {
+        console.log("📡 AI 서버에 요청 중...");
         const response = await axios.post("http://127.0.0.1:8000/ai/chat/", {
-          message: currentMessage,
+          message: modifiedMessage,
         });
 
-        // ✅ AI 응답 저장 및 턴 카운트 감소
-        setMessageHistory((prev) => [...prev, { role: "ai", message: response.data.message }]);
-        setTurnCount((prev) => prev - 1);
-      } catch (error) {
-        console.error("AI 응답 오류:", error);
-      }
-    }
+        const aiResponse = response.data.message;
+        console.log(`📝 AI 응답 받음: ${aiResponse}`);
 
-    // ✅ 턴이 0이 된 후 사용자가 메시지 입력하면 AI 종료 인사
-    if (turnCount === 1) {
-      setIsOverlay(true);
-      setTimeout(() => {
-        setIsOverlay(false);
-        setIsChatEnd(true);
-      }, 10000);
-      setMessageHistory((prev) => [
-        ...prev,
-        { role: "ai", message: "너와의 대화가 즐거웠어. 다음번에 또 즐거운 대화를 하자!" },
-      ]);
+        handleNewAIResponse(aiResponse); // ✅ 비디오 변경 트리거
+
+        setMessageHistory((prev) => [...prev, { role: "ai", message: aiResponse }]);
+        setAiResponseBuffer(aiResponse);
+        setIsWaiting(false);
+
+        playTTS(aiResponse);
+        setTurnCount((prev) => prev - 1);
+
+      } catch (error) {
+        console.error("❌ AI 응답 오류:", error);
+      }
     }
 
     resetTranscript();
@@ -125,7 +198,30 @@ function VoiceChatPage() {
       setCurrentMessage('');
       SpeechRecognition.startListening({ continuous: true, language: 'ko-KR' });
       setIsListening(true);
+
+
+      if (turnCount === 0) {
+        setIsChatEnd(true);
+      }
     }
+  };
+
+  /* 특정 대화에 물음표 붙이기 */
+  const addQuestionMark = (sentence: string): string => {
+    const questionWords = ["넌", "너는", "어디", "뭐", "뭘까", "왜", "어떻게", "언제", "무엇", "몇", "누가", "누구", "어떤"];
+    const lastChar = sentence.trim().slice(-1);
+
+    // 문장이 비어있거나 마지막에 이미 물음표가 있다면 그대로 반환
+    if (!sentence.trim() || lastChar === "?" || lastChar === "!" || lastChar === ".") {
+      return sentence;
+    }
+
+    // 질문 단어 포함 여부 확인 후 물음표 추가
+    if (questionWords.some(word => sentence.includes(word))) {
+      return `${sentence.trim()}?`;
+    }
+
+    return sentence; // 기본적으로 변경 없음
   };
 
   /* 대화 종료 모달창 */
@@ -145,6 +241,33 @@ function VoiceChatPage() {
   const endChat = () => {
     navigate("/report");
   };
+
+  const videos = [Video_AI_1, Video_AI_2, Video_AI_4, Video_AI_3];
+
+  // 기본 영상
+  const [videoState, setVideoState] = useState<string>(videos[1]);
+
+  // ai 영상 상태 변화
+  const [currentVideo, setCurrentVideo] = useState<string>(videos[1]);
+  const [nextVideo, setNextVideo] = useState<string | null>(null);
+
+  // typing 애니메이션
+  const [aiMessage, setAiMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [aiResponseBuffer, setAiResponseBuffer] = useState('');
+  const [lastAiMessage, setLastAiMessage] = useState(''); // 마지막 AI 응답 저장
+  const [lastUserMessage, setLastUserMessage] = useState<string>(''); // 마지막 사용자 메시지 저장
+
+  const handleVideoLoaded = () => {
+    console.log(`비디오 로드 완료: ${currentVideo}`);
+
+    if (nextVideo) {
+      setCurrentVideo(nextVideo);
+      setNextVideo(null);
+    }
+  };
+
 
   return (
     <div className={styles.page}>
@@ -172,17 +295,22 @@ function VoiceChatPage() {
         {/* AI 캐릭터 대화 */}
         <div className={styles.chat__ai}>
           <div className={styles.chat__ai__video}>
-            <Video />
+            {/* <Video videoSrc={currentVideo} nextVideo={nextVideo} /> */}
+            <Video
+              videoSrc={currentVideo}  // 현재 비디오 소스 전달
+              nextVideo={nextVideo}
+              onVideoLoaded={handleVideoLoaded}
+            />
           </div>
           <div className={styles.chat__ai__bubble}>
-            {/* 최신 AI 메시지만 표시 */}
-            {messageHistory.length > 0 &&
-              <div className={styles.bubble__left}>
-                {messageHistory
-                  .filter(msg => msg.role === 'ai')
-                  .slice(-1)[0]?.message || '대화를 시작하세요!'}
-              </div>
-            }
+            <div className={styles.bubble__left}>
+              {isWaiting
+                ? "AI가 응답을 생성 중입니다. 잠시만 기다려 주세요..."
+                : isTyping
+                  ? aiMessage
+                  : lastAiMessage || "AI가 응답을 생성 중입니다. 잠시만 기다려 주세요..."
+              }
+            </div>
           </div>
         </div>
 
@@ -191,8 +319,9 @@ function VoiceChatPage() {
         <div className={styles.chat__user}>
           <div className={styles.chat__user__bubble}>
             <div className={styles.bubble__right}>
-              {currentMessage || '음성을 입력하세요...'}
+              {currentMessage.trim() ? currentMessage : lastUserMessage || '음성을 입력하세요...'}
             </div>
+
           </div>
           <div className={styles.chat__user__video}>
             <WebcamComponent />
@@ -213,20 +342,6 @@ function VoiceChatPage() {
       </div>
 
       <Footer />
-
-      {/* 대화 종료 모달
-      {isChatEnd && (
-        <ChatEnd isOpen={isChatEnd} onClose={endChat}>
-          <div className={styles.modal__btn}>
-            <button className={styles.modal__btn__continue} onClick={restartChat}>
-              다른 대화 진행하기
-            </button>
-            <button className={styles.modal__btn__leave} onClick={endChat}>
-              종료하기
-            </button>
-          </div>
-        </ChatEnd>
-      )} */}
 
       {/* 키워드 모달 */}
       <KeywordModal isOpen={isKeywordOpen} onClose={() => setIsKeywordOpen(false)} setSelectedKeyword={setSelectedKeyword}>
