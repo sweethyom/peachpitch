@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import styles from "./styles/Drawer.module.scss";
 
 import openBtn from "@/assets/icons/drawer_open.png";
@@ -9,14 +10,14 @@ import hintIcon from "@/assets/icons/drawer_hint.png";
 import chatBtn from "@/assets/icons/drawer_chatting.png";
 
 import FeedbackModal from "@/components/modal/Feedback"
-import axios from "axios";
 
 type DrawerProps = {
     selectedKeyword: string | null;
     chatHistory: { role: string; message: string }[];
+    turnCount: number;
 };
 
-const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
+const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // 드로어 토글
@@ -32,10 +33,6 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
         setLimitOn(!limitOn);
     };
 
-    const hintSwitch = () => {
-        setHintOn(!hintOn);
-    };
-
     // 채팅 토글
     const [chatOpen, setChatOpen] = useState(false);
 
@@ -46,25 +43,30 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
     // 힌트
     const [hints, setHints] = useState<string[]>([]);
 
-    // const [setChatHistory] = useState<{ role: string; message: string }[]>([]);
+    const hintSwitch = () => {
+        setHintOn(!hintOn);
+    };
 
+    // ✅ 힌트 데이터 불러오기
+    useEffect(() => {
+        const loadHints = async () => {
+            try {
+                const response = await fetch("/data/hints.json");
+                const data = await response.json();
+                if (selectedKeyword && data[selectedKeyword]) {
+                    setHints(data[selectedKeyword]);
+                } else {
+                    setHints([]);
+                }
+            } catch (error) {
+                console.error("힌트 데이터를 불러오는 중 오류가 발생했습니다:", error);
+            }
+        };
 
-    // useEffect(() => {
-    //     if (chatOpen) {
-    //         const fetchChatHistory = async () => {
-    //             try {
-    //                 const response = await axios.get("http://127.0.0.1:8000/api/chat-history", {
-    //                     params: { keyword: selectedKeyword },
-    //                 });
-    //                 setChatHistory(response.data.history);
-    //             } catch (error) {
-    //                 console.error("채팅 기록 로딩 오류:", error);
-    //             }
-    //         };
-
-    //         fetchChatHistory();
-    //     }
-    // }, [chatOpen, selectedKeyword]);
+        if (selectedKeyword) {
+            loadHints();
+        }
+    }, [selectedKeyword]);
 
     // 피드백 토글
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
@@ -88,9 +90,14 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
                 <div className={styles.drawer__tag}>
                     <p className={styles.drawer__tag__1}>{selectedKeyword || "여행"}</p>
                     <p className={styles.drawer__tag__2} style={{ display: "none" }}></p>
+
                     {limitOn && (
                         <p className={styles.drawer__tag__limit}>
-                            <strong>10</strong> 회
+                            {turnCount > 0 ? (
+                                <>남은 턴: <strong>{turnCount}</strong> 회</>
+                            ) : (
+                                <><strong style={{ color: "red" }}>0</strong> 회</>
+                            )}
                         </p>
                     )}
 
@@ -127,18 +134,24 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
                 </div>
 
                 {/* 힌트 리스트 */}
-                <div className={styles.drawer__hint}>
-                    <div className={styles.drawer__hint__header}>
-                        <p className={styles.drawer__hint__header__title}>[{selectedKeyword || "키워드"}]에 관련된 질문</p>
+                {hintOn && (
+                    <div className={styles.drawer__hint}>
+                        <div className={styles.drawer__hint__header}>
+                            <p className={styles.drawer__hint__header__title}>[{selectedKeyword}] 관련 질문</p>
+                        </div>
+                        <ul className={styles.drawer__hint__list}>
+                            {hints.length > 0 ? (
+                                hints.map((hint, index) => (
+                                    <li key={index} className={styles.drawer__hint__list__item}>
+                                        {hint}
+                                    </li>
+                                ))
+                            ) : (
+                                <li className={styles.noHint}>관련 힌트가 없습니다.</li>
+                            )}
+                        </ul>
                     </div>
-                    <ul className={`${styles.drawer__hint__list} ${!hintOn ? styles["drawer__hint__list--hidden"] : ""}`}>
-                        {hints.map((hint, index) => (
-                            <li key={index} className={styles.drawer__hint__list__item}>
-                                {hint}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                )}
 
                 {/* 채팅 */}
                 <div className={styles.drawer__chatting}>

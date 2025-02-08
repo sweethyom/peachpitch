@@ -1,5 +1,8 @@
 import 'regenerator-runtime/runtime';
 
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+
 import Footer from '@/components/footer/Footer';
 import styles from './styles/voice.module.scss';
 
@@ -10,15 +13,15 @@ import sttBtnActive from '@/assets/icons/chat_stt_active.png';
 import Video from '@/components/chat/Video';
 import WebcamComponent from '@/components/chat/WebcamComponent';
 import Drawer from '@/components/chat/Drawer';
-
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import ChatEnd from "@/components/modal/ChatEnd";
 
 import RoomLeaveModal from '@/components/modal/RoomLeave';
 import KeywordModal from '@/components/modal/Keyword';
 import RedAlert from '@/components/alert/redAlert';
 
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
+import { useNavigate } from "react-router-dom";
 
 function VoiceChatPage() {
   /* 모달 관련 상태 */
@@ -42,6 +45,8 @@ function VoiceChatPage() {
       setCurrentMessage(transcript);
     }
   }, [transcript, listening, currentMessage]);
+
+
 
   /* 브라우저 지원 여부 확인 */
   if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
@@ -70,21 +75,41 @@ function VoiceChatPage() {
   const handleUserMessage = async () => {
     if (!currentMessage.trim()) return;
 
-    setMessageHistory(prev => [...prev, { role: 'user', message: currentMessage }]);
+    // ✅ 사용자의 메시지를 저장
+    setMessageHistory((prev) => [...prev, { role: "user", message: currentMessage }]);
 
-    try {
-      const response = await axios.post('http://127.0.0.1:8000/ai/chat/', {
-        message: currentMessage,
-      });
+    // ✅ AI의 응답을 12번까지 받도록 함
+    if (turnCount > 0) {
+      try {
+        const response = await axios.post("http://127.0.0.1:8000/ai/chat/", {
+          message: currentMessage,
+        });
 
-      setMessageHistory(prev => [...prev, { role: 'ai', message: response.data.message }]);
-    } catch (error) {
-      console.error('Error fetching AI response:', error);
+        // ✅ AI 응답 저장 및 턴 카운트 감소
+        setMessageHistory((prev) => [...prev, { role: "ai", message: response.data.message }]);
+        setTurnCount((prev) => prev - 1);
+      } catch (error) {
+        console.error("AI 응답 오류:", error);
+      }
+    }
+
+    // ✅ 턴이 0이 된 후 사용자가 메시지 입력하면 AI 종료 인사
+    if (turnCount === 1) {
+      setIsOverlay(true);
+      setTimeout(() => {
+        setIsOverlay(false);
+        setIsChatEnd(true);
+      }, 10000);
+      setMessageHistory((prev) => [
+        ...prev,
+        { role: "ai", message: "너와의 대화가 즐거웠어. 다음번에 또 즐거운 대화를 하자!" },
+      ]);
     }
 
     resetTranscript();
-    setCurrentMessage('');
+    setCurrentMessage("");
   };
+
 
   /* 음성 인식 버튼 ON/OFF */
   const toggleListening = () => {
@@ -103,10 +128,37 @@ function VoiceChatPage() {
     }
   };
 
+  /* 대화 종료 모달창 */
+  const navigate = useNavigate();
+
+  const [turnCount, setTurnCount] = useState(10);
+  const [isChatEnd, setIsChatEnd] = useState(false);
+  const [isOverlay, setIsOverlay] = useState(false);
+
+  /* 대화 재시작 */
+  const restartChat = () => {
+    window.location.href = "/chat/ai";
+  };
+
+  /* 대화 종료 후 /report 페이지 이동 */
+  const endChat = () => {
+    navigate("/report");
+  };
+
   return (
     <div className={styles.page}>
+      {/* 오버레이 로딩 화면 */}
+      {isOverlay && (
+        <div className={styles.overlay}>
+          <div className={styles.loader}>로딩 중...</div>
+        </div>
+      )}
+
+      {/* 대화 종료 모달 */}
+      <ChatEnd isOpen={isChatEnd} onClose={endChat} />
+
       <div className={styles.menu}>
-        <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} />
+        <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} turnCount={turnCount} />
       </div>
 
       <div className={styles.chat}>
@@ -122,13 +174,17 @@ function VoiceChatPage() {
             <Video />
           </div>
           <div className={styles.chat__ai__bubble}>
-            {messageHistory.map((msg, index) => (
-              <div key={index} className={msg.role === 'ai' ? styles.bubble__left : styles.bubble__right}>
-                {msg.message}
+            {/* 최신 AI 메시지만 표시 */}
+            {messageHistory.length > 0 &&
+              <div className={styles.bubble__left}>
+                {messageHistory
+                  .filter(msg => msg.role === 'ai')
+                  .slice(-1)[0]?.message || '대화를 시작하세요!'}
               </div>
-            ))}
+            }
           </div>
         </div>
+
 
         {/* 사용자 웹캠 및 대화 */}
         <div className={styles.chat__user}>
@@ -147,15 +203,29 @@ function VoiceChatPage() {
           <p className={styles.chat__input__content}>
             {isListening ? transcript || '음성을 입력하세요...' : ''}
           </p>
-          <img 
-            src={isListening ? sttBtnActive : sttBtn} 
-            className={styles.chat__input__img} 
-            onClick={toggleListening} 
+          <img
+            src={isListening ? sttBtnActive : sttBtn}
+            className={styles.chat__input__img}
+            onClick={toggleListening}
           />
         </div>
       </div>
 
       <Footer />
+
+      {/* 대화 종료 모달
+      {isChatEnd && (
+        <ChatEnd isOpen={isChatEnd} onClose={endChat}>
+          <div className={styles.modal__btn}>
+            <button className={styles.modal__btn__continue} onClick={restartChat}>
+              다른 대화 진행하기
+            </button>
+            <button className={styles.modal__btn__leave} onClick={endChat}>
+              종료하기
+            </button>
+          </div>
+        </ChatEnd>
+      )} */}
 
       {/* 키워드 모달 */}
       <KeywordModal isOpen={isKeywordOpen} onClose={() => setIsKeywordOpen(false)} setSelectedKeyword={setSelectedKeyword}>
