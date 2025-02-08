@@ -4,13 +4,11 @@ FROM python:3.11-slim
 ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 
-ENV SERVER_PORT=8084
-
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
-EXPOSE 8084
+EXPOSE 8083
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:${SERVER_PORT}"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8083"]
