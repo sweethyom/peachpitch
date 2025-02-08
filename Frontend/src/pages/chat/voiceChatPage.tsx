@@ -344,9 +344,13 @@ function VoiceChatPage() {
       <Footer />
 
       {/* 키워드 모달 */}
-      <KeywordModal isOpen={isKeywordOpen} onClose={() => setIsKeywordOpen(false)} setSelectedKeyword={setSelectedKeyword}>
-        <div className={styles.btn} onClick={handleStartClick}>시작하기</div>
-      </KeywordModal>
+      {isKeywordOpen && (
+        <KeywordModal setSelectedKeyword={setSelectedKeyword} onClose={() => setIsKeywordOpen(false)}>
+          <div className={styles.btn} onClick={handleStartClick}>시작하기</div>
+        </KeywordModal>
+      )}
+
+
 
       {/* 키워드 미선택 시 alert */}
       {showAlert && (
