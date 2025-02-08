@@ -4,6 +4,8 @@ services:
   springboot-app:
     image: yuseon7129/peachpitch:bluegreen8081
     container_name: bluegreen-8081
+    build:
+      dockerfile: Dockerfile8081
     environment:
       - TZ=Asia/Seoul
       - LANG=ko_KR.UTF-8

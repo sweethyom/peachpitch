@@ -4,6 +4,8 @@ services:
   django-app:
     image: yuseon7129/peachpitch:bluegreen8083
     container_name: bluegreen-8083
+    build:
+      dockerfile: Dockerfile8083
     environment:
       - TZ=Asia/Seoul
       - LANG=ko_KR.UTF-8
