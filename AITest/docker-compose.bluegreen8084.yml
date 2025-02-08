@@ -22,7 +22,7 @@ services:
     networks:
       - peachpitch-network
     ports:
-      - "8084:8083"
+      - "8084:8084"
 
 networks:
   peachpitch-network:
