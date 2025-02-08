@@ -98,7 +98,7 @@ public class VideoChatServiceImpl implements VideoChatService {
                     .status("waiting")
                     .build();
             //messagingTemplate.convertAndSendToUser(String.valueOf(userId), "/sub/call", waitingResponse);
-            messagingTemplate.convertAndSend("/sub/call/" + userId, ResponseEntity.ok(ResponseDto.of("Waiting for another user to join", waitingResponse)));
+            messagingTemplate.convertAndSend("/sub/call/" + userId, ResponseEntity.ok(new ResponseDto<>("Waiting for another user to join", waitingResponse)));
         } else {
             //두번째 사용자가 들어오면 매칭 진행
             Long matchedUserId = waitingUsers.poll();
@@ -136,9 +136,9 @@ public class VideoChatServiceImpl implements VideoChatService {
 
             //추후 jwt인증으로 변경한다면 사용해야 하는 코드
             //messagingTemplate.convertAndSendToUser(String.valueOf(matchedUserId), "/sub/call", user1Response);
-            messagingTemplate.convertAndSend("/sub/call/" + matchedUserId, ResponseEntity.ok(ResponseDto.of("Waiting for another user to join", user1Response)));
+            messagingTemplate.convertAndSend("/sub/call/" + matchedUserId, ResponseEntity.ok(new ResponseDto<>("Waiting for another user to join", user1Response)));
             //messagingTemplate.convertAndSendToUser(String.valueOf(userId), "/queue/call", user2Response);
-            messagingTemplate.convertAndSend("/sub/call/" + userId, ResponseEntity.ok(ResponseDto.of("Waiting for another user to join", user2Response)));
+            messagingTemplate.convertAndSend("/sub/call/" + userId, ResponseEntity.ok(new ResponseDto<>("Waiting for another user to join", user2Response)));
         }
     }
 }

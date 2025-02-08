@@ -51,6 +51,6 @@ public class AudioChatController {
                 .keyword(keyword)
                 .historyId(historyId)
                 .build();
-        return ResponseEntity.ok(ResponseDto.of("Keyword added and create AI room successfully", chatResponse));
+        return ResponseEntity.ok(new ResponseDto<>("Keyword added and create AI room successfully", chatResponse));
     }
 }
