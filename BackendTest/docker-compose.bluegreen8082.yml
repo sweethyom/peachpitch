@@ -15,14 +15,14 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://43.201.5.129:13306/test?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=pikapikapika1234
-      - SPRING_JPA_HIBERNATE_DDL-AUTO=update
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SERVER_PORT=8082
       - SPRING_REDIS_HOST=43.201.5.129
       - SPRING_REDIS_PORT=6379
     networks:
       - peachpitch-network
     ports:
-      - "8082:8081"
+      - "8082:8082"
 
 networks:
   peachpitch-network:

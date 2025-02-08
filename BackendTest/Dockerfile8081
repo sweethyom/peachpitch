@@ -8,11 +8,11 @@ ENV LC_ALL=ko_KR.UTF-8
 # Spring Boot 포트 설정 (필요 시 오버라이드 가능)
 ENV SERVER_PORT=8081
 
-WORKDIR /spring-boot
+WORKDIR /app
 
 # 애플리케이션 복사 및 실행 설정
 COPY build/libs/*SNAPSHOT.jar app.jar
 
 EXPOSE 8081
 
-ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=${SERVER_PORT}"]
+ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=8081"]
