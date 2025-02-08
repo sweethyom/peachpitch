@@ -34,8 +34,8 @@ if [ -z "$EXIST_GITCHAN" ]; then
     echo "8081(블루) 환경이 실행되지 않음. 8081 환경 실행..."
     remove_existing_container $BLUE_S_CONTAINER
     remove_existing_container $BLUE_D_CONTAINER
-    sudo docker compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml up -d --force-recreate --remove-orphans
-    sudo docker compose -p bluegreen-8083 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8083.yml up -d --force-recreate --remove-orphans
+    docker-compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml up -d --build
+    docker-compose -p bluegreen-8083 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8083.yml up -d --build
     BEFORE_S_COLOR="8082"
     AFTER_S_COLOR="8081"
     BEFORE_S_PORT=8082
@@ -48,8 +48,8 @@ else
     echo "8082(그린) 환경이 실행되지 않음. 8082 환경 실행..."
     remove_existing_container $GREEN_S_CONTAINER
     remove_existing_container $GREEN_D_CONTAINER
-    sudo docker compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8082.yml up -d --force-recreate --remove-orphans
-    sudo docker compose -p bluegreen-8084 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8084.yml up -d --force-recreate --remove-orphans
+    docker-compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8082.yml up -d --build
+    docker-compose -p bluegreen-8084 -f /home/ubuntu/S12P11D201/AITest/docker-compose.bluegreen8084.yml up -d --build
     BEFORE_S_COLOR="8081"
     AFTER_S_COLOR="8082"
     BEFORE_S_PORT=8081
