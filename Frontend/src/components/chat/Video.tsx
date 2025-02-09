@@ -24,7 +24,7 @@ function VideoComponent({ videoSrc, nextVideo, onVideoLoaded }: VideoProps) {
 
 
   return (
-    <div style={{ width: "550px", height: "460px", overflow: "hidden", position: "relative", margin: "0 auto" }}>
+    <div style={{ width: "470px", height: "400px", overflow: "hidden", position: "relative", margin: "0 auto" }}>
       {/* ✅ 배경 비디오도 새로운 비디오로 변경 */}
       <video
         src={backgroundVideo}

@@ -194,8 +194,9 @@ function MainPage() {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
-      <Footer />
+      
 
       {/* ✅ 결제 완료 모달 */}
       {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />}

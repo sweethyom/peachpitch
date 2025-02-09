@@ -3,7 +3,7 @@ import 'regenerator-runtime/runtime';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-import Footer from '@/components/footer/Footer';
+// import Footer from '@/components/footer/Footer';
 import styles from './styles/voice.module.scss';
 
 import leaveBtn from '@/assets/icons/leave.png';
@@ -341,7 +341,7 @@ function VoiceChatPage() {
         </div>
       </div>
 
-      <Footer />
+      {/* <Footer /> */}
 
       {/* 키워드 모달 */}
       {isKeywordOpen && (
