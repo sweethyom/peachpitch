@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import CompletePay from '@/components/modal/SuccessPay';
 
 import GreenAlert from '@/components/alert/greenAlert';
+import RedAlert from '@/components/alert/redAlert';
 
 function MainPage() {
   const [randomTalks, setRandomTalks] = useState<string[]>([]);
@@ -28,6 +29,9 @@ function MainPage() {
   const navigate = useNavigate();
 
   const [showWelcomeAlert, setShowWelcomeAlert] = useState(false);
+
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [permissionAlert, setPermissionAlert] = useState<string | null>(null);
 
   // ✅ 핑거프린트 생성 함수
   const generateFingerprint = async () => {
@@ -123,26 +127,56 @@ function MainPage() {
   // ✅ AI 채팅 접근 핸들러
   const handleAIChatClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+
+    const hasPermission = await checkPermissions();
+    if (!hasPermission) {
+      setAlertMessage("마이크 및 카메라 권한을 허용해야 합니다!");
+      return;
+    }
+
     if (!fingerprint) {
       console.error('Fingerprint not generated');
       return;
     }
 
-    try {
-      const response = await axios.post('/api/trial/check', {
-        fingerprint: fingerprint,
-      });
+    // try {
+      // const response = await axios.post('/api/trial/check', {
+      //   fingerprint: fingerprint,
+      // });
 
-      if (response.data.canAccess) {
+      // if (response.data.canAccess) {
         navigate('/chat/ai');
-      } else {
-        alert('무료 체험은 1회만 가능합니다. 로그인해주세요.');
-        navigate('/login');
-      }
+      // } else {
+        // setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
+        // navigate('/login');
+      // }
+    // } catch (error) {
+      // console.error('Trial check failed:', error);
+      // setAlertMessage("서비스 이용에 문제가 발생했습니다.");
+    // }
+  };
+
+  // ✅ 마이크 및 카메라 권한 체크 함수
+  const checkPermissions = async () => {
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+      return true; // ✅ 권한이 허용됨
     } catch (error) {
-      console.error('Trial check failed:', error);
-      alert('서비스 이용에 문제가 발생했습니다.');
+      return false; // ❌ 권한이 거부됨
     }
+  };
+
+  // ✅ 1:1 매칭 접근 핸들러 (권한 체크 추가)
+  const handleVideoChatClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    const hasPermission = await checkPermissions();
+    if (!hasPermission) {
+      setAlertMessage("마이크 및 카메라 권한을 허용해야 합니다!");
+      return;
+    }
+
+    navigate("/chat/video");
   };
 
   return (
@@ -160,14 +194,14 @@ function MainPage() {
 
           {/* ✅ AI 채팅 & 1:1 매칭 */}
           <div className={styles.main__chat}>
-            <Link to="/chat/ai" className={styles.main__link}>
+            <Link to="#" onClick={handleAIChatClick} className={styles.main__link}>
               <div className={styles.main__chat__voice}>
                 <p className={styles.voice}>AI와 스몰토킹</p>
                 <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
               </div>
             </Link>
 
-            <Link to="/chat/video" className={styles.main__link}>
+            <Link to="#" onClick={handleVideoChatClick} className={styles.main__link}>
               <div className={styles.main__chat__video}>
                 <p className={styles.video}>1:1 매칭 스몰토킹</p>
                 <p className={styles.video__description}>사람과의 스몰토킹 너두 할 수 있어!</p>
@@ -196,16 +230,26 @@ function MainPage() {
         </div>
         <Footer />
       </div>
-      
+
 
       {/* ✅ 결제 완료 모달 */}
       {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />}
 
       {/* ✅ 로그인 성공 후 GreenAlert 유지 */}
       {showWelcomeAlert && (
-        <div style={{ zIndex: 9999 }}>
+        <div>
           <GreenAlert message="로그인에 성공하였습니다. 환영합니다." onClose={() => setShowWelcomeAlert(false)} />
         </div>
+      )}
+
+      {alertMessage && (
+        <div>
+          <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
+        </div>
+      )}
+
+      {permissionAlert && (
+        <RedAlert message={permissionAlert} onClose={() => setPermissionAlert(null)} />
       )}
     </>
   );
