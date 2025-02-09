@@ -12,7 +12,7 @@ docker-compose -p my-react -f /home/ubuntu/S12P11D201/test/docker-compose.yml pu
 function remove_existing_container() {
     local container_name=$1
     echo "기존 컨테이너 확인 중: $container_name"
-    existing_container=$(sudo docker ps -a --filter "name=$container_name" --format "{{.ID}}")
+    existing_container=$(docker ps -a --filter "name=$container_name" --format "{{.ID}}")
     if [ ! -z "$existing_container" ]; then
         echo "기존 컨테이너($container_name)가 존재합니다. 삭제 중..."
         docker stop $container_name >/dev/null 2>&1
@@ -28,7 +28,7 @@ BLUE_D_CONTAINER="bluegreen-8083"
 GREEN_D_CONTAINER="bluegreen-8084"
 
 # Blue-Green 배포 환경 전환
-EXIST_GITCHAN=$(sudo docker compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml ps | grep Up)
+EXIST_GITCHAN=$(docker-compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/BackendTest/docker-compose.bluegreen8081.yml ps | grep Up)
 
 if [ -z "$EXIST_GITCHAN" ]; then
     echo "8081(블루) 환경이 실행되지 않음. 8081 환경 실행..."
