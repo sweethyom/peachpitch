@@ -79,59 +79,65 @@ function joinPage() {
   return (
     <>
       <Header />
+      <div className={styles.wrap}>
+        <div className={styles.page}>
 
-      <div className={styles.page}>
+          <div className={styles.join}>
 
-        <div className={styles.join}>
+            <p className={styles.join__title}>환영합니다!</p>
+            <p className={styles.join__explain}>가벼운 대화가 어려운 사람들을 위한 PeachPitch</p>
 
-          <p className={styles.join__title}>환영합니다!</p>
-          <p className={styles.join__explain}>가벼운 대화가 어려운 사람들을 위한 PeachPitch</p>
+            <form onSubmit={handleSubmit} style={{ width: "100%" }}>
+              <div className={styles.join__form}>
+                <label htmlFor='email' className={styles.join__form__label}>이메일</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className={styles.join__form__input}
+                />
+              </div>
 
-          <form onSubmit={handleSubmit} style={{ width: "100%" }}>
-            <div className={styles.join__form}>
-              <label htmlFor='email' className={styles.join__form__label}>이메일</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className={styles.join__form__input}
-              />
+              <div className={styles.join__form}>
+                <label htmlFor='password' className={styles.join__form__label}>비밀번호</label>
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className={styles.join__form__input}
+                />
+              </div>
+
+              <div className={styles.join__form}>
+                <label htmlFor='birthdate' className={styles.join__form__label}>생년월일</label>
+                <input
+                  type="date"
+                  id="birthdate"
+                  name="birthdate"
+                  value={formData.birthdate}
+                  onChange={handleChange}
+                  required
+                  className={styles.join__form__input}
+                />
+              </div>
+
+              <button type="submit" className={styles.join__submit}>회원가입</button>
+            </form>
+
+            <div className={styles.join__login}>
+              로그인을 진행하시겠습니까?{' | '}
+              <a href="/login" className={styles.join__login__btn}>로그인하러 가기</a>
             </div>
-
-            <div className={styles.join__form}>
-              <label htmlFor='password' className={styles.join__form__label}>비밀번호</label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className={styles.join__form__input}
-              />
-            </div>
-
-            <div className={styles.join__form}>
-              <label htmlFor='birthdate' className={styles.join__form__label}>생년월일</label>
-              <input
-                type="date"
-                id="birthdate"
-                name="birthdate"
-                value={formData.birthdate}
-                onChange={handleChange}
-                required
-                className={styles.join__form__input}
-              />
-            </div>
-
-            <button type="submit" className={styles.join__submit}>회원가입</button>
-          </form>
+          </div>
         </div>
+        <Footer />
       </div>
-      <Footer />
 
       {showAlert && (
         <div style={{ zIndex: 9999 }}>
