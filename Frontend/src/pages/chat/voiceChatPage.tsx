@@ -1,6 +1,6 @@
 import 'regenerator-runtime/runtime';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
 // import Footer from '@/components/footer/Footer';
@@ -81,10 +81,18 @@ function VoiceChatPage() {
 
   // 구글 tts api 이용
   const GOOGLE_TTS_API_KEY = import.meta.env.VITE_GOOGLE_TTS_API_KEY;
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   /* ✅ Google TTS 요청 함수 */
   const playTTS = async (text: string) => {
     try {
+      stopTTS();
+
+      // if (audioRef.current) {
+      //   audioRef.current.pause();
+      //   audioRef.current.currentTime = 0;
+      // }
+
       const response = await fetch(`https://texttospeech.googleapis.com/v1/text:synthesize?key=${GOOGLE_TTS_API_KEY}`, {
         method: "POST",
         headers: {
@@ -100,6 +108,7 @@ function VoiceChatPage() {
       const data = await response.json();
       if (data.audioContent) {
         const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+        audioRef.current = audio;
 
         // ✅ 음성이 시작되면 타이핑 효과 시작
         setIsTyping(true);
@@ -268,6 +277,25 @@ function VoiceChatPage() {
     }
   };
 
+  /* 페이지 이동 시 TTS 중단 */
+  useEffect(() => {
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    };
+  }, []);
+
+  const stopTTS = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      audioRef.current.src = "";
+      audioRef.current.load();
+      audioRef.current = null; // ✅ 오디오 객체 초기화
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -360,7 +388,7 @@ function VoiceChatPage() {
       )}
 
       {/* 대화 나가기 모달 */}
-      <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} />
+      <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} stopTTS={stopTTS} />
     </div>
   );
 }
