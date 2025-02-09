@@ -89,56 +89,62 @@ function LandingPage() {
 
             {/* 상위 컨테이너에 동적으로 클래스 추가 */}
             <div className={`${styles.page} ${getPageClass()}`}>
-                <div className={styles.landing}>
-                    <p className={styles.landing__keyword}>{keyword}</p>
-                    <p
-                        className={styles.landing__title}
-                        dangerouslySetInnerHTML={{ __html: title }}
-                    ></p>
-                    <div className={styles.landing__button}>
-                        <Link to="/main">
+                <div className={styles.page__wrap}>
+                    <div className={styles.landing}>
+                        <p className={styles.landing__keyword}>{keyword}</p>
+                        <p
+                            className={styles.landing__title}
+                            dangerouslySetInnerHTML={{ __html: title }}
+                        ></p>
+                        <div className={styles.landing__button}>
+                            <Link to="/main">
+                                <button
+                                    className={styles.landing__button__start}
+                                    onClick={() =>
+                                        (document.body.style.backgroundColor = 'var(--color-white-000)')
+                                    }
+                                >
+                                    시작하기
+                                </button>
+                            </Link>
                             <button
-                                className={styles.landing__button__start}
-                                onClick={() =>
-                                    (document.body.style.backgroundColor = 'var(--color-white-000)')
-                                }
+                                className={styles.landing__button__tutorial}
+                                onClick={toggleTutorial}
                             >
-                                시작하기
+                                튜토리얼
                             </button>
-                        </Link>
-                        <button
-                            className={styles.landing__button__tutorial}
-                            onClick={toggleTutorial}
-                        >
-                            튜토리얼
-                        </button>
+                        </div>
                     </div>
+
+                    <div className={styles.post}>
+                        <img
+                            src={magnifier}
+                            alt="magnifier"
+                            className={`${styles.post__image} ${currentStep === 0 ? styles.active : currentStep === 1 ? styles.exit : ''}`}
+                        />
+                        <img
+                            src={meeting}
+                            alt="meeting"
+                            className={`${styles.post__image} ${currentStep === 1 ? styles.active : currentStep === 2 ? styles.exit : ''}`}
+                        />
+                        <img
+                            src={talk}
+                            alt="talk"
+                            className={`${styles.post__image} ${currentStep === 2 ? styles.active : currentStep === 0 ? styles.exit : ''}`}
+                        />
+                    </div>
+
+
                 </div>
 
-                <div className={styles.post}>
-                    <img
-                        src={magnifier}
-                        alt="magnifier"
-                        className={`${styles.post__image} ${currentStep === 0 ? styles.active : currentStep === 1 ? styles.exit : ''}`}
-                    />
-                    <img
-                        src={meeting}
-                        alt="meeting"
-                        className={`${styles.post__image} ${currentStep === 1 ? styles.active : currentStep === 2 ? styles.exit : ''}`}
-                    />
-                    <img
-                        src={talk}
-                        alt="talk"
-                        className={`${styles.post__image} ${currentStep === 2 ? styles.active : currentStep === 0 ? styles.exit : ''}`}
-                    />
-                </div>
+                <Footer
+                    isGreen={currentStep === 0}
+                    isPink={currentStep === 1}
+                    isYellow={currentStep === 2}
+                />
             </div>
 
-            <Footer
-                isGreen={currentStep === 0}
-                isPink={currentStep === 1}
-                isYellow={currentStep === 2}
-            />
+
 
             <TutorialModal isOpen={isTutorialOpen} onClose={toggleTutorial} />
         </>

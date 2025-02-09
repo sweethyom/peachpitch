@@ -1,18 +1,28 @@
 .page {
     display: flex;
-    // flex-direction: column;
+    flex-direction: column; // 세로 정렬로 변경
+    align-items: center; // 수직 중앙 정렬
+    justify-content: center; // 수평 중앙 정렬
     margin: 0 auto;
-
     width: 1100px;
-    min-height: 90vh;
-    align-items: center;
-    justify-content: space-between;
+    flex: 1;
+
+    height: auto;
+    min-height: 100vh;
+    min-height: 880px;
+
+    &__wrap {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-grow: 1;
+    }
 }
 
 .landing {
-
     display: flex;
     flex-direction: column;
+    justify-content: center;
 
     &__keyword {
         font-weight: 700;
@@ -29,7 +39,8 @@
         display: flex;
         gap: 20px;
 
-        &__start, &__tutorial {
+        &__start,
+        &__tutorial {
             transition: background-color 0.3s ease, color 0.3s ease;
         }
     }

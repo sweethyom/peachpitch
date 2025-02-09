@@ -15,8 +15,8 @@ const WebcamComponent = () => {
                 width={500}
                 height={460}
                 videoConstraints={{
-                    width: 500,
-                    height: 460,
+                    width: 470,
+                    height: 400,
                     facingMode: "user", // 전면 카메라 (후면 카메라 사용 시 "environment")
                 }}
                 // style={{ borderRadius: "10px", border: "2px solid #ccc" }}

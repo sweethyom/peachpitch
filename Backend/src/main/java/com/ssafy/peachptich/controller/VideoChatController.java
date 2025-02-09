@@ -31,10 +31,10 @@ public class VideoChatController {
         RoomResponse result = videoChatService.handleVideoChat(userId);
         // 첫 번째 사용자 요청 시 (token과 historyId가 null)
         if (result.getHistoryId() == null) {
-            return ResponseEntity.ok(ResponseDto.of("Waiting for another user to join", result));
+            return ResponseEntity.ok(new ResponseDto<>("Waiting for another user to join", result));
         }
         //두번째 사용자 요청
-        return ResponseEntity.ok(ResponseDto.of("Video chat matched successfully",
+        return ResponseEntity.ok(new ResponseDto<>("Video chat matched successfully",
                 result));
     }
 
@@ -62,7 +62,7 @@ public class VideoChatController {
                 .keyword(keyword)
                 .historyId(historyId)
                 .build();
-        return ResponseEntity.ok(ResponseDto.of("Keyword added successfully", chatResponse));
+        return ResponseEntity.ok(new ResponseDto<>("Keyword added successfully", chatResponse));
     }
 
     @PostMapping("/feedback")
@@ -73,7 +73,7 @@ public class VideoChatController {
         Long historyId = feedbackRequest.getHistoryId();
         String feedback = feedbackRequest.getFeedback();
         chatHistoryService.updateFeedbackByUserId(historyId, userId, feedback);
-        return ResponseEntity.ok(ResponseDto.of("Successfully saved feedback", null));
+        return ResponseEntity.ok(new ResponseDto<>("Successfully saved feedback", null));
     }
 
 }
