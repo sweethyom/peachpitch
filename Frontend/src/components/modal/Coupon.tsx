@@ -1,123 +1,146 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./styles/Coupon.module.scss";
-
 import closeBtn from "@/assets/icons/modal__close.png";
 import couponImg from "@/assets/images/coupon_img.png";
 
+import RedAlert from "../alert/redAlert";
+
 type ModalProps = {
-    isOpen: boolean; // 모달 열림 상태
-    onClose: () => void; // 닫기 버튼 클릭 이벤트
+    isOpen: boolean;
+    onClose: () => void;
 };
 
 function Coupon({ isOpen, onClose }: ModalProps) {
-    const [counts, setCounts] = useState([0, 0, 0]); // 아이템 개수 배열로 관리
-    const prices = [1000, 3000, 5000]; // 각 아이템의 가격
-    const totalPrice = counts.reduce((acc, count, index) => acc + count * prices[index], 0); // 총 금액 계산
+    const [counts, setCounts] = useState([0, 0, 0]);
+    const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const prices = [1000, 3000, 5000];
+    const totalPrice = counts.reduce((acc, count, index) => acc + count * prices[index], 0);
 
-    // 증가 버튼 클릭 이벤트
     const increment = (index: number) => {
         setCounts((prevCounts) =>
             prevCounts.map((count, i) => (i === index ? count + 1 : count))
         );
     };
 
-    // 감소 버튼 클릭 이벤트
     const decrement = (index: number) => {
         setCounts((prevCounts) =>
             prevCounts.map((count, i) => (i === index && count > 0 ? count - 1 : count))
         );
     };
 
-    if (!isOpen) return null;
-    // 결제 처리 함수
-    const handlePayment = async () => {
-        try {
-            // counts 배열의 합계 계산
-            const totalCount = counts.reduce((acc, count, index) => {
-                const usage = (index * 2) + 1;  // 1회권, 3회권, 5회권
-                return acc + (count * usage);
-            }, 0);
+    // ✅ 결제 완료 메시지를 감지하여 모달 닫기
+    useEffect(() => {
 
-            console.log('결제 요청 시작');
-            const response = await fetch('http://localhost:8080/api/pay/ready', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'  // Content-Type 헤더 명시적 설정
-                },
+        const handlePaymentMessage = (event: MessageEvent) => {
+            console.log("📩 쿠폰 모달에서 결제 완료 메시지 수신:", event.data, "from:", event.origin);
+
+            if (event.origin !== "http://localhost:8080") return;
+
+            if (event.data === "paymentSuccess") {
+                onClose(); // ✅ 쿠폰 모달 닫기
+            }
+        };
+
+        window.addEventListener("message", handlePaymentMessage);
+
+        return () => {
+            window.removeEventListener("message", handlePaymentMessage);
+        };
+    }, []);
+
+    if (!isOpen) return null;
+
+    const handlePayment = async () => {
+        if (totalPrice === 0) {
+            setAlertMessage("최소 1개 이상 선택해야 합니다!");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:8080/api/pay/ready", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    item: {
-                        name: "이용권",
-                    },
+                    item: { name: "이용권" },
                     totalPrice: totalPrice,
-                    ea: totalCount
-                })
+                    ea: counts.reduce((acc, count, index) => acc + count * ((index * 2) + 1), 0),
+                }),
             });
 
-            console.log('응답 상태:', response.status);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+            const data = await response.json();
+            localStorage.setItem("tid", data.tid); // ✅ tid 저장
+
+            // ✅ 카카오페이 결제 페이지로 이동 (팝업)
+            const paymentWindow = window.open(data.next_redirect_pc_url, "kakaopay", "width=500,height=700");
+
+            if (!paymentWindow) {
+                setAlertMessage("팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.");
+                return;
             }
 
-            const data = await response.json();
-            console.log('응답 데이터:', data);
+            // ✅ 팝업 창에서 결제 완료 메시지 수신 후 닫힘 감지
+            window.addEventListener("message", (event) => {
+                console.log("📩 결제 완료 메시지 수신:", event.data, "from:", event.origin);
 
-            window.location.href = data.next_redirect_pc_url;
+                if (event.data === "paymentSuccess") {
+                    if (paymentWindow) {
+                        paymentWindow.close(); // ✅ 팝업 창 닫기
+                    }
+                }
+            }, false);
+
         } catch (error) {
-            console.error('상세 에러:', error);
-            alert('결제 처리 중 오류가 발생했습니다.');
+            console.error("🚨 결제 처리 오류:", error);
+            setAlertMessage("결제 처리 중 문제가 발생했습니다.");
         }
     };
 
     return (
-        <div className={styles.overlay}>
-            <div className={styles.modal}>
-                <div className={styles.modal__header}>
-                    <img src={closeBtn} className={styles.modal__header__close} onClick={onClose}/>
-                    <p className={styles.modal__header__logo}>PeachPitch</p>
-                </div>
-                <p className={styles.modal__header__title}>이용권 구매</p>
+        <>
+            {alertMessage && <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />}
 
-                {/* 이용권 아이템들 */}
-                <div className={styles.modal__contents}>
-                    {[...Array(3)].map((_, index) => (
-                        <div key={index} className={styles.modal__contents__item}>
-                            <img src={couponImg} width={"210px"}/>
-                            <p className={styles.modal__contents__label}>
-                                AI와 스몰토킹 {(index * 2) + 1}회권
-                            </p>
-                            <p className={styles.modal__contents__label}>{(index * 2) + 1},000원</p>
-
-                            <div className={styles.modal__count}>
-                                <button className={styles.modal__count__btn} onClick={() => increment(index)}>
-                                    +
-                                </button>
-                                <p id={`count_item${index + 1}`} className={styles.modal__count__label}>
-                                    {counts[index]}
-                                </p>
-                                <button className={styles.modal__count__btn} onClick={() => decrement(index)}>
-                                    -
-                                </button>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-
-                {/* 총 금액 표시 */}
-                <div className={styles.modal__price}>
-                    <div className={styles.modal__price__wrapper}>
-                        <p className={styles.modal__price__label}>총</p>
-                        <p className={styles.modal__price__total}>{totalPrice.toLocaleString()}</p>
-                        <p className={styles.modal__price__label}>원</p>
+            <div className={styles.overlay}>
+                <div className={styles.modal}>
+                    <div className={styles.modal__header}>
+                        <img src={closeBtn} className={styles.modal__header__close} onClick={onClose} />
+                        <p className={styles.modal__header__logo}>PeachPitch</p>
                     </div>
-                    <button
-                        className={styles.modal__price__btn}
-                        onClick={handlePayment}
-                    >
-                        구매하기
-                    </button>
+                    <p className={styles.modal__header__title}>이용권 구매</p>
+                    <div className={styles.modal__contents}>
+                        {[...Array(3)].map((_, index) => (
+                            <div key={index} className={styles.modal__contents__item}>
+                                <img src={couponImg} width={"210px"} />
+                                <p className={styles.modal__contents__label}>
+                                    AI와 스몰토킹 {(index * 2) + 1}회권
+                                </p>
+                                <p className={styles.modal__contents__label}>{(index * 2) + 1},000원</p>
+                                <div className={styles.modal__count}>
+                                    <button className={styles.modal__count__btn} onClick={() => increment(index)}>
+                                        +
+                                    </button>
+                                    <p id={`count_item${index + 1}`} className={styles.modal__count__label}>
+                                        {counts[index]}
+                                    </p>
+                                    <button className={styles.modal__count__btn} onClick={() => decrement(index)}>
+                                        -
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className={styles.modal__price}>
+                        <div className={styles.modal__price__wrapper}>
+                            <p className={styles.modal__price__label}>총</p>
+                            <p className={styles.modal__price__total}>{totalPrice.toLocaleString()}</p>
+                            <p className={styles.modal__price__label}>원</p>
+                        </div>
+                        <button className={styles.modal__price__btn} onClick={handlePayment}>
+                            구매하기
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 
