@@ -10,15 +10,15 @@ import hintIcon from "@/assets/icons/drawer_hint.png";
 import chatBtn from "@/assets/icons/drawer_chatting.png";
 
 import FeedbackModal from "@/components/modal/Feedback"
-import Setting from "@/components/modal/Setting";
+
+import Setting from "@/components/modal/Setting"
 
 type DrawerProps = {
     selectedKeyword: string | null;
     chatHistory: { role: string; message: string }[];
-    turnCount: number;
 };
 
-const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
+const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // 드로어 토글
@@ -29,6 +29,7 @@ const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
     // 스위치 토글
     const [limitOn, setLimitOn] = useState(false);
     const [hintOn, setHintOn] = useState(false);
+    const [timeLeft, setTimeLeft] = useState(180);
 
     const limitSwitch = () => {
         setLimitOn(!limitOn);
@@ -74,6 +75,30 @@ const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
         }
     }, [selectedKeyword]);
 
+    useEffect(() => {
+        if (limitOn) {
+            const timer = setInterval(() => {
+                setTimeLeft((prevTime) => {
+                    if (prevTime <= 1) {
+                        clearInterval(timer);
+                        return 0;
+                    }
+                    return prevTime - 1;
+                });
+            }, 1000);
+
+            return () => clearInterval(timer);
+        } else {
+            setTimeLeft(180); // 스위치를 끄면 다시 3분으로 리셋
+        }
+    }, [limitOn]);
+
+    const formatTime = (seconds: number) => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    };
+
     // 피드백 토글
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
@@ -87,7 +112,7 @@ const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
                 <div className={styles.drawer__header}>
                     <img src={closeBtn} onClick={toggleDrawer} width={"12px"} height={"23px"} />
                     <button onClick={toggleFeedback}>피드백</button>
-                    <img src={settingBtn} width={"30px"} onClick={toggleSetting} />
+                    <img src={settingBtn} width={"30px"} onClick={toggleSetting}/>
                 </div>
 
                 <hr className={styles.drawer__divider} />
@@ -99,11 +124,9 @@ const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
 
                     {limitOn && (
                         <p className={styles.drawer__tag__limit}>
-                            {turnCount > 0 ? (
-                                <><strong>{turnCount}</strong> 회</>
-                            ) : (
-                                <><strong style={{ color: "red" }}>0</strong> 회</>
-                            )}
+                            <strong style={{ color: timeLeft === 0 ? "red" : "black" }}>
+                                {formatTime(timeLeft)}
+                            </strong>
                         </p>
                     )}
 
@@ -112,7 +135,7 @@ const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
                 {/* 남은 턴수 */}
                 <div className={styles.drawer__wrapper}>
                     <img src={timerIcon} width={"30px"} />
-                    <p className={styles.drawer__sub}>남은 턴수</p>
+                    <p className={styles.drawer__sub}>타이머</p>
 
                     {/* 스위치 */}
                     <div className={styles.drawer__wrapper__switch}>
@@ -190,7 +213,7 @@ const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
             </div>
 
             <Setting isOpen={isSettingOpen} onClose={toggleSetting} />
-            
+
             {/* 열기 버튼 */}
             {!isOpen && (
                 <button onClick={toggleDrawer} className={styles.drawerToggle}>
