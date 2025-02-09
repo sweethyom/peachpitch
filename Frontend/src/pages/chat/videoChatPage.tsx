@@ -4,7 +4,7 @@ import leaveBtn from '@/assets/icons/leave.png'
 import sstBtn from '@/assets/icons/chat_stt.png'
 import WebcamComponent from '@/components/chat/WebcamComponent';
 
-import Drawer from '@/components/chat/Drawer';
+import Drawer from '@/components/chat/DrawerVideo';
 import { useState } from 'react';
 
 import RoomLeaveModal from '@/components/modal/RoomLeave';
@@ -43,7 +43,7 @@ function videoChatPage() {
 
       {/* 설정 메뉴바 */}
       <div className={styles.menu}>
-        <Drawer selectedKeyword={selectedKeyword} chatHistory={chatHistory} turnCount={10} />
+        <Drawer selectedKeyword={selectedKeyword} chatHistory={chatHistory} />
       </div>
 
       <div className={styles.chat}>
@@ -111,7 +111,7 @@ function videoChatPage() {
       }
 
       {/* 대화 나가기 모달 */}
-      <RoomLeaveModal isOpen={isLeaveOpen} onClose={toggleLeave} />
+      <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} stopTTS={() => {}} />
     </div >
   )
 }
