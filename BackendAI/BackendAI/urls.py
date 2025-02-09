@@ -4,5 +4,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ai/', include('chatbotAPI.urls')),
-    path('ai/users/', include('reportAI.urls')),  # 변경된 부분
+    path('ai/users/reports/analysis/', include('reportAI.urls')),
+    path('ai/users/reports/words/', include('wordAI.urls')),
 ]
