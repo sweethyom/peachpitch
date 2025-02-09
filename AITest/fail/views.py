@@ -46,4 +46,4 @@ def chat_api(request):
         
         return JsonResponse({"response": response_text})
     else:
-        return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405, json_dumps_params={'ensure_ascii': False}  # 한글 깨짐 방지)
+        return JsonResponse({"error": "POST 요청만 허용됩니다."}, status=405, json_dumps_params={'ensure_ascii': False})  # 한글 깨짐 방지)
