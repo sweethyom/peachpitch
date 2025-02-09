@@ -9,7 +9,7 @@ docker-compose -p bluegreen-8084 -f /home/ubuntu/S12P11D201/AITest/docker-compos
 docker-compose -p my-react -f /home/ubuntu/S12P11D201/test/docker-compose.yml pull
 
 # 1. 실행 중인 컨테이너 확인 및 중복 제거
-function remove_existing_container() {
+remove_existing_container() {
     local container_name=$1
     echo "기존 컨테이너 확인 중: $container_name"
     existing_container=$(docker ps -a --filter "name=$container_name" --format "{{.ID}}")
