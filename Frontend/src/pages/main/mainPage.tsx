@@ -15,6 +15,8 @@ import { useNavigate } from 'react-router-dom';
 
 import CompletePay from '@/components/modal/SuccessPay';
 
+import GreenAlert from '@/components/alert/greenAlert';
+
 function MainPage() {
   const [randomTalks, setRandomTalks] = useState<string[]>([]);
   const [currentTalk, setCurrentTalk] = useState('');
@@ -24,6 +26,8 @@ function MainPage() {
   const [showCompletePay, setShowCompletePay] = useState(false);
   const [fingerprint, setFingerprint] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  const [showWelcomeAlert, setShowWelcomeAlert] = useState(false);
 
   // ✅ 핑거프린트 생성 함수
   const generateFingerprint = async () => {
@@ -70,6 +74,16 @@ function MainPage() {
   // ✅ 최초 실행 시 핑거프린트 생성 및 결제 성공 메시지 감지
   useEffect(() => {
     generateFingerprint();
+
+    if (localStorage.getItem('loginSuccess') === 'true') {
+      setShowWelcomeAlert(true);
+
+      // ✅ 3초 후 자동으로 알림 제거
+      setTimeout(() => {
+        setShowWelcomeAlert(false);
+        localStorage.removeItem('loginSuccess'); // ✅ localStorage에서도 삭제
+      }, 3000);
+    }
 
     const handlePaymentMessage = (event: MessageEvent) => {
       console.log("📩 결제 완료 메시지 수신:", event.data, "from:", event.origin);
@@ -182,9 +196,16 @@ function MainPage() {
         </div>
       </div>
       <Footer />
-      
+
       {/* ✅ 결제 완료 모달 */}
       {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />}
+
+      {/* ✅ 로그인 성공 후 GreenAlert 유지 */}
+      {showWelcomeAlert && (
+        <div style={{ zIndex: 9999 }}>
+          <GreenAlert message="로그인에 성공하였습니다. 환영합니다." onClose={() => setShowWelcomeAlert(false)} />
+        </div>
+      )}
     </>
   );
 }
