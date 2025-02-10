@@ -6,7 +6,8 @@ WORKDIR /app
 COPY package*.json ./
 
 # 의존성 설치
-RUN npm ci
+# RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # 소스 코드 복사
 COPY . .
