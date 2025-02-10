@@ -3,6 +3,7 @@ package com.ssafy.peachptich.global.config.jwt;
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.repository.UserRepository;
+import com.ssafy.peachptich.service.CustomUserDetailsService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -92,12 +93,11 @@ public class JwtFilter extends OncePerRequestFilter {
         String role = tokenProvider.getRole(accessToken);
         LocalDate birth = userRepository.findByEmail(userEmail).get().getBirth();
 
-        System.out.println("JWTFilter에서 userEmail = " + userEmail + ", role = " + role);
+        User userEntity = userRepository.findByEmail(userEmail).orElseThrow(() ->
+                new UsernameNotFoundException("User not found with email: " + userEmail)
+        );
+        System.out.println("JWTFilter에서 userId = " + userEntity.getUserId() + ", userEmail = " + userEntity.getEmail() + ", role = " + userEntity.getRole() + ", birth = " + userEntity.getBirth());
 
-        User userEntity = new User();
-        userEntity.setEmail(userEmail);
-        userEntity.setRole(role);
-        userEntity.setBirth(birth);
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
 
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());

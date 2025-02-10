@@ -1,5 +1,6 @@
 package com.ssafy.peachptich.service;
 
+import com.ssafy.peachptich.dto.request.FeedbackRequest;
 import com.ssafy.peachptich.entity.ChatHistory;
 import com.ssafy.peachptich.repository.ChatHistoryRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,9 +59,10 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
     }
 
     @Override
-    public void updateFeedbackByUserId(Long historyId, Long userId, String feedback) {
+    public void updateFeedbackByUserId(FeedbackRequest feedbackRequest, Long userId) {
         int updatedRows = 0;
-
+        Long historyId = feedbackRequest.getHistoryId();
+        String feedback = feedbackRequest.getFeedback();
         if(chatHistoryRepository.updateUser1Feedback(historyId, userId, feedback) > 0) {
             updatedRows++;
         }

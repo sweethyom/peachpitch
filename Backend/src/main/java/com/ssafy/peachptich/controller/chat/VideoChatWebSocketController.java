@@ -1,0 +1,55 @@
+package com.ssafy.peachptich.controller.chat;
+
+import com.ssafy.peachptich.service.VideoChatWebSocketService;
+import io.openvidu.java.client.OpenViduHttpException;
+import io.openvidu.java.client.OpenViduJavaClientException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
+import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
+
+
+@Controller
+@RequiredArgsConstructor
+@Slf4j
+public class VideoChatWebSocketController {
+    private final VideoChatWebSocketService videoChatService;
+
+    /* userId로 웹소켓
+    @MessageMapping("/request") // 클라이언트가 /pub/request로 header에 userId 담아서 보냄
+    public synchronized void requestVideoChatRoom(
+            @Header(value = "userId", required = false) Long userId
+    ) throws OpenViduJavaClientException, OpenViduHttpException {
+        videoChatService.handleVideoChatWebSocket(userId);
+    }*/
+
+    /* subscribe 헤더에 jwt 토큰으로 웹소켓
+    @MessageMapping("/request") // 클라이언트가 /pub/request로 header에 userId 담아서 보냄
+    public synchronized void requestVideoChatRoom(
+            @Header("access") String Authorization
+    ) throws OpenViduJavaClientException, OpenViduHttpException {
+        String email = tokenProvider.getUserEmail(Authorization);
+        Long userId = userRepository.findUserIdByEmail(email);
+        videoChatService.handleVideoChatWebSocket(userId);
+    }
+     */
+
+    // accessor에 있는 principal로 user 각각에게 토큰 전송
+    @MessageMapping("/request")
+    public synchronized void requestVideoChatRoom(
+            StompHeaderAccessor accessor
+    ) throws OpenViduJavaClientException, OpenViduHttpException {
+        // STOMP 세션에서 user 가져오기
+        Principal principal = accessor.getUser();
+
+        if (principal != null) {
+            String email = principal.getName();
+            videoChatService.handleVideoChatWebSocket(email);
+        } else {
+            log.error("Principal이 null입니다. WebSocket 연결에 실패했습니다.");
+        }
+    }
+}

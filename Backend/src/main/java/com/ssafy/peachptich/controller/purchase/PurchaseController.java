@@ -7,7 +7,6 @@ import com.ssafy.peachptich.service.PurchaseService;
 import com.ssafy.peachptich.global.util.SessionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -52,7 +51,7 @@ public class PurchaseController {
     }
 
     @GetMapping("/completed")
-    public ResponseEntity<ApproveResponse> payCompleted(@RequestParam("pg_token") String pgToken) {
+    public ResponseEntity<String> payCompleted(@RequestParam("pg_token") String pgToken) {
 //            log.info("세션 상태 확인");
 //            SessionUtils.printSessionAttributes();  // 세션 상태 출력
 //
@@ -64,9 +63,29 @@ public class PurchaseController {
             ApproveResponse approveResponse = purchaseService.payApprove(pgToken);
             purchaseService.savePaymentInfo(approveResponse);
 
+        String htmlResponse = """
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>결제 완료</title>
+                <script>
+                    window.onload = function() {
+                        if (window.opener) {
+                            window.opener.postMessage("paymentSuccess", "*");
+                            window.close();
+                        }
+                    };
+                </script>
+            </head>
+            <body>
+                <h1>결제가 완료되었습니다.</h1>
+            </body>
+            </html>
+        """;
+
 //            SessionUtils.addAttribute("orderId", approveResponse.getPartner_order_id());
             log.info("payCompleted : 마지막 로그");
-            return new ResponseEntity<>(approveResponse, HttpStatus.OK);
+            return ResponseEntity.ok().body(htmlResponse);
     }
 
 

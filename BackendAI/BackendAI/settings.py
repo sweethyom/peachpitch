@@ -18,6 +18,21 @@ load_dotenv()
 # .env 파일에서 API 키 가져오기
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',   # MySQL 엔진 사용
+        'NAME': 'test',           # 데이터베이스 이름
+        'USER': 'root',              # MySQL 사용자 이름
+        'PASSWORD': '1234',      # MySQL 비밀번호
+        'HOST': 'localhost',                    # 로컬에서 실행 중이므로 localhost
+        'PORT': '3306',                         # MySQL 기본 포트 (3306)
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
+    }
+}
+
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,6 +55,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'chatbotAPI',
+    'reportAI',
+    'wordAI',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,6 +66,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # CORS 관련 추가 (가장 상단에 위치)
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -82,12 +100,12 @@ WSGI_APPLICATION = 'BackendAI.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -130,3 +148,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CORS_ORIGIN_WHITELIST = (
+    "http://localhost:5173",
+)

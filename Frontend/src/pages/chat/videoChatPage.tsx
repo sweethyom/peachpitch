@@ -1,16 +1,14 @@
-import Footer from '@/components/footer/Footer';
-
 import styles from './styles/video.module.scss'
 
 import leaveBtn from '@/assets/icons/leave.png'
 import sstBtn from '@/assets/icons/chat_stt.png'
 import WebcamComponent from '@/components/chat/WebcamComponent';
 
-import Drawer from '@/components/chat/Drawer';
+import Drawer from '@/components/chat/DrawerVideo';
 import { useState } from 'react';
 
 import RoomLeaveModal from '@/components/modal/RoomLeave';
-import KeywordModal from '@/components/modal/Keyword';
+import KeywordModal from '@/components/modal/KeywordVideo';
 import RedAlert from '@/components/alert/redAlert';
 
 function videoChatPage() {
@@ -29,6 +27,8 @@ function videoChatPage() {
   /* alert 창 */
   const [showAlert, setShowAlert] = useState(false);
 
+  const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+
   /* 시작하기 버튼 클릭 시 */
   const handleStartClick = () => {
     if (!selectedKeyword) {
@@ -43,7 +43,7 @@ function videoChatPage() {
 
       {/* 설정 메뉴바 */}
       <div className={styles.menu}>
-        <Drawer selectedKeyword={selectedKeyword} />
+        <Drawer selectedKeyword={selectedKeyword} chatHistory={chatHistory} />
       </div>
 
       <div className={styles.chat}>
@@ -90,8 +90,6 @@ function videoChatPage() {
 
       </div>
 
-      <Footer />
-
       {/* 키워드 모달 */}
       <KeywordModal
         isOpen={isKeywordOpen}
@@ -101,18 +99,20 @@ function videoChatPage() {
       </KeywordModal>
 
       {/* 키워드 선택안했을 경우 뜨는 alert창 */}
-      {showAlert && (
-        <div style={{ zIndex: 9999 }}>
-          <RedAlert
-            message="키워드를 선택해주세요!"
-            onClose={() => setShowAlert(false)}
-          />
-        </div>
-      )}
+      {
+        showAlert && (
+          <div style={{ zIndex: 9999 }}>
+            <RedAlert
+              message="키워드를 선택해주세요!"
+              onClose={() => setShowAlert(false)}
+            />
+          </div>
+        )
+      }
 
       {/* 대화 나가기 모달 */}
-      <RoomLeaveModal isOpen={isLeaveOpen} onClose={toggleLeave} />
-    </div>
+      <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} stopTTS={() => {}} />
+    </div >
   )
 }
 

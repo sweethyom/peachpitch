@@ -49,165 +49,180 @@ function totalReportPage() {
     }
   };
 
+  // ✅ 특정 섹션으로 스크롤 이동 함수
+  const handleScrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       <Header />
-
-      <div className={styles.page}>
-        {/* 목차 */}
-        <div className={styles.index}>
-          <p className={styles.index__item}>반복되는 단어 습관</p>
-          <p className={styles.index__item}>대화 주도권</p>
-          <p className={styles.index__item}>대화 키워드</p>
-          <p className={styles.index__item}>대화 리스트</p>
-        </div>
-
-        <div className={styles.report}>
-          <p className={styles.report__title}>전체 리포트</p>
-
-          {/* 시간 통계 */}
-          <div className={styles.report__status}>
-            <div className={styles.total}>
-              <p className={styles.total__title}>총 대화 시간</p>
-              <p className={styles.total__time}><span className={styles.total__time__strong}>50</span>시간 <span className={styles.total__time__strong}>20</span>분</p>
-            </div>
-            <div className={styles.total}>
-              <p className={styles.total__title}>평균 공백 시간</p>
-              <p className={styles.total__time}>평균 <span className={styles.total__time__strong}>16</span>초</p>
-            </div>
+      <div className={styles.wrap}>
+        <div className={styles.page}>
+          {/* 목차 */}
+          <div className={styles.index}>
+            <p className={styles.index__item}
+            onClick={() => handleScrollToSection('habits')}>반복되는 단어 습관</p>
+            <p className={styles.index__item}
+            onClick={() => handleScrollToSection('lead')}>대화 주도권</p>
+            <p className={styles.index__item}
+            onClick={() => handleScrollToSection('keyword')}>대화 키워드</p>
+            <p className={styles.index__item}
+            onClick={() => handleScrollToSection('list')}>대화 리스트</p>
           </div>
 
-          {/* 반복되는 단어 습관 */}
-          <div className={styles.report__habits}>
-            <p className={styles.report__sub}>반복되는 단어 습관</p>
+          <div className={styles.report}>
+            <p className={styles.report__title}>전체 리포트</p>
 
-            {/* Pie 차트 */}
-            <div className={styles.pie}>
-              <div className={styles.pie__graph}>
-                <HabitsChart />
+            {/* 시간 통계 */}
+            <div className={styles.report__status}>
+              <div className={styles.total}>
+                <p className={styles.total__title}>총 대화 시간</p>
+                <p className={styles.total__time}><span className={styles.total__time__strong}>50</span>시간 <span className={styles.total__time__strong}>20</span>분</p>
+              </div>
+              <div className={styles.total}>
+                <p className={styles.total__title}>평균 공백 시간</p>
+                <p className={styles.total__time}>평균 <span className={styles.total__time__strong}>16</span>초</p>
               </div>
             </div>
-          </div>
 
+            {/* 반복되는 단어 습관 */}
+            <div id="habits"
+            className={styles.report__habits}>
+              <p className={styles.report__sub}>반복되는 단어 습관</p>
 
-          {/* 대화 주도권 */}
-          <div className={styles.report__lead}>
-            <p className={styles.report__sub}>대화 주도권</p>
-            <div className={styles.meter}>
-              <p className={styles.meter__label}>질문</p>
-              <div className={styles.meter__graph}>
-                <LeadChart />
-              </div>
-              <p className={styles.meter__label}>답변</p>
-            </div>
-          </div>
-
-
-          {/* 대화 키워드(워드 클라우드) */}
-          <div className={styles.report__keyword}>
-            <p className={styles.report__sub}>대화 키워드(워드 클라우드)</p>
-            <div className={styles.keyword}>
-              <div className={styles.keyword__wordcloud}>
-                <WordCloud />
-              </div>
-              <div className={styles.keyword__bar}>
-                <WordChart />
+              {/* Pie 차트 */}
+              <div className={styles.pie}>
+                <div className={styles.pie__graph}>
+                  <HabitsChart />
+                </div>
               </div>
             </div>
-          </div>
 
 
-          {/* 대화 리스트 */}
-          <div className={styles.report__list}>
-            <p className={styles.report__sub}>대화 리스트</p>
-
-            <div className={styles.report__list__items}>
-
-              {/* ✅ 대화 리스트 필터 */}
-              <div className={styles.report__filter}>
-                {/* 키워드 필터 */}
-                <select
-                  className={styles.report__filter__drop}
-                  value={keywordFilter}
-                  onChange={(e) => {
-                    setKeywordFilter(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <option value="전체">전체</option>
-                  <option value="보드 게임">보드 게임</option>
-                  <option value="겨울 스포츠">겨울 스포츠</option>
-                  <option value="AI">AI</option>
-                  <option value="블록체인">블록체인</option>
-                </select>
-
-                {/* 정렬 필터 */}
-                <select
-                  className={styles.report__filter__drop}
-                  value={sortOrder}
-                  onChange={(e) => {
-                    setSortOrder(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                >
-                  <option value="최신순">최신순</option>
-                  <option value="오래된순">오래된순</option>
-                </select>
+            {/* 대화 주도권 */}
+            <div id="lead"
+            className={styles.report__lead}>
+              <p className={styles.report__sub}>대화 주도권</p>
+              <div className={styles.meter}>
+                <p className={styles.meter__label}>질문</p>
+                <div className={styles.meter__graph}>
+                  <LeadChart />
+                </div>
+                <p className={styles.meter__label}>답변</p>
               </div>
+            </div>
 
-              {/* ✅ 필터링된 대화 리스트 (2x3 레이아웃 적용) */}
-              <div className={styles.report__grid}>
-                {paginatedConversations.map((conv) => (
-                  <div key={conv.id} className={styles.item}>
-                    {/* <Link to={`/report/detail/${conv.id}`} className={styles.item__link}> */}
-                    <Link to={`/report/detail`} className={styles.item__link}>
-                      <p className={styles.item__name}>{conv.name}</p>
-                      <div className={styles.item__keyword}>
-                        <p className={styles.item__keyword__title}>대화 키워드</p>
-                        <div className={styles.item__tag}>
-                          {conv.keywords.map((kw, idx) => (
-                            <p key={idx} className={idx === 0 ? styles.item__tag__1 : styles.item__tag__2}>{kw}</p>
-                          ))}
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-                ))}
+
+            {/* 대화 키워드(워드 클라우드) */}
+            <div id="keyword"
+            className={styles.report__keyword}>
+              <p className={styles.report__sub}>대화 키워드(워드 클라우드)</p>
+              <div className={styles.keyword}>
+                <div className={styles.keyword__wordcloud}>
+                  <WordCloud />
+                </div>
+                <div className={styles.keyword__bar}>
+                  <WordChart />
+                </div>
               </div>
+            </div>
 
-              {/* ✅ 페이징 */}
-              <div className={styles.report__paging}>
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={styles.report__paging__button}
-                >
-                  ◁
-                </button>
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i}
-                    className={`${styles.report__paging__number} ${currentPage === i + 1 ? styles.active : ""}`}
-                    onClick={() => handlePageChange(i + 1)}
+
+            {/* 대화 리스트 */}
+            <div id="list"
+            className={styles.report__list}>
+              <p className={styles.report__sub}>대화 리스트</p>
+
+              <div className={styles.report__list__items}>
+
+                {/* ✅ 대화 리스트 필터 */}
+                <div className={styles.report__filter}>
+                  {/* 키워드 필터 */}
+                  <select
+                    className={styles.report__filter__drop}
+                    value={keywordFilter}
+                    onChange={(e) => {
+                      setKeywordFilter(e.target.value);
+                      setCurrentPage(1);
+                    }}
                   >
-                    {i + 1}
-                  </button>
-                ))}
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={styles.report__paging__button}
-                >
-                  ▷
-                </button>
-              </div>
+                    <option value="전체">전체</option>
+                    <option value="보드 게임">보드 게임</option>
+                    <option value="겨울 스포츠">겨울 스포츠</option>
+                    <option value="AI">AI</option>
+                    <option value="블록체인">블록체인</option>
+                  </select>
 
+                  {/* 정렬 필터 */}
+                  <select
+                    className={styles.report__filter__drop}
+                    value={sortOrder}
+                    onChange={(e) => {
+                      setSortOrder(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <option value="최신순">최신순</option>
+                    <option value="오래된순">오래된순</option>
+                  </select>
+                </div>
+
+                {/* ✅ 필터링된 대화 리스트 (2x3 레이아웃 적용) */}
+                <div className={styles.report__grid}>
+                  {paginatedConversations.map((conv) => (
+                    <div key={conv.id} className={styles.item}>
+                      {/* <Link to={`/report/detail/${conv.id}`} className={styles.item__link}> */}
+                      <Link to={`/report/detail`} className={styles.item__link}>
+                        <p className={styles.item__name}>{conv.name}</p>
+                        <div className={styles.item__keyword}>
+                          <p className={styles.item__keyword__title}>대화 키워드</p>
+                          <div className={styles.item__tag}>
+                            {conv.keywords.map((kw, idx) => (
+                              <p key={idx} className={idx === 0 ? styles.item__tag__1 : styles.item__tag__2}>{kw}</p>
+                            ))}
+                          </div>
+                        </div>
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+
+                {/* ✅ 페이징 */}
+                <div className={styles.report__paging}>
+                  <button
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={styles.report__paging__button}
+                  >
+                    ◁
+                  </button>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button
+                      key={i}
+                      className={`${styles.report__paging__number} ${currentPage === i + 1 ? styles.active : ""}`}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={styles.report__paging__button}
+                  >
+                    ▷
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+        <Footer />
       </div>
-
-      <Footer />
     </>
   )
 }

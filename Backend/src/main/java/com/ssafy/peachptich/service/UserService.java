@@ -1,8 +1,7 @@
 package com.ssafy.peachptich.service;
 
-import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.JoinRequest;
-import com.ssafy.peachptich.dto.response.ApiResponse;
+import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -13,7 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface UserService {
-    public Optional<User> joinProcess(JoinRequest joinRequest);
-    public ResponseEntity<ApiResponse<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
+    Optional<User> joinProcess(JoinRequest joinRequest);
+    ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
                                                                             Authentication authentication);
+    Long getUserId(String email);
+    String getUserEmail(Long userId);
 }
