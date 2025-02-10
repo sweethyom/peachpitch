@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import styles from "./styles/Drawer.module.scss";
 
 import openBtn from "@/assets/icons/drawer_open.png";
@@ -9,12 +10,15 @@ import hintIcon from "@/assets/icons/drawer_hint.png";
 import chatBtn from "@/assets/icons/drawer_chatting.png";
 
 import FeedbackModal from "@/components/modal/Feedback"
+import Setting from "@/components/modal/Setting";
 
 type DrawerProps = {
     selectedKeyword: string | null;
+    chatHistory: { role: string; message: string }[];
+    turnCount: number;
 };
 
-const Drawer = ({ selectedKeyword }: DrawerProps) => {
+const Drawer = ({ selectedKeyword, chatHistory, turnCount }: DrawerProps) => {
     const [isOpen, setIsOpen] = useState(false);
 
     // 드로어 토글
@@ -30,10 +34,6 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
         setLimitOn(!limitOn);
     };
 
-    const hintSwitch = () => {
-        setHintOn(!hintOn);
-    };
-
     // 채팅 토글
     const [chatOpen, setChatOpen] = useState(false);
 
@@ -44,6 +44,16 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
     // 힌트
     const [hints, setHints] = useState<string[]>([]);
 
+    const hintSwitch = () => {
+        setHintOn(!hintOn);
+    };
+
+    const [isSettingOpen, setIsSettingOpen] = useState(false);
+    const toggleSetting = () => {
+        setIsSettingOpen(!isSettingOpen);
+    };
+
+    // ✅ 힌트 데이터 불러오기
     useEffect(() => {
         const loadHints = async () => {
             try {
@@ -59,7 +69,9 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
             }
         };
 
-        loadHints();
+        if (selectedKeyword) {
+            loadHints();
+        }
     }, [selectedKeyword]);
 
     // 피드백 토글
@@ -75,7 +87,7 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
                 <div className={styles.drawer__header}>
                     <img src={closeBtn} onClick={toggleDrawer} width={"12px"} height={"23px"} />
                     <button onClick={toggleFeedback}>피드백</button>
-                    <img src={settingBtn} width={"30px"} />
+                    <img src={settingBtn} width={"30px"} onClick={toggleSetting} />
                 </div>
 
                 <hr className={styles.drawer__divider} />
@@ -84,9 +96,14 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
                 <div className={styles.drawer__tag}>
                     <p className={styles.drawer__tag__1}>{selectedKeyword || "여행"}</p>
                     <p className={styles.drawer__tag__2} style={{ display: "none" }}></p>
+
                     {limitOn && (
                         <p className={styles.drawer__tag__limit}>
-                            <strong>10</strong> 회
+                            {turnCount > 0 ? (
+                                <><strong>{turnCount}</strong> 회</>
+                            ) : (
+                                <><strong style={{ color: "red" }}>0</strong> 회</>
+                            )}
                         </p>
                     )}
 
@@ -123,18 +140,24 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
                 </div>
 
                 {/* 힌트 리스트 */}
-                <div className={styles.drawer__hint}>
-                    <div className={styles.drawer__hint__header}>
-                        <p className={styles.drawer__hint__header__title}>[{selectedKeyword || "키워드"}]에 관련된 질문</p>
+                {hintOn && (
+                    <div className={styles.drawer__hint}>
+                        <div className={styles.drawer__hint__header}>
+                            <p className={styles.drawer__hint__header__title}>[{selectedKeyword}] 관련 질문</p>
+                        </div>
+                        <ul className={styles.drawer__hint__list}>
+                            {hints.length > 0 ? (
+                                hints.map((hint, index) => (
+                                    <li key={index} className={styles.drawer__hint__list__item}>
+                                        {hint}
+                                    </li>
+                                ))
+                            ) : (
+                                <li className={styles.noHint}>관련 힌트가 없습니다.</li>
+                            )}
+                        </ul>
                     </div>
-                    <ul className={`${styles.drawer__hint__list} ${!hintOn ? styles["drawer__hint__list--hidden"] : ""}`}>
-                        {hints.map((hint, index) => (
-                            <li key={index} className={styles.drawer__hint__list__item}>
-                                {hint}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+                )}
 
                 {/* 채팅 */}
                 <div className={styles.drawer__chatting}>
@@ -151,29 +174,23 @@ const Drawer = ({ selectedKeyword }: DrawerProps) => {
                     {/* Prompt 창 */}
                     {chatOpen && (
                         <div className={styles.drawer__chatting__prompt}>
-                            <div className={styles.bubble__left}>
-                                여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?
-                            </div>
-                            <div className={styles.bubble__right}>
-                                최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                            </div>
-                            <div className={styles.bubble__left}>
-                                맘껏 뛰어다니는 그 기분이 해방되셨을 것 같아요. 그런 순간들이 정말 시원하고 행복하죠.
-                            </div>
-                            <div className={styles.bubble__right}>
-                                정말 재밌는 경험이었다고 생각해. 너도 그런 경험 해봤어?
-                            </div>
-                            <div className={styles.bubble__left}>
-                                네, 해변에서 맨발로 뛰어본 경험이 있어요. 정말 자유롭고 즐거운 기억으로 남아있어요. 친구와의 그런 순간은 정말 소중하죠.
-                            </div>
-                            <div className={styles.bubble__right}>
-                                정말 멋진 추억이 되었겠네요. 그런 경험은 두고두고 떠올리게 되죠. 다음 여행도 기대될 것같아!
-                            </div>
+                            {chatHistory && chatHistory.length > 0 ? ( // ✅ chatHistory가 undefined/null인지 체크
+                                chatHistory.map((msg, index) => (
+                                    <div key={index} className={msg.role === "ai" ? styles.bubble__left : styles.bubble__right}>
+                                        {msg.message}
+                                    </div>
+                                ))
+                            ) : (
+                                <p className={styles.noChat}>채팅 기록이 없습니다.</p>
+                            )}
                         </div>
                     )}
+
                 </div>
             </div>
 
+            <Setting isOpen={isSettingOpen} onClose={toggleSetting} />
+            
             {/* 열기 버튼 */}
             {!isOpen && (
                 <button onClick={toggleDrawer} className={styles.drawerToggle}>
