@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  react-app:
+    build: .
+    container_name: my-react
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    networks:
+      - peachpitch-network
+
+networks:
+  peachpitch-network:
+    external: true
