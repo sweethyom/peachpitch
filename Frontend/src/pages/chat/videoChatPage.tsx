@@ -27,7 +27,7 @@ function videoChatPage() {
   /* alert 창 */
   const [showAlert, setShowAlert] = useState(false);
 
-  const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+  const [chatHistory, _setChatHistory] = useState<{ role: string; message: string }[]>([]);
 
   /* 시작하기 버튼 클릭 시 */
   const handleStartClick = () => {
