@@ -54,25 +54,41 @@ function loginPage() {
         body: JSON.stringify(formData)
       });
 
-      const data = await response.json();
+      // 응답 헤더 출력
+      for (let [key, value] of response.headers.entries()) {
+        console.log(`Header Key: ${key}, Value: ${value}`);
+      }
+      const headers = Object.fromEntries(response.headers.entries());
+      console.log("Full Headers:", headers); // 모든 헤더 출력
+
+      // 대소문자 상관없이 access 헤더 찾기
+      const accessToken = headers["access"] || headers["Access"] || headers["ACCESS"];
+
+      const data = await response.json(); // ✅ JSON 데이터 파싱
 
       if (response.ok) {
-        localStorage.setItem('loginSuccess', 'true');
+        if (accessToken) {
+          console.log("✅ Access Token:", accessToken);
+          localStorage.setItem('accessToken', accessToken); // ✅ localStorage에 저장
+        } else {
+          console.warn("🚨 Access 토큰이 undefined (서버 헤더 확인 필요)");
+        }
 
-        // ✅ localStorage에 로그인 정보 저장
+        localStorage.setItem('loginSuccess', 'true');
         localStorage.setItem('userEmail', formData.email);
 
         navigate('/main'); // 홈 화면으로 이동
-        // window.dispatchEvent(new Event("storage")); // ✅ 상태 변경 이벤트 발생
       } else {
         setError('아이디 혹은 비밀번호를 다시 입력해주세요.');
         setShowErrorAlert(true);
       }
     } catch (error) {
+      console.error("🚨 서버 오류:", error);
       setError('서버와의 통신 중 오류가 발생했습니다.');
       setShowErrorAlert(true);
     }
   };
+
 
   return (
     <>
