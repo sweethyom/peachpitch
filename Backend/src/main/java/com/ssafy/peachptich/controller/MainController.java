@@ -1,7 +1,11 @@
 package com.ssafy.peachptich.controller;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
+import com.ssafy.peachptich.dto.response.RankResponse;
+import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.User;
+import com.ssafy.peachptich.service.UserKeywordService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,7 +18,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
+@RequiredArgsConstructor
 public class MainController {
+    private final UserKeywordService userKeywordService;
 //    @GetMapping("/api/main")
 //    public String mainP(@AuthenticationPrincipal Optional<User> user){
 //        System.out.println("MainController 입성");
@@ -40,12 +46,12 @@ public class MainController {
 //    }
 
     @GetMapping("/api/main")
-    public ResponseEntity<Map<String, Object>> mainP(@AuthenticationPrincipal CustomUserDetails userDetails){
+    public ResponseEntity<Map<String, Object>> mainP(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, Object> response = new HashMap<>();
         System.out.println("MainController 입성");
         System.out.println(userDetails);
 
-        if(userDetails != null) {
+        if (userDetails != null) {
             // 인증된 사용자가 있는 경우
             response.put("isAuthenticated", true);
             response.put("email", userDetails.getUserEmail());
@@ -59,5 +65,15 @@ public class MainController {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/main/rank")
+    public ResponseEntity<ResponseDto<RankResponse>> getRank() {
+        List<RankResponse.KeywordRankResponseItem> rank = userKeywordService.rank();
+        return ResponseEntity.ok().
+                body(ResponseDto.<RankResponse>builder()
+                        .message("Rank successfully")
+                        .data(RankResponse.builder().rank(rank).build())
+                        .build());
     }
 }

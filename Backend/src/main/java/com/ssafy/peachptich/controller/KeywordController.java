@@ -20,7 +20,6 @@ public class KeywordController {
 
     /**
      * 랜덤 키워드 15개 반환
-     *
      * @return
      */
     @GetMapping(value = {"/api/chat/video/keywords/add", "/api/chat/ai/keywords/add"})
@@ -29,11 +28,6 @@ public class KeywordController {
         KeywordListResponse responseDto = KeywordListResponse.builder()
                 .keywords(keywords)
                 .build();
-        return ResponseEntity.ok(new ResponseDto<>(
-                "Keyword added successfully",
-                responseDto
-        ));
+        return ResponseEntity.ok().body(ResponseDto.<KeywordListResponse>builder().message("Keyword added successfully").data(responseDto).build());
     }
-
-
 }

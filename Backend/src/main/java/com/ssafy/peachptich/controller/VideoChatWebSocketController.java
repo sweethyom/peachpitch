@@ -1,6 +1,7 @@
 package com.ssafy.peachptich.controller;
 
 import com.ssafy.peachptich.service.VideoChatService;
+import com.ssafy.peachptich.service.VideoChatWebSocketService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @Slf4j
 public class VideoChatWebSocketController {
-    private final VideoChatService videoChatService;
+    private final VideoChatWebSocketService videoChatService;
 
     /* userId로 웹소켓
     @MessageMapping("/request") // 클라이언트가 /pub/request로 header에 userId 담아서 보냄
