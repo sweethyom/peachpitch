@@ -1,4 +1,4 @@
-package com.ssafy.peachptich.config;
+package com.ssafy.peachptich.global.config;
 
 import lombok.Getter;
 import lombok.Setter;

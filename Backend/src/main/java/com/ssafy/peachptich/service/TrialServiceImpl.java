@@ -17,7 +17,7 @@ public class TrialServiceImpl implements TrialService{
     public TrialResponse checkTrialAccess(String fingerprint) {
         String key = TRIAL_KEY_PREFIX + fingerprint;
         Boolean isFirst = redisTemplate.opsForValue()
-                .setIfAbsent(key, "1", Duration.ofDays(TRIAL_EXPIRATION_DAYS));
+                .setIfAbsent(key, "1", Duration.ofSeconds(30));
 
         return new TrialResponse(
                 Boolean.TRUE.equals(isFirst),

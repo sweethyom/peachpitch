@@ -48,14 +48,14 @@ function MainPage() {
   // ✅ "오늘의 토킹" 데이터를 불러오기
   useEffect(() => {
     fetch('/data/random_talks.json')
-      .then(response => response.json())
-      .then(data => {
-        setRandomTalks(data.random_talks);
-        if (data.random_talks.length > 0) {
-          setCurrentTalk(data.random_talks[Math.floor(Math.random() * data.random_talks.length)]);
-        }
-      })
-      .catch(error => console.error('Error fetching random talks:', error));
+        .then(response => response.json())
+        .then(data => {
+          setRandomTalks(data.random_talks);
+          if (data.random_talks.length > 0) {
+            setCurrentTalk(data.random_talks[Math.floor(Math.random() * data.random_talks.length)]);
+          }
+        })
+        .catch(error => console.error('Error fetching random talks:', error));
   }, []);
 
   // ✅ 5초마다 "오늘의 토킹" 변경
@@ -140,19 +140,19 @@ function MainPage() {
     }
 
     // try {
-      // const response = await axios.post('/api/trial/check', {
-      //   fingerprint: fingerprint,
-      // });
+    // const response = await axios.post('/api/trial/check', {
+    //   fingerprint: fingerprint,
+    // });
 
-      // if (response.data.canAccess) {
-        navigate('/chat/ai');
-      // } else {
-        // setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
-        // navigate('/login');
-      // }
+    // if (response.data.canAccess) {
+    navigate('/chat/ai');
+    // } else {
+    // setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
+    // navigate('/login');
+    // }
     // } catch (error) {
-      // console.error('Trial check failed:', error);
-      // setAlertMessage("서비스 이용에 문제가 발생했습니다.");
+    // console.error('Trial check failed:', error);
+    // setAlertMessage("서비스 이용에 문제가 발생했습니다.");
     // }
   };
 
@@ -180,78 +180,78 @@ function MainPage() {
   };
 
   return (
-    <>
-      <Header />
-      <div className={styles.page}>
-        <div className={styles.main}>
-          {/* ✅ 오늘의 토킹 섹션 */}
-          <div className={styles.main__random}>
-            <p className={styles.main__random__title}>오늘의 토킹</p>
-            <p className={`${styles.main__random__content} ${rotate ? styles.rotateOut : styles.rotateIn}`}>
-              {currentTalk}
-            </p>
-          </div>
+      <>
+        <Header />
+        <div className={styles.page}>
+          <div className={styles.main}>
+            {/* ✅ 오늘의 토킹 섹션 */}
+            <div className={styles.main__random}>
+              <p className={styles.main__random__title}>오늘의 토킹</p>
+              <p className={`${styles.main__random__content} ${rotate ? styles.rotateOut : styles.rotateIn}`}>
+                {currentTalk}
+              </p>
+            </div>
 
-          {/* ✅ AI 채팅 & 1:1 매칭 */}
-          <div className={styles.main__chat}>
-            <Link to="#" onClick={handleAIChatClick} className={styles.main__link}>
-              <div className={styles.main__chat__voice}>
-                <p className={styles.voice}>AI와 스몰토킹</p>
-                <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
-              </div>
-            </Link>
+            {/* ✅ AI 채팅 & 1:1 매칭 */}
+            <div className={styles.main__chat}>
+              <Link to="#" onClick={handleAIChatClick} className={styles.main__link}>
+                <div className={styles.main__chat__voice}>
+                  <p className={styles.voice}>AI와 스몰토킹</p>
+                  <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
+                </div>
+              </Link>
 
-            <Link to="#" onClick={handleVideoChatClick} className={styles.main__link}>
-              <div className={styles.main__chat__video}>
-                <p className={styles.video}>1:1 매칭 스몰토킹</p>
-                <p className={styles.video__description}>사람과의 스몰토킹 너두 할 수 있어!</p>
-              </div>
-            </Link>
-          </div>
+              <Link to="#" onClick={handleVideoChatClick} className={styles.main__link}>
+                <div className={styles.main__chat__video}>
+                  <p className={styles.video}>1:1 매칭 스몰토킹</p>
+                  <p className={styles.video__description}>사람과의 스몰토킹 너두 할 수 있어!</p>
+                </div>
+              </Link>
+            </div>
 
-          {/* ✅ 인기 키워드 섹션 */}
-          <div className={styles.main__keyword}>
-            <p className={styles.main__keyword__title}>🔥 현재 가장 인기 있는 키워드 🔥</p>
-            <div className={styles.main__keyword__list}>
-              <div className={styles.item}>
-                <img className={styles.item__medal} src={medal1} />
-                <p className={styles.item__keyword}>취미</p>
-              </div>
-              <div className={styles.item}>
-                <img className={styles.item__medal} src={medal2} />
-                <p className={styles.item__keyword}>여행</p>
-              </div>
-              <div className={styles.item}>
-                <img className={styles.item__medal} src={medal3} />
-                <p className={styles.item__keyword}>티타임</p>
+            {/* ✅ 인기 키워드 섹션 */}
+            <div className={styles.main__keyword}>
+              <p className={styles.main__keyword__title}>🔥 현재 가장 인기 있는 키워드 🔥</p>
+              <div className={styles.main__keyword__list}>
+                <div className={styles.item}>
+                  <img className={styles.item__medal} src={medal1} />
+                  <p className={styles.item__keyword}>취미</p>
+                </div>
+                <div className={styles.item}>
+                  <img className={styles.item__medal} src={medal2} />
+                  <p className={styles.item__keyword}>여행</p>
+                </div>
+                <div className={styles.item}>
+                  <img className={styles.item__medal} src={medal3} />
+                  <p className={styles.item__keyword}>티타임</p>
+                </div>
               </div>
             </div>
           </div>
+          <Footer />
         </div>
-        <Footer />
-      </div>
 
 
-      {/* ✅ 결제 완료 모달 */}
-      {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />}
+        {/* ✅ 결제 완료 모달 */}
+        {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />}
 
-      {/* ✅ 로그인 성공 후 GreenAlert 유지 */}
-      {showWelcomeAlert && (
-        <div>
-          <GreenAlert message="로그인에 성공하였습니다. 환영합니다." onClose={() => setShowWelcomeAlert(false)} />
-        </div>
-      )}
+        {/* ✅ 로그인 성공 후 GreenAlert 유지 */}
+        {showWelcomeAlert && (
+            <div>
+              <GreenAlert message="로그인에 성공하였습니다. 환영합니다." onClose={() => setShowWelcomeAlert(false)} />
+            </div>
+        )}
 
-      {alertMessage && (
-        <div>
-          <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
-        </div>
-      )}
+        {alertMessage && (
+            <div>
+              <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
+            </div>
+        )}
 
-      {permissionAlert && (
-        <RedAlert message={permissionAlert} onClose={() => setPermissionAlert(null)} />
-      )}
-    </>
+        {permissionAlert && (
+            <RedAlert message={permissionAlert} onClose={() => setPermissionAlert(null)} />
+        )}
+      </>
   );
 }
 
