@@ -4,9 +4,11 @@ import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.JoinRequest;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.HaveCoupon;
+import com.ssafy.peachptich.entity.Item;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.global.config.jwt.TokenProvider;
 import com.ssafy.peachptich.repository.HaveCouponRepository;
+import com.ssafy.peachptich.repository.ItemRepository;
 import com.ssafy.peachptich.repository.RefreshRepository;
 import com.ssafy.peachptich.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,6 +37,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final RefreshRepository refreshRepository;
+    private final ItemRepository itemRepository;
     private final HaveCouponRepository haveCouponRepository;
     private final TokenProvider tokenProvider;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -61,6 +65,17 @@ public class UserServiceImpl implements UserService {
         User savedUser = userRepository.save(data);
 
         log.info("successfully data saved!");
+
+        List<Item> items = itemRepository.findAll();
+
+        for (Item item : items) {
+            HaveCoupon haveCoupon = HaveCoupon.builder()
+                    .user(savedUser)
+                    .item(item)
+                    .ea(0)
+                    .build();
+            haveCouponRepository.save(haveCoupon);
+        }
         return Optional.of(savedUser);
     }
 
@@ -75,6 +90,7 @@ public class UserServiceImpl implements UserService {
             // get refresh token
             String refresh = null;
             Cookie[] cookies = request.getCookies();
+            log.info("in UserServiceImpl, cookies = " + cookies);
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("refresh")) {
                     refresh = cookie.getValue();
@@ -147,6 +163,7 @@ public class UserServiceImpl implements UserService {
             // 회원 상태(status) false 전환
             User userEntity = userRepository.findByEmail(userEmail).get();
             userEntity.setStatus(false);
+            log.info("in UserServiceImpl, userId = " + userEntity.getUserId());
 
             // Refresh Token Cookie 값 0
             Cookie cookie = new Cookie("refresh", null);
@@ -154,12 +171,16 @@ public class UserServiceImpl implements UserService {
             cookie.setPath("/");
 
             // 사용자가 가진 쿠폰 수 조회
-            HaveCoupon haveCoupon = haveCouponRepository.findByUser(userEntity);
+            int couponCnt = Optional.ofNullable(haveCouponRepository.findByUser(userEntity))
+                    .map(coupons -> coupons.stream()
+                            .mapToInt(HaveCoupon::getEa)
+                            .sum())
+                    .orElse(0);
 
             // JSON 응답 생성
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("email", userEmail);
-            responseData.put("coupon", haveCoupon.getEa());
+            responseData.put("coupon", couponCnt);
             responseData.put("status", false);
             responseData.put("deletedAt", LocalDateTime.now());
 
@@ -173,7 +194,7 @@ public class UserServiceImpl implements UserService {
             log.error("Unexpected error during authentication", e);
 
             Map<String, Object> responseData = new HashMap<>();
-            responseData.put("error", "Unexpected error during authentication");
+            responseData.put("error", "Unexpected error during authentication: " + e.getMessage());
 
             ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
                     "Bad Request: Unexpected error during authentication",

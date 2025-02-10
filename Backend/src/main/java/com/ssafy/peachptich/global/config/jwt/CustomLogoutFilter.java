@@ -12,12 +12,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
 import java.util.Map;
 
 @RequiredArgsConstructor
+@Slf4j
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final TokenProvider tokenProvider;
@@ -50,6 +52,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         for(Cookie cookie : cookies) {
             if(cookie.getName().equals("refresh")) {
                 refresh = cookie.getValue();
+                log.info("in CustomLogoutFilter, refresh token = " + refresh);
             }
         }
 
