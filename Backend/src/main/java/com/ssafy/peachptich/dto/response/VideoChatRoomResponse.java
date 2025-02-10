@@ -7,7 +7,8 @@ import lombok.ToString;
 @Builder
 @Getter
 @ToString
-public class RoomResponse {
+//token, 상태를 포함하는 1:1 대화방 내용
+public class VideoChatRoomResponse {
     private String token;
     private String status;
     private Long historyId;

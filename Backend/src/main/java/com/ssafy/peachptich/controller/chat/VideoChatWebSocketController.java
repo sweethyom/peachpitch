@@ -1,6 +1,5 @@
-package com.ssafy.peachptich.controller;
+package com.ssafy.peachptich.controller.chat;
 
-import com.ssafy.peachptich.service.VideoChatService;
 import com.ssafy.peachptich.service.VideoChatWebSocketService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;

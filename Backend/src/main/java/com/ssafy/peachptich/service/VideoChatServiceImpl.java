@@ -3,17 +3,13 @@ package com.ssafy.peachptich.service;
 import com.ssafy.peachptich.dto.request.VideoChatRequest;
 import com.ssafy.peachptich.dto.response.ChatRoomResponse;
 import com.ssafy.peachptich.dto.response.HintResponse;
-import com.ssafy.peachptich.dto.response.ResponseDto;
-import com.ssafy.peachptich.dto.response.RoomResponse;
+import com.ssafy.peachptich.dto.response.VideoChatRoomResponse;
 import com.ssafy.peachptich.entity.RandomName;
-import com.ssafy.peachptich.repository.UserRepository;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +51,7 @@ public class VideoChatServiceImpl implements VideoChatService {
 
     //대기큐 방식
     @Override //token, history id 반환
-    public RoomResponse handleVideoChat(Long userId) throws OpenViduHttpException, OpenViduJavaClientException {
+    public VideoChatRoomResponse handleVideoChat(Long userId) throws OpenViduHttpException, OpenViduJavaClientException {
         if (waitingUserId == null) {
             System.out.println("waitingUserId is null");
             //첫번째 사용자가 요청하면 대기상태로 저장,
@@ -70,7 +66,7 @@ public class VideoChatServiceImpl implements VideoChatService {
             waitingUserId = userId;
             waitingSessionId = sessionId; // 세션 ID 저장
 
-            return RoomResponse.builder()
+            return VideoChatRoomResponse.builder()
                     .status("waiting")
                     .token(token)  // 첫 번째 사용자에게도 토큰 제공
                     .historyId(null)  // 대화 내역 ID는 아직 없음
@@ -92,7 +88,7 @@ public class VideoChatServiceImpl implements VideoChatService {
             waitingUserId = null;
             waitingSessionId = null;
 
-            return RoomResponse.builder()
+            return VideoChatRoomResponse.builder()
                     .status("matched")
                     .token(token)
                     .historyId(historyId)
