@@ -12,7 +12,9 @@ import java.util.Map;
 import java.util.Optional;
 
 public interface UserService {
-    public Optional<User> joinProcess(JoinRequest joinRequest);
-    public ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
+    Optional<User> joinProcess(JoinRequest joinRequest);
+    ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
                                                                             Authentication authentication);
+    Long getUserId(String email);
+    String getUserEmail(Long userId);
 }

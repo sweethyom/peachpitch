@@ -67,8 +67,11 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/main", "/api/index", "/api/users/login", "/api/users/signup", "/api/pay/ready", "/api/pay/completed").permitAll()
-                        .anyRequest().authenticated()
+                                .requestMatchers("/ws/**", "/ws/room/**").permitAll() // WebSocket 엔드포인트
+                                .requestMatchers("/pub/**", "/sub/**").permitAll() // STOMP 메시징 경로
+                                .requestMatchers("/api/main", "/api/index", "/api/users/login", "/api/users/signup", "/api/pay/ready", "/api/pay/completed",
+                                        "/api/chat/ai/keywords/**", "/api/chat/ai/check").permitAll()
+                                .anyRequest().authenticated()
 //                                .anyRequest().permitAll()
                 )
                 .exceptionHandling(exception -> exception
@@ -94,7 +97,8 @@ public class SecurityConfig {
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration configuration = new CorsConfiguration();
 
-                        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
+                        //configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
+                        configuration.setAllowedOriginPatterns(Collections.singletonList("*")); // Websocket 때문에 바꾼 설정
                         configuration.setAllowedMethods(Collections.singletonList("*"));
                         configuration.setAllowCredentials(true);        // 프론트에서 credential 설정하면 true로 설정해줘야 함
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
