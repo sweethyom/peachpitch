@@ -11,7 +11,7 @@
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "auto",
-    // "noEmit": true,
+    "noEmit": true,
 
     /* Linting */
     "strict": true,
@@ -21,7 +21,7 @@
     "noUncheckedSideEffectImports": true,
 
     "composite": true,
-    "emit": true
+    // "emit": true
   },
   "include": ["vite.config.ts"]
 }
