@@ -21,29 +21,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MainController {
     private final UserKeywordService userKeywordService;
-//    @GetMapping("/api/main")
-//    public String mainP(@AuthenticationPrincipal Optional<User> user){
-//        System.out.println("MainController 입성");
-//        System.out.println(user);               // 이게 왜 null로 뜨지
-//
-//        if(user != null) {
-//            // 인증된 사용자가 있는 경우
-//            // 세션 현재 사용자 아이디
-//            String name = user.get().getEmail();
-//
-//            // 세션 현재 사용자 role
-//            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-//            Iterator<? extends GrantedAuthority> iter = authorities.iterator();
-//            GrantedAuthority auth = iter.next();
-//            String role = auth.getAuthority();
-//            return "Main Controller: " + name + ", " + role;
-//        } else {
-//            // 인증된 사용자가 아닌 경우
-//            return "Main Controller: 로그인되지 않은 사용자";
-//        }
-//    }
 
     @GetMapping("/api/main")
     public ResponseEntity<Map<String, Object>> mainP(@AuthenticationPrincipal CustomUserDetails userDetails) {

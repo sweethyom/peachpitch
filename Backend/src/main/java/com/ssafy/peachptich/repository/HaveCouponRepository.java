@@ -9,11 +9,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface HaveCouponRepository extends JpaRepository<HaveCoupon, Long> {
-    public HaveCoupon findByUser(User user);
+    List<HaveCoupon> findByUser(User user);
+
     @Query("SELECT h FROM HaveCoupon h WHERE h.user.userId = :userId " +
             "AND h.item.type = :itemType " +
             "AND h.expirationDate > :dateTime")
@@ -22,6 +24,7 @@ public interface HaveCouponRepository extends JpaRepository<HaveCoupon, Long> {
             @Param("itemType") Item.ItemType itemType,
             @Param("dateTime") LocalDateTime dateTime
     );
+
     @Query("SELECT h FROM HaveCoupon h WHERE h.user.userId = :userId AND h.item = :item")
     Optional<HaveCoupon> findByUser_IdAndItem(
             @Param("userId") Long userId,

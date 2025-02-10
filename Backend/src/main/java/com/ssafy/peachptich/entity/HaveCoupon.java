@@ -9,20 +9,24 @@ import java.time.LocalDateTime;
 @ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Table(name="have_coupon")
 public class HaveCoupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "have_coupon_id")
     private Long haveCouponId;
 
+    @Setter
     private Integer ea;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @Setter
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
+    @Setter
     private Item item;
 
     // 무료 쿠폰의 경우 만료 시간 관리

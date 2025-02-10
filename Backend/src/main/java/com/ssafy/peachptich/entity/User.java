@@ -23,13 +23,15 @@ public class User {
     private String email;
 
     @Setter
-    @Column(length = 1000, nullable = false)
+    @Column(length = 1000)
     private String password;
 
-    @Column(length = 40)
+    @Setter
+    @Column(length = 200)
     private String snsId;
 
-    @Column(length = 100)
+    @Setter
+    @Column(length = 200)
     private String snsType;
 
     @Setter
