@@ -63,7 +63,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
     // ✅ 로그아웃 처리
     const handleLogout = async () => {
-        await fetch("http://localhost:8080/api/users/logout", {
+        await fetch("https://peachpitch.site/api/users/logout", {
             method: "POST",
             credentials: "include",
         });
