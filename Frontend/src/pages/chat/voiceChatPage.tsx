@@ -138,7 +138,7 @@ function VoiceChatPage() {
   };
 
   /* AI 응답이 발생할 때 새로운 영상으로 전환 */
-  const handleNewAIResponse = (aiResponse: string) => {
+  const handleNewAIResponse = () => {
     console.log("🚀 handleNewAIResponse 실행됨!");
 
     let randomVideo;
@@ -174,7 +174,7 @@ function VoiceChatPage() {
         const aiResponse = response.data.message;
         console.log(`📝 AI 응답 받음: ${aiResponse}`);
 
-        handleNewAIResponse(aiResponse); // ✅ 비디오 변경 트리거
+        handleNewAIResponse(); // ✅ 비디오 변경 트리거
 
         setMessageHistory((prev) => [...prev, { role: "ai", message: aiResponse }]);
         setAiResponseBuffer(aiResponse);
@@ -242,9 +242,9 @@ function VoiceChatPage() {
   const [isOverlay, _setIsOverlay] = useState(false);
 
   /* 대화 재시작 */
-  const restartChat = () => {
-    window.location.href = "/chat/ai";
-  };
+  // const restartChat = () => {
+  //   window.location.href = "/chat/ai";
+  // };
 
   /* 대화 종료 후 /report 페이지 이동 */
   const endChat = () => {
@@ -307,7 +307,7 @@ function VoiceChatPage() {
       )}
 
       {/* 대화 종료 모달 */}
-      <ChatEnd isOpen={isChatEnd} onClose={endChat} />
+      <ChatEnd isOpen={isChatEnd} />
 
       <div className={styles.menu}>
         <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} turnCount={turnCount} />
