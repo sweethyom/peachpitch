@@ -67,7 +67,7 @@ function VoiceChatPage() {
     setIsKeywordOpen(false);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/ai/start/', {
+      const response = await axios.post('https://peachpitch.site/ai/start/', {
         keyword: selectedKeyword,
       });
       const aiResponse = response.data.message;
@@ -167,7 +167,7 @@ function VoiceChatPage() {
     if (turnCount > 0) {
       try {
         console.log("📡 AI 서버에 요청 중...");
-        const response = await axios.post("http://127.0.0.1:8000/ai/chat/", {
+        const response = await axios.post("https://peachpitch.site/ai/chat/", {
           message: modifiedMessage,
         });
 
