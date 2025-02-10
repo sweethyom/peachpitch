@@ -1,12 +1,12 @@
 spring:
   data:
     redis:
-      host: localhost
+      host: 43.201.5.129
       port: 6379
   datasource:
-    url: jdbc:mysql://localhost:3306/peachpitch
+    url: jdbc:mysql://43.201.5.129:13306/peachpitch?useSSL=false&useUnicode=true&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
     username: root
-    password: 1234
+    password: pikapikapika1234
     driver-class-name: com.mysql.cj.jdbc.Driver
   autoconfigure:
     exclude:
@@ -18,10 +18,14 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  application:
+    name: Backend
+    
 server:
   servlet:
     session:
       cookie:
         same-site: none
         secure: true
+  port: 8081
 
