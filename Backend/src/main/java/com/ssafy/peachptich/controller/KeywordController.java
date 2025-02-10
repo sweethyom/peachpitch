@@ -29,7 +29,7 @@ public class KeywordController {
         KeywordListResponse responseDto = KeywordListResponse.builder()
                 .keywords(keywords)
                 .build();
-        return ResponseEntity.ok(ResponseDto.of(
+        return ResponseEntity.ok(new ResponseDto<>(
                 "Keyword added successfully",
                 responseDto
         ));
