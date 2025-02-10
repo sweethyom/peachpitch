@@ -4,13 +4,15 @@ import com.ssafy.peachptich.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 
 @RequiredArgsConstructor
-public class CustomUserDetails implements UserDetails {
+public class CustomUserDetails implements UserDetails, OAuth2User {
 
     private final User userEntity;
 
@@ -76,6 +78,16 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 
+    @Override
+    public Map<String, Object> getAttributes(){
+        return null;
+    }
 
+    //TODO
+    // UserDTO에 필드를 email로 변경해야 하나?
+    @Override
+    public String getName(){
+        return userEntity.getEmail();
+    }
 
 }

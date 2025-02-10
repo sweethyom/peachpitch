@@ -53,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
         // 헤더에서 access 키에 담긴 토큰을 꺼냄
         String accessToken = request.getHeader("access");
-        System.out.println("JWTFilter에서 accessToken = " + accessToken);
+        log.info("JWTFilter에서 accessToken = " + accessToken);
 
         // 토큰이 없다면 다음 필터로 넘김
         if (accessToken == null){
@@ -89,20 +89,33 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         // userEmail, role 값 획득
+
         String userEmail = tokenProvider.getUserEmail(accessToken);
         String role = tokenProvider.getRole(accessToken);
         LocalDate birth = userRepository.findByEmail(userEmail).get().getBirth();
 
+<<<<<<< Updated upstream
         User userEntity = userRepository.findByEmail(userEmail).orElseThrow(() ->
                 new UsernameNotFoundException("User not found with email: " + userEmail)
         );
         System.out.println("JWTFilter에서 userId = " + userEntity.getUserId() + ", userEmail = " + userEntity.getEmail() + ", role = " + userEntity.getRole() + ", birth = " + userEntity.getBirth());
 
-        CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
+=======
+        log.info("JWTFilter에서 userEmail = " + userEmail + ", role = " + role);
 
+        User userEntity = new User();
+        userEntity.setEmail(userEmail);
+        userEntity.setRole(role);
+        userEntity.setBirth(birth);
+        
+        // UserDetails에 회원 정보 객체 담기
+>>>>>>> Stashed changes
+        CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
+        
+        // Spring Security 인증 토큰 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
 
-        // SecurityContextHolder에게 넘기면 일시적으로 세션이 생성됨
+        // SecurityContextHolder에게 넘기면 일시적으로 세션이 생성됨 - 세션에 사용자 등록
         SecurityContextHolder.getContext().setAuthentication(authToken);
 
         // 검증 종료 후 다음 필터로 넘김
