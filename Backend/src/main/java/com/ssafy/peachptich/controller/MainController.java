@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequiredArgsConstructor
 public class MainController {
+<<<<<<< Updated upstream
     private final UserKeywordService userKeywordService;
 //    @GetMapping("/api/main")
 //    public String mainP(@AuthenticationPrincipal Optional<User> user){
@@ -44,6 +45,8 @@ public class MainController {
 //            return "Main Controller: 로그인되지 않은 사용자";
 //        }
 //    }
+=======
+>>>>>>> Stashed changes
 
     @GetMapping("/api/main")
     public ResponseEntity<Map<String, Object>> mainP(@AuthenticationPrincipal CustomUserDetails userDetails) {

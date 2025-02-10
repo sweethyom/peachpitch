@@ -1,11 +1,9 @@
 package com.ssafy.peachptich.global.config.security;
 
-import com.ssafy.peachptich.global.config.jwt.CustomLogoutFilter;
-import com.ssafy.peachptich.global.config.jwt.TokenProvider;
-import com.ssafy.peachptich.global.config.jwt.JwtFilter;
-import com.ssafy.peachptich.global.config.jwt.CustomLoginFilter;
+import com.ssafy.peachptich.global.config.jwt.*;
 import com.ssafy.peachptich.repository.RefreshRepository;
 import com.ssafy.peachptich.repository.UserRepository;
+import com.ssafy.peachptich.service.CustomOAuth2UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +32,8 @@ public class SecurityConfig {
     private final TokenProvider tokenProvider;
     private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomOauthSuccessHandler customOauthSuccessHandler;
 
 
 //    @Bean
@@ -67,11 +67,17 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests((auth) -> auth
+<<<<<<< Updated upstream
                                 .requestMatchers("/ws/**", "/ws/room/**").permitAll() // WebSocket 엔드포인트
                                 .requestMatchers("/pub/**", "/sub/**").permitAll() // STOMP 메시징 경로
                                 .requestMatchers("/api/main/**", "/api/index", "/api/users/login", "/api/users/signup", "/api/pay/ready", "/api/pay/completed",
                                         "/api/chat/ai/keywords/**", "/api/chat/ai/check").permitAll()
                                 .anyRequest().authenticated()
+=======
+                        .requestMatchers("/api/main", "/api/index", "/api/users/login", "/api/users/signup",
+                                "/api/pay/ready", "/api/pay/completed", "/login").permitAll()
+                        .anyRequest().authenticated()
+>>>>>>> Stashed changes
 //                                .anyRequest().permitAll()
                 )
                 .exceptionHandling(exception -> exception
@@ -110,11 +116,19 @@ public class SecurityConfig {
                     }
                 })));
 
+
         AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
 
         // JWTFilter 등록
         http
                 .addFilterBefore(new JwtFilter(tokenProvider, userRepository), CustomLoginFilter.class);
+
+        //oauth2
+        http
+                .oauth2Login((oauth2) -> oauth2
+                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))
+                        .successHandler(customOauthSuccessHandler));
 
         // CustomLogoutFilter 등록
         http
