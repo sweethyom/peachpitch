@@ -1,6 +1,5 @@
 package com.ssafy.peachptich.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.JoinRequest;
 import com.ssafy.peachptich.dto.response.ResponseDto;
@@ -17,7 +16,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.antlr.v4.runtime.Token;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -185,5 +183,15 @@ public class UserServiceImpl implements UserService {
         }
         // @Transactional 어노테이션을 사용하여 JPA가 트랜잭션 내에서 자동으로 변경 사항을 flush하여 DB에 반영함
 
+    }
+
+    @Override
+    public Long getUserId(String email) {
+        return userRepository.findByEmail(email).get().getUserId();
+    }
+
+    @Override
+    public String getUserEmail(Long userId) {
+        return userRepository.findByUserId(userId).get().getEmail();
     }
 }
