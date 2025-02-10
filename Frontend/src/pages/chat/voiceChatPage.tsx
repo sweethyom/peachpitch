@@ -239,7 +239,7 @@ function VoiceChatPage() {
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
   const [turnCount, setTurnCount] = useState(10);
   const [isChatEnd, setIsChatEnd] = useState(false);
-  const [isOverlay, setIsOverlay] = useState(false);
+  const [isOverlay, _setIsOverlay] = useState(false);
 
   /* 대화 재시작 */
   const restartChat = () => {
@@ -254,7 +254,7 @@ function VoiceChatPage() {
   const videos = [Video_AI_1, Video_AI_2, Video_AI_4, Video_AI_3];
 
   // 기본 영상
-  const [videoState, setVideoState] = useState<string>(videos[1]);
+  const [_videoState, _setVideoState] = useState<string>(videos[1]);
 
   // ai 영상 상태 변화
   const [currentVideo, setCurrentVideo] = useState<string>(videos[1]);
@@ -264,7 +264,7 @@ function VoiceChatPage() {
   const [aiMessage, setAiMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
-  const [aiResponseBuffer, setAiResponseBuffer] = useState('');
+  const [_aiResponseBuffer, setAiResponseBuffer] = useState('');
   const [lastAiMessage, setLastAiMessage] = useState(''); // 마지막 AI 응답 저장
   const [lastUserMessage, setLastUserMessage] = useState<string>(''); // 마지막 사용자 메시지 저장
 

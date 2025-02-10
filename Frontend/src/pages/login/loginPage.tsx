@@ -16,7 +16,7 @@ import RedAlert from '@/components/alert/redAlert';
 function loginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   // alert창
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -54,7 +54,7 @@ function loginPage() {
         body: JSON.stringify(formData)
       });
 
-      const data = await response.json();
+      // const data = await response.json();
 
       if (response.ok) {
         localStorage.setItem('loginSuccess', 'true');
