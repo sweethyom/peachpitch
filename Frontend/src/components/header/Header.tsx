@@ -89,7 +89,10 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 <div className={styles.header__navi}>
                     {isLoggedIn ? (
                         <>
-                            <Link to="/report">
+                            <Link
+                            to="/report"
+                            onClick={() => (document.body.style.backgroundColor = 'var(--color-white-000)')}
+                        >
                                 <span className={styles.header__navi__item}>report</span>
                             </Link>
 
