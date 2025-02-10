@@ -7,7 +7,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GoogleResponse implements OAuthResponse{
     private final Map<String, Object> attribute;
-
     @Override
     public String getProvider(){
         return "google";
@@ -34,8 +33,4 @@ public class GoogleResponse implements OAuthResponse{
         return null;
     }
 
-    @Override
-    public String getSnsId(){
-        return attribute.get("sub").toString();
-    }
 }
