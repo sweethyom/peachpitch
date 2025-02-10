@@ -1,6 +1,6 @@
 package com.ssafy.peachptich.service;
 
-import com.ssafy.peachptich.config.KakaoPayProperties;
+import com.ssafy.peachptich.global.config.KakaoPayProperties;
 import com.ssafy.peachptich.dto.response.ApproveResponse;
 import com.ssafy.peachptich.dto.response.ReadyResponse;
 import com.ssafy.peachptich.entity.Item;
