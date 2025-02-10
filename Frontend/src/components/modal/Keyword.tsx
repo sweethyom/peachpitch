@@ -3,7 +3,7 @@ import styles from "./styles/Keyword.module.scss";
 
 import closeBtn from "@/assets/icons/modal__close.png";
 
-import axios from "axios";
+// import axios from "axios";
 import { Link } from "react-router-dom";
 
 type ModalProps = {

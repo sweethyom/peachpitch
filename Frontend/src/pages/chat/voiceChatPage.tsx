@@ -27,7 +27,7 @@ import RedAlert from '@/components/alert/redAlert';
 
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 function VoiceChatPage() {
   /* 모달 관련 상태 */
@@ -138,7 +138,7 @@ function VoiceChatPage() {
   };
 
   /* AI 응답이 발생할 때 새로운 영상으로 전환 */
-  const handleNewAIResponse = (aiResponse: string) => {
+  const handleNewAIResponse = () => {
     console.log("🚀 handleNewAIResponse 실행됨!");
 
     let randomVideo;
@@ -174,7 +174,7 @@ function VoiceChatPage() {
         const aiResponse = response.data.message;
         console.log(`📝 AI 응답 받음: ${aiResponse}`);
 
-        handleNewAIResponse(aiResponse); // ✅ 비디오 변경 트리거
+        handleNewAIResponse(); // ✅ 비디오 변경 트리거
 
         setMessageHistory((prev) => [...prev, { role: "ai", message: aiResponse }]);
         setAiResponseBuffer(aiResponse);
@@ -234,27 +234,27 @@ function VoiceChatPage() {
   };
 
   /* 대화 종료 모달창 */
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
   const [turnCount, setTurnCount] = useState(10);
   const [isChatEnd, setIsChatEnd] = useState(false);
-  const [isOverlay, setIsOverlay] = useState(false);
+  const [isOverlay, _setIsOverlay] = useState(false);
 
   /* 대화 재시작 */
-  const restartChat = () => {
-    window.location.href = "/chat/ai";
-  };
+  // const restartChat = () => {
+  //   window.location.href = "/chat/ai";
+  // };
 
   /* 대화 종료 후 /report 페이지 이동 */
-  const endChat = () => {
-    navigate("/report");
-  };
+  // const endChat = () => {
+  //   navigate("/report");
+  // };
 
   const videos = [Video_AI_1, Video_AI_2, Video_AI_4, Video_AI_3];
 
   // 기본 영상
-  const [videoState, setVideoState] = useState<string>(videos[1]);
+  const [_videoState, _setVideoState] = useState<string>(videos[1]);
 
   // ai 영상 상태 변화
   const [currentVideo, setCurrentVideo] = useState<string>(videos[1]);
@@ -264,7 +264,7 @@ function VoiceChatPage() {
   const [aiMessage, setAiMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
-  const [aiResponseBuffer, setAiResponseBuffer] = useState('');
+  const [_aiResponseBuffer, setAiResponseBuffer] = useState('');
   const [lastAiMessage, setLastAiMessage] = useState(''); // 마지막 AI 응답 저장
   const [lastUserMessage, setLastUserMessage] = useState<string>(''); // 마지막 사용자 메시지 저장
 
@@ -307,7 +307,7 @@ function VoiceChatPage() {
       )}
 
       {/* 대화 종료 모달 */}
-      <ChatEnd isOpen={isChatEnd} onClose={endChat} />
+      <ChatEnd isOpen={isChatEnd} />
 
       <div className={styles.menu}>
         <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} turnCount={turnCount} />
