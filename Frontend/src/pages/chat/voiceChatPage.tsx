@@ -27,7 +27,7 @@ import RedAlert from '@/components/alert/redAlert';
 
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
-import { useNavigate } from "react-router-dom";
+// import { useNavigate } from "react-router-dom";
 
 function VoiceChatPage() {
   /* 모달 관련 상태 */
@@ -234,7 +234,7 @@ function VoiceChatPage() {
   };
 
   /* 대화 종료 모달창 */
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
   const [turnCount, setTurnCount] = useState(10);
@@ -247,9 +247,9 @@ function VoiceChatPage() {
   // };
 
   /* 대화 종료 후 /report 페이지 이동 */
-  const endChat = () => {
-    navigate("/report");
-  };
+  // const endChat = () => {
+  //   navigate("/report");
+  // };
 
   const videos = [Video_AI_1, Video_AI_2, Video_AI_4, Video_AI_3];
 
