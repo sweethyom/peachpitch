@@ -1,11 +1,10 @@
-package com.ssafy.peachptich.controller;
+package com.ssafy.peachptich.controller.chat;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.AudioChatRequest;
 import com.ssafy.peachptich.dto.request.TrialRequest;
 import com.ssafy.peachptich.dto.response.ChatRoomResponse;
 import com.ssafy.peachptich.dto.response.ResponseDto;
-import com.ssafy.peachptich.entity.RandomName;
 import com.ssafy.peachptich.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

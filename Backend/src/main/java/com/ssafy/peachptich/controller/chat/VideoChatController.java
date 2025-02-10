@@ -1,4 +1,4 @@
-package com.ssafy.peachptich.controller;
+package com.ssafy.peachptich.controller.chat;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.FeedbackRequest;
@@ -22,22 +22,22 @@ public class VideoChatController {
     private final ChatHistoryService chatHistoryService;
 
     @PostMapping("/request")
-    public ResponseEntity<ResponseDto<RoomResponse>> requestVideoChatRoom(
+    public ResponseEntity<ResponseDto<VideoChatRoomResponse>> requestVideoChatRoom(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws OpenViduJavaClientException, OpenViduHttpException {
         // 세션에 들어가거나 만드는 요청 전부 포함 -> 매칭 되면 token, 대화내역 id 반환
         Long userId = userDetails.getUserId();
-        RoomResponse result = videoChatService.handleVideoChat(userId);
+        VideoChatRoomResponse result = videoChatService.handleVideoChat(userId);
         // 첫 번째 사용자 요청 시 (token과 historyId가 null)
         if (result.getHistoryId() == null) {
             return ResponseEntity.ok().body
-                    (ResponseDto.<RoomResponse>builder()
+                    (ResponseDto.<VideoChatRoomResponse>builder()
                             .message("Waiting for another user to join")
                             .data(result)
                             .build());
         }
         //두번째 사용자 요청
-        return ResponseEntity.ok().body(ResponseDto.<RoomResponse>builder().message("Video chat matched successfully").data(result).build());
+        return ResponseEntity.ok().body(ResponseDto.<VideoChatRoomResponse>builder().message("Video chat matched successfully").data(result).build());
     }
 
     @PostMapping("/keywords")

@@ -1,6 +1,6 @@
 package com.ssafy.peachptich.service;
 
-import com.ssafy.peachptich.dto.response.RoomResponse;
+import com.ssafy.peachptich.dto.response.VideoChatRoomResponse;
 import com.ssafy.peachptich.entity.RandomName;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -43,7 +41,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         if (waitingUsers.isEmpty()) {
             //첫번째 사용자 대기열에 추가
             waitingUsers.add(userId);
-            RoomResponse waitingResponse = RoomResponse.builder()
+            VideoChatRoomResponse waitingResponse = VideoChatRoomResponse.builder()
                     .status("waiting")
                     .build();
             messagingTemplate.convertAndSendToUser(userEmail, "/sub/call", waitingResponse);
@@ -68,7 +66,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
             String userName = randomName.getRandomName(); //늦게 들어온 사람 이름
             Long historyId = chatHistoryService.addVideoChatHistory(matchedUserId, userId, matchedUserName, userName);
 
-            RoomResponse user1Response = RoomResponse.builder()
+            VideoChatRoomResponse user1Response = VideoChatRoomResponse.builder()
                     .token(token1)
                     .status("matched")
                     .historyId(historyId)
@@ -76,7 +74,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
                     .matchedUserName(userName)
                     .build();
 
-            RoomResponse user2Response = RoomResponse.builder()
+            VideoChatRoomResponse user2Response = VideoChatRoomResponse.builder()
                     .token(token2)
                     .status("matched")
                     .historyId(historyId)
