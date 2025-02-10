@@ -45,13 +45,13 @@ const Habits = (): JSX.Element => {
 
     // 커스텀 Legend 구성
     const customLegend = data.labels?.map((label, index) => {
-        const color = data.datasets[0].backgroundColor[index];
-        const value = data.datasets[0].data[index];
-        const total = data.datasets[0].data.reduce((acc, cur) => acc + cur, 0);
+        const color = (data.datasets[0]?.backgroundColor as string[] | undefined)?.[index] ?? "gray";
+        const value = data.datasets[0]?.data?.[index] ?? 0;
+        const total = data.datasets[0]?.data?.reduce((acc, cur) => acc + cur, 0) ?? 1;
         const percentage = Math.round((value / total) * 100);
 
         return (
-            <div key={label} style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "8px" }}>
+            <div key={String(label)} style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "8px" }}>
                 <div className={styles.box}>
                     <div className={styles.legend__item}>
                         <div
@@ -64,7 +64,7 @@ const Habits = (): JSX.Element => {
                             }}
                         ></div>
                         <span className={styles.legend__item__label}>
-                            {label}
+                            {String(label)}
                         </span>
                     </div>
                     <span className={styles.legend__item__explain}>
