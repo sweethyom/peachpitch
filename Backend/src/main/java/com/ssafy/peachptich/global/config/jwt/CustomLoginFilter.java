@@ -118,8 +118,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authentication){
         try{
-            //TODO
-            // authentication.getEmail()로 바꿀 필요 없을 것 같은데..?
             CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
             String userEmail = customUserDetails.getUserEmail();
             Long userId = customUserDetails.getUserId();
@@ -143,7 +141,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             }
 
             // JSON 응답 생성
-            Map<String, Long> responseData = Map.of("userId", userId);
+            // Map<String, Long> responseData = Map.of("userId", userId);
+            Map<String, Long> responseData = new HashMap<>();
             ResponseDto<Map<String, Long>> responseDto = ResponseDto.<Map<String, Long>>builder()
                     .message("User login success!")
                     .data(responseData)
