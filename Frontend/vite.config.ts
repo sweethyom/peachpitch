@@ -3,7 +3,9 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'url';
 
 export default defineConfig({
-    plugins: [react()],
+    plugins: [
+        react()
+    ],
     server: {
         proxy: {
             '/api': {
@@ -21,7 +23,7 @@ export default defineConfig({
             '@pages': fileURLToPath(new URL('./src/pages', import.meta.url)),
             '@recoil': fileURLToPath(new URL('./src/recoil', import.meta.url)),
             '@types': fileURLToPath(new URL('./src/types', import.meta.url)),
-            '@apis': fileURLToPath(new URL('./src/apis', import.meta.url)),
+            '@apis': fileURLToPath(new URL('./src/apis', import.meta.url))
         },
     },
     css: {

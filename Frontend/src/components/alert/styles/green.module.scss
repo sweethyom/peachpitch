@@ -3,20 +3,19 @@
     top: 40px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: #fde8e8;
-    border: 1px solid #f44336;
-    color: #d32f2f;
+    background-color: rgba(0, 168, 129, 0.08);
+    border: 1px solid #08785E;
+    color: #08785E;
     padding: 12px 16px;
     border-radius: 8px;
     display: flex;
     align-items: center;
     gap: 10px;
-    z-index: 9999;
 
     &__icon {
         width: 16px;
         height: 16px;
-        color: #f44336;
+        color: #08785E;
     }
 
     &__message {
@@ -27,14 +26,14 @@
     &__close {
         background: none;
         border: none;
-        color: #d32f2f;
+        color: #08785E;
         font-size: 18px;
         font-weight: bold;
         cursor: pointer;
         margin-left: auto;
 
-        &:hover {
-            color: #b71c1c;
-        }
+        // &:hover {
+        //     color: #b71c1c;
+        // }
     }
 }

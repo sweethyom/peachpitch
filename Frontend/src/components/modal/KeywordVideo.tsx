@@ -2,18 +2,17 @@ import { useState, useEffect } from "react";
 import styles from "./styles/Keyword.module.scss";
 
 import closeBtn from "@/assets/icons/modal__close.png";
-
-import axios from "axios";
 import { Link } from "react-router-dom";
 
 type ModalProps = {
-    children?: React.ReactNode;
-    setSelectedKeyword: (keyword: string) => void;
-    onClose: () => void;
+    isOpen: boolean; // 모달 열림 상태
+    onClose: () => void; // 닫기 버튼 클릭 이벤트
+    children?: React.ReactNode; // 추가적인 child 요소
+    setSelectedKeyword: (keyword: string) => void; // 키워드 저장 함수
 };
 
-function Keyword({ children, setSelectedKeyword }: ModalProps) {
-    // if (!isOpen) return null;
+function Keyword({ isOpen, onClose, children, setSelectedKeyword }: ModalProps) {
+    if (!isOpen) return null;
 
     const [keywords, setKeywords] = useState<string[]>([]);
     const [visibleCount, setVisibleCount] = useState(5); // 처음 5개만 표시
@@ -25,18 +24,16 @@ function Keyword({ children, setSelectedKeyword }: ModalProps) {
                 const response = await fetch("/data/keywords.json");
                 const data = await response.json();
 
-                if (data.keywords && data.keywords.length > 0) {
-                    const shuffledKeywords = [...data.keywords].sort(() => 0.5 - Math.random());
-                    setKeywords(shuffledKeywords.slice(0, 15));
-                }
+                // 랜덤한 15개 키워드 선택
+                const shuffledKeywords = data.keywords.sort(() => 0.5 - Math.random());
+                setKeywords(shuffledKeywords.slice(0, 15));
             } catch (error) {
-                console.error("키워드 로딩 오류:", error);
+                console.error("키워드 로딩 중 오류 발생:", error);
             }
         };
 
         fetchKeywords();
     }, []);
-
 
     const handleAddKeyword = () => {
         setVisibleCount((prev) => Math.min(prev + 5, 15)); // 5개씩 추가 표시, 최대 15개까지
@@ -52,7 +49,7 @@ function Keyword({ children, setSelectedKeyword }: ModalProps) {
             <div className={styles.modal}>
                 <div className={styles.modal__header}>
                     <Link to="/main">
-                        <img src={closeBtn} className={styles.modal__header__close} />
+                        <img src={closeBtn} className={styles.modal__header__close} onClick={onClose} />
                     </Link>
                     <p className={styles.modal__header__logo}>PeachPitch</p>
                 </div>
