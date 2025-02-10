@@ -91,25 +91,12 @@ public class JwtFilter extends OncePerRequestFilter {
         // userEmail, role 값 획득
 
         String userEmail = tokenProvider.getUserEmail(accessToken);
-        String role = tokenProvider.getRole(accessToken);
-        LocalDate birth = userRepository.findByEmail(userEmail).get().getBirth();
 
-<<<<<<< Updated upstream
         User userEntity = userRepository.findByEmail(userEmail).orElseThrow(() ->
                 new UsernameNotFoundException("User not found with email: " + userEmail)
         );
         System.out.println("JWTFilter에서 userId = " + userEntity.getUserId() + ", userEmail = " + userEntity.getEmail() + ", role = " + userEntity.getRole() + ", birth = " + userEntity.getBirth());
 
-=======
-        log.info("JWTFilter에서 userEmail = " + userEmail + ", role = " + role);
-
-        User userEntity = new User();
-        userEntity.setEmail(userEmail);
-        userEntity.setRole(role);
-        userEntity.setBirth(birth);
-        
-        // UserDetails에 회원 정보 객체 담기
->>>>>>> Stashed changes
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
         
         // Spring Security 인증 토큰 생성
