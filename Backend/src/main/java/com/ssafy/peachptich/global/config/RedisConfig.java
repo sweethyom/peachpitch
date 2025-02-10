@@ -1,4 +1,4 @@
-package com.ssafy.peachptich.config;
+package com.ssafy.peachptich.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

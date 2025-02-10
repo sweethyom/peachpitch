@@ -2,13 +2,14 @@ package com.ssafy.peachptich.controller.purchase;
 
 import com.ssafy.peachptich.dto.response.ApproveResponse;
 import com.ssafy.peachptich.dto.response.ReadyResponse;
+import com.ssafy.peachptich.entity.Item;
 import com.ssafy.peachptich.entity.Purchase;
+import com.ssafy.peachptich.service.CouponService;
 import com.ssafy.peachptich.service.PurchaseService;
 import com.ssafy.peachptich.global.util.SessionUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,16 +18,17 @@ import org.springframework.web.bind.annotation.*;
  *
  */
 @Slf4j
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/pay")
 @SessionAttributes({"tid", "orderNum", "totalPrice"})  // 추가
-@CrossOrigin(origins = "http://localhost:5175", allowedHeaders = "*", allowCredentials = "true", methods = {
+@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true", methods = {
         RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE
 })
 public class PurchaseController {
 
     private final PurchaseService purchaseService;
+    private final CouponService couponService;
 
     @PostMapping("/ready")
     public @ResponseBody ReadyResponse payReady(@RequestBody Purchase purchase){
@@ -59,9 +61,15 @@ public class PurchaseController {
 //            log.info("결제 승인 요청을 인증하는 토큰: " + pgToken);
 //            log.info("결제 고유번호: "+ tid);
 
-            // 카카오 결제 요청
-            ApproveResponse approveResponse = purchaseService.payApprove(pgToken);
-            purchaseService.savePaymentInfo(approveResponse);
+        // 카카오 결제 요청
+        ApproveResponse approveResponse = purchaseService.payApprove(pgToken);
+        purchaseService.savePaymentInfo(approveResponse);
+
+        // 쿠폰 구매인 경우 쿠폰 발급
+        Purchase purchase = purchaseService.getPaymentInfo(approveResponse.getPartner_order_id());
+        if (purchase.getItem().getType() == Item.ItemType.PAID_COUPON) {
+            couponService.handlePaidCoupon(purchase.getUser().getUserId(), purchase.getEa());
+        }
 
         String htmlResponse = """
             <!DOCTYPE html>
