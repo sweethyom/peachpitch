@@ -17,6 +17,8 @@ load_dotenv()
 
 # .env 파일에서 API 키 가져오기
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+GOOGLE_CX = os.getenv('GOOGLE_CX')
 
 DATABASES = {
     'default': {
@@ -54,6 +56,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'chatbotAPI',
     'reportAI',
     'wordAI',
@@ -67,6 +70,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware', # CORS 관련 추가 (가장 상단에 위치)
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

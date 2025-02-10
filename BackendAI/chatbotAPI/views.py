@@ -1,7 +1,24 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+import requests
 from .chatbot import generate_initial_message, generate_reply
+from django.conf import settings
+
+# 구글 API 설정
+GOOGLE_API_KEY = settings.GOOGLE_API_KEY
+GOOGLE_CX = settings.GOOGLE_CX
+
+# 구글 검색 함수
+def google_search(query):
+    url = "https://www.googleapis.com/customsearch/v1"
+    params = {"key": GOOGLE_API_KEY, "cx": GOOGLE_CX, "q": query}
+    response = requests.get(url, params=params)
+    if response.status_code == 200:
+        data = response.json()
+        return [item["snippet"] for item in data.get("items", [])[:3]]
+    else:
+        return []
 
 # 대화 히스토리 관리 (프론트엔드에서 관리하거나 DB로 옮길 수 있음)
 conversation_history = []  # 이 부분은 프론트에서 히스토리를 받아올 수도 있음
@@ -16,7 +33,13 @@ def start_conversation(request):
             if not keyword:
                 return JsonResponse({'error': '키워드를 입력하세요.'}, status=400)
 
+            # 구글 검색 결과 추가
+            search_results = google_search(keyword)
+            search_content = "\n".join(search_results) if search_results else ""
+
             initial_message = generate_initial_message(keyword)
+            if search_content:
+                initial_message += "\n\n최근 검색 결과:\n" + search_content
             
             # 히스토리에 추가
             conversation_history.clear()  # 새로운 대화 시작 시 이전 기록 초기화
@@ -43,6 +66,15 @@ def continue_conversation(request):
 
             # 사용자 메시지 히스토리에 추가
             conversation_history.append({"role": "user", "content": user_message})
+
+            # 모르는 단어 검색
+            search_results = google_search(user_message)
+            search_content = "\n".join(search_results) if search_results else ""
+
+            # GPT로부터 응답 생성
+            bot_reply = generate_reply(conversation_history)
+            if search_content:
+                bot_reply += "\n\n관련 정보:\n" + search_content
 
             # GPT로부터 응답 생성
             bot_reply = generate_reply(conversation_history)
