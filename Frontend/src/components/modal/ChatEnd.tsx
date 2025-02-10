@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 
 type ModalProps = {
     isOpen: boolean;
-    onClose: () => void;  // ✅ 모달 닫기 이벤트 추가
+    // onClose: () => void;  // ✅ 모달 닫기 이벤트 추가
 };
 
-function ChatEnd({ isOpen, onClose }: ModalProps) {
+function ChatEnd({ isOpen }: ModalProps) {
     const navigate = useNavigate();
 
     if (!isOpen) return null;
