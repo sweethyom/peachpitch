@@ -2,14 +2,21 @@ import styles from './styles/video.module.scss'
 
 import leaveBtn from '@/assets/icons/leave.png'
 import sstBtn from '@/assets/icons/chat_stt.png'
-import WebcamComponent from '@/components/chat/WebcamComponent';
+// import WebcamComponent from '@/components/chat/WebcamComponent';
+import UserVideoComponent from "@components/chat/UserVideoComponent.tsx";
 
 import Drawer from '@/components/chat/DrawerVideo';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import RoomLeaveModal from '@/components/modal/RoomLeave';
 import KeywordModal from '@/components/modal/KeywordVideo';
 import RedAlert from '@/components/alert/redAlert';
+
+import { Client } from "@stomp/stompjs";
+import { OpenVidu, Session, Publisher, Subscriber } from "openvidu-browser";
+
+// import Wait from "@/components/modal/Wait"
+import { useNavigate } from 'react-router-dom';
 
 function videoChatPage() {
 
@@ -38,6 +45,149 @@ function videoChatPage() {
     setIsKeywordOpen(false); // 키워드가 선택된 경우 모달 닫기
   };
 
+  /* OpenVidu 관련 */
+  const [client, setClient] = useState<Client | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [publisher, setPublisher] = useState<Publisher | null>(null);
+  const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+  const [token, setToken] = useState<string | null>(null);
+  const [isMatching, setIsMatching] = useState<boolean>(false);
+  const [userJwt, setUserJwt] = useState<string>("");
+  const [isWaiting, setIsWaiting] = useState(true);
+
+  useEffect(() => {
+    const userJwtFromStorage = localStorage.getItem("accessToken");
+    setUserJwt(userJwtFromStorage || "");
+    console.log("stomp call " + userJwt);
+    const stompClient = new Client({
+      brokerURL: "ws://localhost:8080/ws/room",
+      connectHeaders: {
+        access: `${userJwt}`,
+      },
+      reconnectDelay: 5000,
+      onConnect: () => {
+        console.log("✅ STOMP 연결됨");
+        stompClient.subscribe(`/user/sub/call`, (message) => {
+          console.log("📩 받은 메시지:", message.body);
+          console.log(message.body);
+          const response = JSON.parse(message.body);
+          const data = response;
+          if (data.status === "waiting") {
+            console.log("🔄 매칭 대기 중...");
+          } else if (data.status === "matched") {
+            console.log("🎉 매칭 완료! 토큰:", data.token);
+            setToken(data.token);
+          }
+        });
+        // STOMP 연결이 성공하면 자동으로 매칭 요청
+        console.log("🔍 매칭 시도 중...");
+        setIsMatching(true);
+        stompClient.publish({
+          destination: "/pub/request",
+        });
+      },
+      onDisconnect: () => console.log("❌ STOMP 연결 종료됨"),
+      onStompError: (frame) => console.error("STOMP 에러:", frame),
+      onWebSocketError: (event) => console.error("WebSocket 에러:", event),
+    });
+
+    stompClient.activate();
+    setClient(stompClient);
+
+    return () => {
+      stompClient.deactivate();
+    };
+  }, [userJwt]);
+
+  useEffect(() => {
+    if (token) {
+      console.log("📡 OpenVidu 세션 시작");
+      const ov = new OpenVidu();
+      const newSession: Session = ov.initSession();
+
+      newSession.on("streamCreated", (event: any) => {
+        console.log("📡 새 구독자 추가");
+        const subscriber: Subscriber = newSession.subscribe(event.stream, undefined);
+        setSubscribers((prev) => [...prev, subscriber]);
+      });
+
+      newSession
+        .connect(token)
+        .then(async () => {
+          console.log("✅ OpenVidu 연결 성공");
+
+          // 🎥 getUserMedia로 미디어 권한 요청
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+              audio: true,
+            });
+
+            const cloned = stream.clone(); // 이거 나중에 주석
+
+            // cloned 대신 stream쓰기
+            const newPublisher: Publisher = ov.initPublisher(undefined, {
+              videoSource: cloned.getVideoTracks()[0],
+              audioSource: cloned.getAudioTracks()[0],
+              publishAudio: true,
+              publishVideo: true,
+              resolution: "640x480",
+              frameRate: 30,
+              insertMode: "APPEND",
+              mirror: false,
+            });
+
+            console.log("📡 로컬 비디오 퍼블리싱 시작");
+            newSession.publish(newPublisher);
+            setPublisher(newPublisher);
+          } catch (error) {
+            console.error("❌ 카메라 또는 마이크 사용 불가:", error);
+          }
+        })
+        .catch((error) => console.error("❌ OpenVidu 연결 실패:", error));
+
+      setSession(newSession);
+      setIsMatching(false);
+    }
+  }, [token]);
+
+  const leaveSession = (): void => {
+    if (session) {
+      console.log("📴 세션 종료");
+      session.disconnect();
+      setSession(null);
+      setPublisher(null);
+      setSubscribers([]);
+      setToken(null);
+      setIsMatching(false);
+    }
+  };
+
+  const handleKeywordSelection = (keyword: string) => {
+    setSelectedKeyword(keyword);
+    setIsKeywordOpen(false);
+    setIsWaiting(true);
+  };
+
+  useEffect(() => {
+    if (subscribers.length > 0) {
+      setIsWaiting(false);
+    }
+  }, [subscribers]);
+
+  const navigate = useNavigate();
+  const handleLeave = () => {
+    if (session) {
+      session.disconnect();
+      setSession(null);
+      setPublisher(null);
+      setSubscribers([]);
+      setToken(null);
+      setIsMatching(false);
+    }
+    navigate("/main");
+  };
+
   return (
     <div className={styles.page}>
 
@@ -55,13 +205,18 @@ function videoChatPage() {
           <img
             src={leaveBtn}
             onClick={toggleLeave}
-            className={styles.chat__header__img} />
+            className={styles.chat__header__img}
+            alt="leave button"
+          />
         </div>
 
         {/* 상대방 웹캠 */}
         <div className={styles.chat__other}>
           <div className={styles.chat__other__video}>
-            <WebcamComponent />
+            {/* <WebcamComponent /> */}
+            {publisher && (
+              <UserVideoComponent streamManager={publisher} />
+            )}
           </div>
           <div className={styles.chat__other__bubble}>
             <div className={styles.bubble__left}>
@@ -78,7 +233,12 @@ function videoChatPage() {
             </div>
           </div>
           <div className={styles.chat__user__video}>
-            <WebcamComponent />
+            {subscribers.map((sub) => (
+              <div key={sub.stream.connection.connectionId}>
+                {/* <span>{sub.stream.connection.data}</span> */}
+                <UserVideoComponent streamManager={sub} />
+              </div>
+            ))}
           </div>
         </div>
 
@@ -91,11 +251,8 @@ function videoChatPage() {
       </div>
 
       {/* 키워드 모달 */}
-      <KeywordModal
-        isOpen={isKeywordOpen}
-        onClose={toggleKeyword}
-        setSelectedKeyword={setSelectedKeyword}>
-        <div className={styles.btn} onClick={handleStartClick}>시작하기</div>
+      <KeywordModal isOpen={isKeywordOpen} setSelectedKeyword={handleKeywordSelection}>
+        <div className={styles.btn} onClick={() => selectedKeyword ? setIsKeywordOpen(false) : setShowAlert(true)}>시작하기</div>
       </KeywordModal>
 
       {/* 키워드 선택안했을 경우 뜨는 alert창 */}
@@ -109,9 +266,9 @@ function videoChatPage() {
           </div>
         )
       }
-
+      {/* {isWaiting && <Wait isOpen={isWaiting} onClose={handleLeave} />} */}
       {/* 대화 나가기 모달 */}
-      <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} stopTTS={() => {}} />
+      <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} stopTTS={() => { }} />
     </div >
   )
 }

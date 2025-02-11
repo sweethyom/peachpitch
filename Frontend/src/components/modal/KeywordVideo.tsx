@@ -13,7 +13,6 @@ type ModalProps = {
 };
 
 
-
 function Keyword({ isOpen, setSelectedKeyword}: ModalProps) {
     if (!isOpen) return null;
 
