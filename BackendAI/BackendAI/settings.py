@@ -23,7 +23,7 @@ GOOGLE_CX = os.getenv('GOOGLE_CX')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # MySQL 엔진 사용
-        'NAME': 'peachpitch',           # 데이터베이스 이름
+        'NAME': 'test',           # 데이터베이스 이름
         'USER': 'root',              # MySQL 사용자 이름
         'PASSWORD': '1234',      # MySQL 비밀번호
         'HOST': 'localhost',                    # 로컬에서 실행 중이므로 localhost
@@ -33,6 +33,11 @@ DATABASES = {
         }
     }
 }
+
+# Redis 설정
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 1  # 사용할 DB 번호
 
 # Redis 연결 설정
 CACHES = {

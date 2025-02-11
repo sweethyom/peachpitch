@@ -37,11 +37,19 @@ def start_conversation(request):
             data = json.loads(request.body)
             keyword = data.get('keyword', '')
             # 내일 프론트랑 합치면서 chathistory_id를 들고 올 것
-            # chat_history_id = data.get('chatHistoryId') 
-            session_id = request.session.session_key or request.session.create()
+            history_id = data.get('history_id') 
+            # session_id = request.session.session_key or request.session.create()
+
+            if not history_id:
+                return JsonResponse({'error': 'history_id is required'}, status=400)
 
             if not keyword:
                 return JsonResponse({'error': '키워드를 입력하세요.'}, status=400)
+
+
+            # Redis 키 생성 전에 history_id 타입 확인
+            redis_key = f"chat:{history_id}:messages"
+            print("Redis key:", redis_key)
 
             # 구글 검색 결과 추가
             search_results = google_search(keyword)
@@ -63,7 +71,7 @@ def start_conversation(request):
             print('redis 객체만들기 완료')
 
             # 세션별로 대화 저장
-            redis_key = f"chat:{session_id}:messages"
+            redis_key = f"chat:{history_id}:messages"
             redis_client.rpush(redis_key, json.dumps(chat_data))
 
             print('redis에 세션별 저장 완료')
@@ -90,8 +98,8 @@ def continue_conversation(request):
             data = json.loads(request.body)
             user_message = data.get('message', '')
             # 내일 프론트랑 합치면서 chathistory_id를 들고 올 것
-            # chat_history_id = data.get('chatHistoryId') 
-            session_id = request.session.session_key or request.session.create()
+            history_id = data.get('history_id') 
+            # session_id = request.session.session_key or request.session.create()
 
             if not user_message:
                 return JsonResponse({'error': '사용자 메시지를 입력하세요.'}, status=400)
@@ -107,7 +115,7 @@ def continue_conversation(request):
             print('사용자 응답 redis 객체만들기 완료')
 
             # 세션별로 대화 저장
-            redis_key = f"chat:{session_id}:messages"
+            redis_key = f"chat:{history_id}:messages"
             redis_client.rpush(redis_key, json.dumps(chat_data))
 
             print('redis에 사용자 응답 세션별 저장 완료')
@@ -141,7 +149,7 @@ def continue_conversation(request):
             print('bot 대답 redis 객체만들기 완료')
 
             # 세션별로 대화 저장
-            redis_key = f"chat:{session_id}:messages"
+            redis_key = f"chat:{history_id}:messages"
             redis_client.rpush(redis_key, json.dumps(chat_data))
 
             print('redis에 bot 대답 세션별 저장 완료')

@@ -7,6 +7,7 @@ import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.ChatRequest;
 import com.ssafy.peachptich.entity.Chat;
 import com.ssafy.peachptich.entity.ChatHistory;
+import com.ssafy.peachptich.repository.ChatHistoryRepository;
 import com.ssafy.peachptich.repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,19 +27,24 @@ public class ChatServiceImpl implements ChatService{
     private final RedisTemplate<String, String> redisTemplate;
     private final ChatRepository chatRepository;
     private final ObjectMapper objectMapper;
+    private final ChatHistoryRepository chatHistoryRepository;
 
     @Override
     @Transactional
     public void saveChatContent(ChatRequest chatRequest, CustomUserDetails userDetails) {
         try {
             List<Chat> chatsToSave = new ArrayList<>();
-            String redisKey = "chat:" + chatRequest.getSessionId() + ":messages";
+            String redisKey = "chat:" + chatRequest.getHistoryId() + ":messages";
             Long userId = userDetails.getUserId();
+
+            ChatHistory chatHistory = chatHistoryRepository.findById(chatRequest.getHistoryId())
+                    .orElseThrow(() -> new RuntimeException("ChatHistory not found"));
+
 
             List<String> messages = redisTemplate.opsForList().range(redisKey, 0, -1);
 
             if (messages == null || messages.isEmpty()) {
-                log.warn("세션 {}의 저장할 채팅 메시지가 없습니다.", chatRequest.getSessionId());
+                log.warn("세션 {}의 저장할 채팅 메시지가 없습니다.", chatRequest.getHistoryId());
                 return;
             }
 
@@ -51,6 +57,7 @@ public class ChatServiceImpl implements ChatService{
                             .content(jsonNode.get("content").asText())
                             .createdAt(LocalDateTime.parse(jsonNode.get("timestamp").asText(), formatter))
                             .userId(userId)
+                            .chatHistory(chatHistory)
                             .build();
                     chatsToSave.add(chat);
                 } catch (JsonProcessingException e) {
@@ -61,11 +68,11 @@ public class ChatServiceImpl implements ChatService{
             if (!chatsToSave.isEmpty()) {
                 chatRepository.saveAll(chatsToSave);
                 redisTemplate.delete(redisKey);
-                log.info("세션 {}의 Redis 데이터가 성공적으로 삭제되었습니다.", chatRequest.getSessionId());
+                log.info("세션 {}의 Redis 데이터가 성공적으로 삭제되었습니다.", chatRequest.getHistoryId());
             }
 
         } catch (Exception e) {
-            log.error("세션 {}의 채팅 저장 중 오류 발생: {}", chatRequest.getSessionId(), e.getMessage());
+            log.error("세션 {}의 채팅 저장 중 오류 발생: {}", chatRequest.getHistoryId(), e.getMessage());
             throw new RuntimeException("채팅 저장 실패", e);
         }
     }
