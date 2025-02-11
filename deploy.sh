@@ -128,4 +128,3 @@ docker-compose -p bluegreen-${BEFORE_D_COLOR} -f /home/ubuntu/S12P11D201/Backend
 # 5. 사용되지 않는 Docker 이미지 정리
 echo "사용되지 않는 Docker 이미지 삭제 중..."
 docker image prune -f
-
