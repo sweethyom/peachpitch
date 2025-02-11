@@ -54,7 +54,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
         return () => {
             window.removeEventListener("storage", checkLoginStatus);
         };
-    }, [isLoggedIn]); 
+    }, [isLoggedIn]);
 
 
     // ✅ 아이디 크기를 가져와서 모달창 너비 설정 (최소 130px)
@@ -121,10 +121,13 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                                 {/* ✅ 작은 모달창 (로그아웃 버튼) */}
                                 {isDropdownOpen && (
                                     <div
+                                        onClick={() => (document.body.style.backgroundColor = 'var(--color-white-000)')}
                                         className={styles.header__dropdown}
                                         style={{ width: `${dropdownWidth}px` }} // ✅ 아이디 너비와 동일하게 설정
                                     >
-                                        <div onClick={handleLogout} className={styles.header__logout}>
+                                        <div
+                                            onClick={handleLogout}
+                                            className={styles.header__logout}>
                                             로그아웃
                                         </div>
                                     </div>
@@ -134,8 +137,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                     ) : (
                         <Link
                             to="/login"
-                            onClick={() => (document.body.style.backgroundColor = 'var(--color-white-000)')}
-                        >
+                            onClick={() => (document.body.style.backgroundColor = 'var(--color-white-000)')}>
                             <span className={styles.header__navi__item}>login</span>
                         </Link>
                     )}
