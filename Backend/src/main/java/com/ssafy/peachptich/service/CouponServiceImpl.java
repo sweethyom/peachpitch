@@ -70,14 +70,14 @@ public class CouponServiceImpl implements CouponService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         System.out.println("User found: " + user.getEmail());
 
-        Item freeCouponItem = itemRepository.findByType(Item.ItemType.FREE_COUPON)
+        Item freeCouponItem = itemRepository.findByType(Item.ItemType.FREE)
                 .orElseThrow(() -> new IllegalStateException("무료 쿠폰 아이템이 설정되지 않았습니다."));
         System.out.println("Free coupon item found: " + freeCouponItem.getItemId());
         // 기존 무료 쿠폰 확인
         Optional<HaveCoupon> existingCoupon = haveCouponRepository
                 .findByUserIdAndItemTypeAndExpirationDateAfter(
                         userId,
-                        Item.ItemType.FREE_COUPON,
+                        Item.ItemType.FREE,
                         LocalDateTime.now()
                 );
 
@@ -100,7 +100,7 @@ public class CouponServiceImpl implements CouponService {
         Optional<HaveCoupon> freeCoupon = haveCouponRepository
                 .findByUserIdAndItemTypeAndExpirationDateAfter(
                         userId,
-                        Item.ItemType.FREE_COUPON,
+                        Item.ItemType.FREE,
                         LocalDateTime.now()
                 );
 
@@ -108,7 +108,7 @@ public class CouponServiceImpl implements CouponService {
         Optional<HaveCoupon> paidCoupon = haveCouponRepository
                 .findByUser_IdAndItem(
                         userId,
-                        itemRepository.findByType(Item.ItemType.PAID_COUPON).orElseThrow()
+                        itemRepository.findByType(Item.ItemType.PAID).orElseThrow()
                 );
 
         int freeCoupons = freeCoupon.map(HaveCoupon::getEa).orElse(0);
@@ -124,7 +124,7 @@ public class CouponServiceImpl implements CouponService {
         Optional<HaveCoupon> freeCoupon = haveCouponRepository
                 .findByUserIdAndItemTypeAndExpirationDateAfter(
                         userId,
-                        Item.ItemType.FREE_COUPON,
+                        Item.ItemType.FREE,
                         LocalDateTime.now()
                 );
 
@@ -137,7 +137,7 @@ public class CouponServiceImpl implements CouponService {
         Optional<HaveCoupon> paidCoupon = haveCouponRepository
                 .findByUser_IdAndItem(
                         userId,
-                        itemRepository.findByType(Item.ItemType.PAID_COUPON).orElseThrow()
+                        itemRepository.findByType(Item.ItemType.PAID).orElseThrow()
                 );
 
         if (paidCoupon.isPresent() && paidCoupon.get().getEa() > 0) {
@@ -154,7 +154,7 @@ public class CouponServiceImpl implements CouponService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
-        Item paidCouponItem = itemRepository.findByType(Item.ItemType.PAID_COUPON)
+        Item paidCouponItem = itemRepository.findByType(Item.ItemType.PAID)
                 .orElseThrow(() -> new IllegalStateException("유료 쿠폰 아이템이 설정되지 않았습니다."));
 
         Optional<HaveCoupon> existingCoupon = haveCouponRepository

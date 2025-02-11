@@ -39,27 +39,14 @@ public class PurchaseController {
         log.info("주문 상품 이름: " + name);
         log.info("주문 금액: " + totalPrice);
 
-//        // 세션에 totalPrice 저장
-//        SessionUtils.addAttribute("totalPrice", String.valueOf(totalPrice));
-
         // 카카오 결제 준비하기
         ReadyResponse readyResponse = purchaseService.payReady(name, totalPrice, ea);
-//        log.info("카카오페이 서비스 응답: {}", readyResponse);
-        // 세션에 결제 고유번호(tid) 저장
-//        SessionUtils.addAttribute("tid", readyResponse.getTid());
-//        log.info("세션에 저장된 TID: {}", readyResponse.getTid());
 
         return readyResponse;
     }
 
     @GetMapping("/completed")
     public ResponseEntity<String> payCompleted(@RequestParam("pg_token") String pgToken) {
-//            log.info("세션 상태 확인");
-//            SessionUtils.printSessionAttributes();  // 세션 상태 출력
-//
-//            String tid = SessionUtils.getStringAttributeValue("tid");
-//            log.info("결제 승인 요청을 인증하는 토큰: " + pgToken);
-//            log.info("결제 고유번호: "+ tid);
 
         // 카카오 결제 요청
         ApproveResponse approveResponse = purchaseService.payApprove(pgToken);
@@ -67,7 +54,7 @@ public class PurchaseController {
 
         // 쿠폰 구매인 경우 쿠폰 발급
         Purchase purchase = purchaseService.getPaymentInfo(approveResponse.getPartner_order_id());
-        if (purchase.getItem().getType() == Item.ItemType.PAID_COUPON) {
+        if (purchase.getItem().getType() == Item.ItemType.PAID) {
             couponService.handlePaidCoupon(purchase.getUser().getUserId(), purchase.getEa());
         }
 
@@ -91,7 +78,6 @@ public class PurchaseController {
             </html>
         """;
 
-//            SessionUtils.addAttribute("orderId", approveResponse.getPartner_order_id());
             log.info("payCompleted : 마지막 로그");
             return ResponseEntity.ok().body(htmlResponse);
     }
