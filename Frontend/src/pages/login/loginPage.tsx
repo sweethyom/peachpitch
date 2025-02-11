@@ -13,10 +13,6 @@ import { SiNaver } from "react-icons/si";
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
 
-import Google from '@/components/login/Google'
-import Kakao from '@/components/login/Kakao'
-import Naver from '@/components/login/Naver'
-
 function loginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -93,6 +89,97 @@ function loginPage() {
     }
   };
 
+  // 소셜 로그인
+  const handleSocialLogin = (provider: string) => {
+    localStorage.setItem('socialLoginAttempt', 'true'); // ✅ 로그인 시도 기록 저장
+
+    // ✅ 팝업 창 열기
+    const popup = window.open(
+      `http://localhost:8080/api/users/login/social/${provider}`,
+      "Social Login",
+      "width=500,height=600"
+    );
+
+    // ✅ 메시지 리스너 추가
+    const receiveMessage = (event: MessageEvent) => {
+      if (event.origin !== "http://localhost:8080") return; // ✅ 보안상 올바른 origin만 허용
+
+      console.log("📩 팝업에서 메시지 수신:", event.data);
+
+      if (typeof event.data === "object" && event.data.status === "success") {
+        console.log("✅ 소셜 로그인 성공!");
+
+        localStorage.setItem("accessToken", event.data.access);
+        localStorage.setItem("userEmail", event.data.email);
+        localStorage.setItem("userId", event.data.userId);
+
+        window.removeEventListener("message", receiveMessage);
+
+        // ✅ storage 이벤트 트리거하여 Header.tsx 업데이트
+        window.dispatchEvent(new Event("storage"));
+
+        // ✅ localStorage 업데이트 후 `/main`으로 이동
+        setTimeout(() => {
+          navigate("/main");
+        }, 500);
+      }
+    };
+    window.addEventListener("message", receiveMessage);
+  };
+
+  useEffect(() => {
+    if (localStorage.getItem("socialLoginAttempt")) {
+      checkSocialLogin();
+    }
+  }, []);
+
+  // ✅ 로그인 상태 확인 (팝업 종료 후 실행)
+  const checkSocialLogin = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/api/users/check-login", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      // ✅ JSON 응답이 아닐 경우 예외 처리
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("서버 응답이 JSON 형식이 아닙니다.");
+      }
+
+      const data = await response.json();
+
+      if (!response.ok) throw new Error("로그인 확인 실패");
+
+      const accessToken = response.headers.get("access") || data.access || null;
+      const email = response.headers.get("email") || data.email || null;
+      const userId = response.headers.get("userId") || data.userId || null;
+
+      console.log("🔑 access:", accessToken);
+      console.log("📧 email:", email);
+      console.log("🆔 userId:", userId);
+
+      if (accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("userEmail", email || "");
+        localStorage.setItem("userId", userId || "");
+
+        // ✅ storage 이벤트 트리거하여 Header.tsx 업데이트
+        window.dispatchEvent(new Event("storage"));
+
+        // ✅ localStorage 업데이트 후 500ms 뒤에 메인 페이지로 이동
+        setTimeout(() => {
+          navigate("/main");
+        }, 500);
+      } else {
+        console.warn("🚨 로그인 정보 없음");
+      }
+    } catch (error) {
+      console.error("🚨 로그인 상태 확인 실패:", error);
+    }
+  };
+
+
 
   return (
     <>
@@ -105,11 +192,11 @@ function loginPage() {
 
             <p className={styles.login__sns}>다른 서비스로 로그인</p>
             <div className={styles.login__sns__item}>
-              <a href="http://localhost:8080/api/users/login/social/google">
+              <a onClick={() => handleSocialLogin('google')}>
                 <FaGoogle style={{ fontSize: '40px' }} />
               </a>
-              {/* <FaGoogle style={{ fontSize: '40px' }} /> */}
-              <a href="http://localhost:8080/api/users/login/social/kakao">
+
+              <a onClick={() => handleSocialLogin('kakao')}>
                 <RiKakaoTalkFill style={{ fontSize: '50px' }} />
               </a>
 
