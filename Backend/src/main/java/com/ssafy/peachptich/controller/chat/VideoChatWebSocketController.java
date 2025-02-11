@@ -1,10 +1,13 @@
 package com.ssafy.peachptich.controller.chat;
 
+import com.ssafy.peachptich.dto.request.AudioChatRequest;
+import com.ssafy.peachptich.dto.request.VideoChatRequest;
 import com.ssafy.peachptich.service.VideoChatWebSocketService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Controller;
@@ -44,10 +47,24 @@ public class VideoChatWebSocketController {
     ) throws OpenViduJavaClientException, OpenViduHttpException {
         // STOMP 세션에서 user 가져오기
         Principal principal = accessor.getUser();
-
         if (principal != null) {
             String email = principal.getName();
             videoChatService.handleVideoChatWebSocket(email);
+        } else {
+            log.error("Principal이 null입니다. WebSocket 연결에 실패했습니다.");
+        }
+    }
+
+    // 같은 화상 채팅방에 있는 유저 두명이 키워드를 선택할 때마다 힌트 전송
+    @MessageMapping("/keyword/{historyId}")
+    public synchronized void sendVideoChatKeyword(
+            StompHeaderAccessor accessor,
+            @DestinationVariable Long historyId,
+            AudioChatRequest videoChatRequest) {
+        Principal principal = accessor.getUser();
+        if (principal != null) {
+            String email = principal.getName();
+            videoChatService.handleVideoChatKeyword(videoChatRequest, historyId, email);
         } else {
             log.error("Principal이 null입니다. WebSocket 연결에 실패했습니다.");
         }

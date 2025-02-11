@@ -63,14 +63,19 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
         int updatedRows = 0;
         Long historyId = feedbackRequest.getHistoryId();
         String feedback = feedbackRequest.getFeedback();
-        if(chatHistoryRepository.updateUser1Feedback(historyId, userId, feedback) > 0) {
+        if (chatHistoryRepository.updateUser1Feedback(historyId, userId, feedback) > 0) {
             updatedRows++;
         }
-        if(chatHistoryRepository.updateUser2Feedback(historyId, userId, feedback) > 0) {
+        if (chatHistoryRepository.updateUser2Feedback(historyId, userId, feedback) > 0) {
             updatedRows++;
         }
         if (updatedRows == 0) {
             throw new IllegalArgumentException("유효하지 않은 userId 또는 historyId");
         }
+    }
+
+    @Override
+    public ChatHistory getChatHistory(Long historyId) {
+        return chatHistoryRepository.findById(historyId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 채팅 내역"));
     }
 }
