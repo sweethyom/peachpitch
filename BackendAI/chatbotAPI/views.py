@@ -34,12 +34,12 @@ def start_conversation(request):
                 return JsonResponse({'error': '키워드를 입력하세요.'}, status=400)
 
             # 구글 검색 결과 추가
-            search_results = google_search(keyword)
-            search_content = "\n".join(search_results) if search_results else ""
+            # search_results = google_search(keyword)
+            # search_content = "\n".join(search_results) if search_results else ""
 
             initial_message = generate_initial_message(keyword)
-            if search_content:
-                initial_message += "\n\n최근 검색 결과:\n" + search_content
+            # if search_content:
+            #     initial_message += "\n\n최근 검색 결과:\n" + search_content
             
             # 히스토리에 추가
             conversation_history.clear()  # 새로운 대화 시작 시 이전 기록 초기화
