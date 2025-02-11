@@ -40,7 +40,7 @@ public class HaveCoupon {
        this.expirationDate = expirationDate;
 
        // 무료 쿠폰인 경우 만료시간 설정
-       if (item.getType() == Item.ItemType.FREE_COUPON) {
+       if (item.getType() == Item.ItemType.FREE) {
            this.expirationDate = LocalDateTime.now()
                    .plusDays(1)
                    .withHour(0)
@@ -64,7 +64,7 @@ public class HaveCoupon {
 
     // 무료 쿠폰 유효성 검사
     public boolean isValid() {
-        if (item.getType() == Item.ItemType.FREE_COUPON) {
+        if (item.getType() == Item.ItemType.FREE) {
             return ea > 0 && LocalDateTime.now().isBefore(expirationDate);
         }
         return ea > 0;
