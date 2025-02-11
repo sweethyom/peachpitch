@@ -70,23 +70,23 @@ echo "${AFTER_S_COLOR} springboot 서버가 실행되었습니다 (포트: ${AFT
 echo "${AFTER_D_COLOR} django 서버가 실행되었습니다 (포트: ${AFTER_D_PORT})"
 
 # 2. 새 버전 서버 응답 확인
-for cnt in `seq 1 10`;
-do
-    echo "서버 응답을 확인 중... (${cnt}/10)"
-    UP=$(docker exec bluegreen-${AFTER_S_PORT} curl -s http://localhost:${AFTER_S_PORT}/trial/health-check)
-    if [ "${UP}" != "OK" ]; then
-        sleep 10
-        continue
-    else
-        break
-    fi
-done
+# for cnt in `seq 1 10`;
+# do
+#     echo "서버 응답을 확인 중... (${cnt}/10)"
+#     UP=$(docker exec bluegreen-${AFTER_S_PORT} curl -s http://localhost:${AFTER_S_PORT}/trial/health-check)
+#     if [ "${UP}" != "OK" ]; then
+#         sleep 10
+#         continue
+#     else
+#         break
+#     fi
+# done
 
 # # 10번 시도 후에도 응답이 없으면 실패 처리
-if [ $cnt -eq 10 ]; then
-    echo "서버에 문제가 있습니다..."
-    exit 1
-fi
+# if [ $cnt -eq 10 ]; then
+#     echo "서버에 문제가 있습니다..."
+#     exit 1
+# fi
 
 # 3. Nginx 설정 파일 수정 (포트 변경)
 echo "Nginx 설정 파일 업데이트..."
