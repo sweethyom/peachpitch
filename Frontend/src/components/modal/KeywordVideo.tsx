@@ -1,65 +1,123 @@
-import { useState, useEffect } from "react";
+import {useState, useEffect} from "react";
 import styles from "./styles/Keyword.module.scss";
 
 import closeBtn from "@/assets/icons/modal__close.png";
-import { Link } from "react-router-dom";
+import {Link} from "react-router-dom";
+import {Client} from "@stomp/stompjs";
 
 type ModalProps = {
     isOpen: boolean; // 모달 열림 상태
     // onClose: () => void; // 닫기 버튼 클릭 이벤트
     setSelectedKeyword: (keyword: string) => void; // 키워드 저장 함수
+    historyId: number; // 현재 대화 내역 id
+    setIsCompleted: (completed: boolean) => void;  // 키워드 전부 선택되었는지
     children?: React.ReactNode; // 추가적인 child 요소
     // onKeywordSelected: (keyword: string) => void;
 };
 
+// Keyword 객체 타입 정의
+type KeywordItem = {
+    id: number;
+    name: string;
+};
 
-function Keyword({ isOpen, setSelectedKeyword}: ModalProps) {
+function Keyword({isOpen, setSelectedKeyword, historyId, setIsCompleted, children}: ModalProps) {
     if (!isOpen) return null;
-
-    const [keywords, setKeywords] = useState<string[]>([]);
+    // 키워드 배열의 타입을 KeywordItem[]으로 수정
+    const [keywords, setKeywords] = useState<KeywordItem[]>([]);
     const [visibleCount, setVisibleCount] = useState(5); // 처음 5개만 표시
     const [selectedKeyword, setSelectedKeywordState] = useState<string | null>(null);
+    const [selectedKeywordId, setSelectedKeywordIdState] = useState<number | null>(null);
+    /* stomp client */
+    const [client, setClient] = useState<Client | null>(null);
+    /* 키워드 선택 상태 */
 
     useEffect(() => {
         const fetchKeywords = async () => {
             try {
-                const response = await fetch("/data/keywords.json");
-                const data = await response.json();
-
-                // 랜덤한 15개 키워드 선택
-                const shuffledKeywords = data.keywords.sort(() => 0.5 - Math.random());
-                setKeywords(shuffledKeywords.slice(0, 15));
+                const response = await fetch("http://localhost:8080/api/chat/ai/keywords/add");
+                const responseJson = await response.json();
+                const data = responseJson.data;
+                console.log(data);
+                if (data.keywords && data.keywords.length > 0) {
+                    // data의 keywordId와 keyword를 추출하여 KeywordItem 객체 배열로 저장
+                    setKeywords(
+                        data.keywords.map((item: { keywordId: number; keyword: string }) => ({
+                            id: item.keywordId,
+                            name: item.keyword,
+                        }))
+                    );
+                }
             } catch (error) {
-                console.error("키워드 로딩 중 오류 발생:", error);
+                console.error("키워드 로딩 오류:", error);
             }
         };
 
         fetchKeywords();
     }, []);
 
+    // 모달 열릴 때 STOMP 클라이언트 생성 및 구독 설정
+    useEffect(() => {
+        const userJwtFromStorage = localStorage.getItem("accessToken");
+        if (isOpen && historyId) {
+            const client = new Client({
+                brokerURL: "ws://localhost:8080/ws/room",
+                connectHeaders: {
+                    access: `${userJwtFromStorage}`,
+                },
+                reconnectDelay: 5000,
+                onConnect: () => {
+                    console.log("✅ KeywordModal: STOMP 연결됨");
+                    // 키워드 관련 메시지 구독
+                    client.subscribe(`/sub/chat/${historyId}`, (message) => {
+                        const response = JSON.parse(message.body);
+                        console.log("키워드 응답:", response);
+                        if (response.status === "waiting") {
+                            console.log("힌트 정보:", response.hints);
+                        } else if (response.status === "completed") {
+                            // 두 명 모두 키워드 선택 완료 -> 최종 데이터 전달 및 모달 닫기
+                            setSelectedKeyword(response.keyword);
+                            // 힌트 전달 필요
+                            setIsCompleted(true);
+                            //키워드 웹소켓 종료
+                            client.deactivate();
+                        }
+                    });
+                },
+                onDisconnect: () => console.log("❌ keyword STOMP 연결 종료됨"),
+                onStompError: (frame) => console.error("STOMP 에러:", frame),
+                onWebSocketError: (event) => console.error("WebSocket 에러:", event),
+            });
+            client.activate();
+            setClient(client);
+            return () => {
+                client.deactivate();
+                setClient(null);
+            };
+        }
+    }, [isOpen, setSelectedKeyword, setIsCompleted]);
+
     const handleAddKeyword = () => {
         setVisibleCount((prev) => Math.min(prev + 5, 15)); // 5개씩 추가 표시, 최대 15개까지
     };
 
-    const handleKeywordClick = async (keyword: string) => {
-        setSelectedKeywordState(keyword); // 로컬 상태 업데이트
-        setSelectedKeyword(keyword); // 부모 컴포넌트(`videoChatPage.tsx`) 상태 업데이트
-        // onKeywordSelected(keyword); // 상대방이 키워드를 선택했음을 부모에 전달
+    // 키워드 클릭 시 로컬 상태만 업데이트
+    const handleKeywordClick = (keyword: KeywordItem) => {
+        setSelectedKeywordState(keyword.name);
+        setSelectedKeywordIdState(keyword.id);
+    };
 
-        // 선택한 키워드를 서버에 전달 (예제 API 호출)
-        try {
-            await fetch("/api/setKeyword", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ keyword }),
+    const handleStart = () => {
+        if (!selectedKeywordId || !client?.connected) return;
+
+        if (selectedKeywordId && client && client.connected) {
+            client.publish({
+                destination: `/pub/keyword/${historyId}`,
+                body: JSON.stringify({
+                    keywordId: selectedKeywordId
+                }),
             });
-            console.log(`📡 서버에 키워드(${keyword}) 저장 완료`);
-        } catch (error) {
-            console.error("❌ 키워드 저장 중 오류 발생:", error);
         }
-
-        // 키워드 선택 후 모달 닫기
-        // onClose();
     };
 
     return (
@@ -67,7 +125,7 @@ function Keyword({ isOpen, setSelectedKeyword}: ModalProps) {
             <div className={styles.modal}>
                 <div className={styles.modal__header}>
                     <Link to="/main">
-                        <img src={closeBtn} className={styles.modal__header__close} />
+                        <img src={closeBtn} className={styles.modal__header__close}/>
                     </Link>
                     <p className={styles.modal__header__logo}>PeachPitch</p>
                 </div>
@@ -87,23 +145,30 @@ function Keyword({ isOpen, setSelectedKeyword}: ModalProps) {
                     <div className={styles.modal__keywords}>
                         {keywords.map((keyword, index) => (
                             <div
-                                key={index}
-                                className={`${styles.modal__keywords__item} ${selectedKeyword === keyword ? styles.selected : ""
-                                    }`}
+                                key={keyword.id}
+                                className={`${styles.modal__keywords__item} ${
+                                    selectedKeyword === keyword.name ? styles.selected : ""
+                                }`}
                                 onClick={() => handleKeywordClick(keyword)}
                                 style={{
-                                    // visibility: index < visibleCount ? "visible" : "hidden",
-                                    // opacity: index < visibleCount ? 1 : 0,
-                                    transition: "opacity 0.3s ease-in-out"
-                                }}>
-                                {keyword}
+                                    visibility: index < visibleCount ? "visible" : "hidden",
+                                    opacity: index < visibleCount ? 1 : 0,
+                                    transition: "opacity 0.3s ease-in-out",
+                                }}
+                            >
+                                {keyword.name}
                             </div>
                         ))}
                     </div>
                 </div>
 
                 {/* main에서 이동 링크 관리 */}
-                {/* <div className={styles.modal__btn}>{children}</div> */}
+                {/*<div className={styles.modal__btn}>{children}</div>*/}
+                <div className={styles.modal__btn}>
+                    <div className={styles.btn} onClick={handleStart}>
+                        시작하기
+                    </div>
+                </div>
             </div>
         </div>
     );
