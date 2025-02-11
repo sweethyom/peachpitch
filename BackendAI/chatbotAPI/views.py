@@ -12,8 +12,6 @@ from datetime import datetime
 
 
 
-
-
 # 구글 API 설정
 GOOGLE_API_KEY = settings.GOOGLE_API_KEY
 GOOGLE_CX = settings.GOOGLE_CX
@@ -50,8 +48,8 @@ def start_conversation(request):
             search_content = "\n".join(search_results) if search_results else ""
 
             initial_message = generate_initial_message(keyword)
-            if search_content:
-                initial_message += "\n\n최근 검색 결과:\n" + search_content
+            # if search_content:
+            #     initial_message += "\n\n최근 검색 결과:\n" + search_content
             
 
             # Redis에 저장
@@ -126,8 +124,8 @@ def continue_conversation(request):
 
             # GPT로부터 응답 생성
             bot_reply = generate_reply(conversation_history)
-            if search_content:
-                bot_reply += "\n\n관련 정보:\n" + search_content
+            # if search_content:
+            #     bot_reply += "\n\n관련 정보:\n" + search_content
 
             # GPT로부터 응답 생성
             bot_reply = generate_reply(conversation_history)

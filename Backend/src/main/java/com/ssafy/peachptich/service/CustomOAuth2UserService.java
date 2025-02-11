@@ -33,12 +33,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         log.info("in CustomOAuth2UserService, oAuth2User = " + oAuth2User);
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
+
         OAuthResponse oAuthResponse = null;
 
         if(registrationId.equals("naver")) {
             oAuthResponse = new NaverResponse(oAuth2User.getAttributes());
         } else if (registrationId.equals("google")) {
             oAuthResponse = new GoogleResponse(oAuth2User.getAttributes());
+        } else if (registrationId.equals("kakao")) {
+            oAuthResponse = new KakaoResponse(oAuth2User.getAttributes());
         } else{
             return null;
         }
@@ -46,22 +49,18 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         // 리소스 서버에서 발급 받은 정보로 사용자를 특정할 아이디 값을 생성
         String email = oAuthResponse.getEmail();
         String birth = oAuthResponse.getBirth();
-        String snsId = oAuthResponse.getSnsId();
-        int dot = email.split("@")[1].indexOf('.');
-        String snsName = email.split("@")[1].substring(0, dot);
-        if (snsName.equals("gmail")){
-            snsName = "google";
-        }
+        String snsId = oAuthResponse.getProviderId();
+        String snsType = oAuthResponse.getProvider();
 
         if (birth == null){
             log.info("in CustomOAuth2UserService, email = " + email);
             log.info("in CustomOAuth2UserService, snsId = " + snsId);
-            log.info("in CustomOAuth2UserService, snsName = " + snsName);
+            log.info("in CustomOAuth2UserService, snsType = " + snsType);
         } else {
             log.info("in CustomOAuth2UserService, email = " + email);
             log.info("in CustomOAuth2UserService, birth = " + birth);
             log.info("in CustomOAuth2UserService, snsId = " + snsId);
-            log.info("in CustomOAuth2UserService, snsName = " + snsName);
+            log.info("in CustomOAuth2UserService, snsType = " + snsType);
         }
 
         User existsData = userRepository.findByEmail(email).orElse(null);
@@ -73,7 +72,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user.setPassword(null);
             user.setRole("ROLE_USER");
             user.setStatus(true);
-            user.setSnsType(snsName);
+            user.setSnsType(snsType);
             user.setSnsId(snsId);
 
             User savedUser = userRepository.save(user);

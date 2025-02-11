@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
@@ -59,12 +60,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, TokenProvider tokenProvider,
                                            RefreshRepository refreshRepository,
                                            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-//        http
-//                .authorizeHttpRequests((auth) -> auth
-//                        .requestMatchers("/api/main").permitAll()
-//                        .requestMatchers("/api/index", "/api/users/login", "/api/users/signup").permitAll()
-//                        .anyRequest().authenticated());
-
         http
                 .authorizeHttpRequests((auth) -> auth
                                 .requestMatchers("/ws/**", "/ws/room/**").permitAll() // WebSocket 엔드포인트
@@ -72,7 +67,6 @@ public class SecurityConfig {
                                 .requestMatchers("/api/main/**", "/api/index", "/api/users/login", "/api/users/signup", "/api/pay/ready", "/api/pay/completed",
                                         "/api/chat/ai/keywords/**", "/api/chat/ai/check", "/api/users/coupon/**", "/error", "/api/chat/report/**").permitAll()
                                 .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
                 )
                 .exceptionHandling(exception -> exception
                         .accessDeniedHandler((request, response, accessDeniedException) -> {
@@ -104,8 +98,8 @@ public class SecurityConfig {
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
                         configuration.setMaxAge(3600L);
 
-                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-
+                        //configuration.setExposedHeaders(Collections.singletonList("Authorization"));
+                        configuration.setExposedHeaders(Arrays.asList("Authorization", "access"));
                         return configuration;
                     }
                 })));
@@ -120,9 +114,13 @@ public class SecurityConfig {
         //oauth2
         http
                 .oauth2Login((oauth2) -> oauth2
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .baseUri("/api/users/login/social"))
                         .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
-                        .successHandler(customOauthSuccessHandler));
+                        .successHandler(customOauthSuccessHandler)
+                );
+
 
         // CustomLogoutFilter 등록
         http
