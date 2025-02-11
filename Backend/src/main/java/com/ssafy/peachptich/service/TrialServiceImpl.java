@@ -14,6 +14,7 @@ public class TrialServiceImpl implements TrialService{
     private static final String TRIAL_KEY_PREFIX = "trial:";
     private static final long TRIAL_EXPIRATION_DAYS = 7;
 
+    // 제출 전, trial_expiration_days로 바꿔야함
     public TrialResponse checkTrialAccess(String fingerprint) {
         String key = TRIAL_KEY_PREFIX + fingerprint;
         Boolean isFirst = redisTemplate.opsForValue()

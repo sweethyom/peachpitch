@@ -22,6 +22,11 @@ public class Item {
     @Column(nullable = false)
     private ItemType type;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Category category;
+
+
     @Builder
     public Item(String name, Integer price, ItemType type) {
         this.name = name;
@@ -31,10 +36,8 @@ public class Item {
 
     @Getter
     public enum ItemType {
-        FREE_COUPON("무료 이용권"),
-        PAID_COUPON("유료 이용권"),
-        AVATAR("아바타"),
-        BACKGROUND("배경");
+        FREE("무료"),
+        PAID("유료");
 
         private final String description;
 
@@ -43,7 +46,20 @@ public class Item {
         }
 
         public boolean isCoupon() {
-            return this == FREE_COUPON || this == PAID_COUPON;
+            return this == FREE || this == PAID;
+        }
+    }
+    
+    @Getter
+    public enum Category {
+        MASK("마스크"), 
+        BACKGROUND("배경"), 
+        COUPON("이용권");
+
+        private final String description;
+
+        Category(String description) {
+            this.description = description;
         }
     }
 }
