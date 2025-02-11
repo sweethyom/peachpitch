@@ -1,64 +1,62 @@
-# insert_dummy_data.py
+# 모델 실험용용
 
-import os
-import django
-from django.utils import timezone
+import openai
+import json
 
-# 환경 변수 설정
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'BackendAI.settings')
-django.setup()
+# OpenAI API Key 설정
+openai.api_key = ""  # 여기에 본인의 API 키 입력
 
-from reportAI.models import Chat, ChatReport, ChatHistory, User
+# 불필요한 단어(인사말 외에 또 있으면 여기 넣자.) 리스트
+stopwords = ["안녕하세요", "감사합니다", "환영합니다", "수고하세요", "잘 지내세요"]
 
-# 더미 데이터 삽입 코드
-user1 = User.objects.create(email='user7@example.com', password='password1', role='user', status=1)
-user2 = User.objects.create(email='user8@example.com', password='password2', role='admin', status=1)
+# 기존 분석 함수
+def analyze_repeated_words(content):
+    prompt = (
+        f"다음 텍스트에서 **명사**만 추출하고, 각각의 반복 횟수를 JSON 형식으로 알려줘. "
+        f"형식은 반드시 {{\"단어\": 횟수}} 형태로만 응답해. "
+        f"**조사, 감탄사, 접속사, 동사, 형용사, 인사말(예: 안녕하세요, 감사합니다 등)은 포함하지 마.** "
+        f"설명은 절대 추가하지 말고 JSON으로만 응답해: {content}"
+    )
+    response = openai.ChatCompletion.create(
+        model="gpt-4",
+        messages=[
+            {"role": "system", "content": "너는 텍스트 분석을 전문으로 하는 AI야."},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=500
+    )
+    return response.choices[0].message['content']
 
-history1 = ChatHistory.objects.create(
-    created_at=timezone.now(),
-    keyword1_id=1,
-    keyword2_id=2,
-    status=1,
-    user1_feedback='Good',
-    user1_id=user1.userid,
-    user1_name='User One',
-    user2_feedback='Excellent',
-    user2_id=user2.userid,
-    user2_name='User Two'
-)
+# stopwords 필터링 함수
+def filter_stopwords_and_zero(result_json):
+    return {
+        word: count for word, count in result_json.items()
+        if word not in stopwords and count > 0
+    }
 
-history2 = ChatHistory.objects.create(
-    created_at=timezone.now(),
-    keyword1_id=3,
-    keyword2_id=4,
-    status=0,
-    user1_feedback='Average',
-    user1_id=user2.userid,
-    user1_name='User Two',
-    user2_feedback='Needs Improvement',
-    user2_id=user1.userid,
-    user2_name='User One'
-)
+# 테스트용 입력 데이터
+test_content = """
+안녕하세요. 오늘은 날씨가 참 좋네요. 날씨가 좋으니까 기분도 좋아요.
+저도 오늘 산책을 나갔어요. 산책을 하니까 기분이 상쾌해졌어요.
+"""
 
-chat1 = Chat.objects.create(content='Hello, how are you?', created_at=timezone.now(), userid=user1.userid, history=history1)
-chat2 = Chat.objects.create(content='I am fine, thank you!', created_at=timezone.now(), userid=user2.userid, history=history2)
+# 함수 호출 및 결과 출력
+try:
+    result = analyze_repeated_words(test_content)
+    print("AI 분석 결과 (원본):")
+    print(result)
 
-report1 = ChatReport.objects.create(
-    chat_time=300,
-    cons='Needs more engagement.',
-    pros='Clear communication.',
-    summary='Overall good performance.',
-    history=history1,
-    user=user1
-)
+    # JSON 파싱 시도
+    result_json = json.loads(result)
 
-report2 = ChatReport.objects.create(
-    chat_time=450,
-    cons='Lacks focus in responses.',
-    pros='Friendly tone.',
-    summary='Could improve with more structure.',
-    history=history2,
-    user=user2
-)
+    # 불필요한 인사말 및 0 값 제거
+    filtered_result = filter_stopwords_and_zero(result_json)
 
-print("더미 데이터 생성 완료!")
+    print("\n파싱된 JSON 결과 (인사말 및 0 값 제거 후):")
+    print(json.dumps(filtered_result, indent=4, ensure_ascii=False))
+
+except json.JSONDecodeError:
+    print("\n❌ 오류: AI의 응답을 JSON으로 파싱할 수 없습니다.")
+except Exception as e:
+    print(f"\n❌ 오류 발생: {e}")
+

@@ -5,6 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.urls import path
 import openai
 import json
+import redis
+import time
 from .models import Chat, ChatReport, ChatHistory, User
 from django.conf import settings
 
@@ -15,11 +17,36 @@ openai.api_key = settings.OPENAI_API_KEY
 def generate_report(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        chat_id = data.get('chat_id')
+        history_id = data.get('history_id')
 
-        # Chat 데이터 가져오기
-        chat = get_object_or_404(Chat, pk=chat_id)
-        conversation_data = chat.content
+        if not history_id:
+            return JsonResponse({"error": "history_id가 필요합니다."}, status=400)
+        
+        # Redis가 대화 내역에 남아있는가 (대화 저장시 사용한 key 규칙에 맞게 수정하라는데..! 효미언니 물어보기)
+        redis_client = redis.Redis(
+            host=settings.REDIS_HOST,
+            port=settings.REDIS_PORT,
+            db=getattr(settings, 'REDIS_DB', 0)
+        )
+        redis_key = f'chat:{history_id}:messages'    # 이 부분 언니 확인
+
+        # Polling 시작 (30초 대기로 가겠습니다.)
+        timeout = 30
+        start_time = time.time()
+
+        while redis_client.exists(redis_key):
+            if time.time() - start_time > timeout:
+                return JsonResponse({"error": "대기 시간 초과되었습니다. 나중에 다시 시도해주세요."})
+            time.sleep(1)   # 1초 간격으로 Redis 상태 확인, 부하 가면 수정
+        
+        # Redis가 비었을 때 모델 구동 시작, history_id에에 연결된 Chat 데이터 가져오기
+        chats = Chat.objects.filter(history_id=history_id)
+        if not chats.exists():
+            return JsonResponse({"error": "해당 histroy_id에 대한 채팅 데이터가 없습니다."})
+        
+
+        # 여러 개의 대화 내용을 합치기
+        conversation_data = "\n".join(chat.content for chat in chats if chat.content)
 
         # OpenAI API 호출
         prompt = (
@@ -41,11 +68,6 @@ def generate_report(request):
         report_content = response.choices[0].message['content']
 
         # 결과 파싱
-        # lines = report_content.split('\n')
-        # strengths = [line.replace("1)", "").strip() for line in lines if line.startswith("1)") or line.startswith("2)") or line.startswith("3)")][:3]
-        # improvements = [line.replace("1)", "").strip() for line in lines if line.startswith("1)") or line.startswith("2)") or line.startswith("3)")][3:6]
-        # summary = [line.replace("1)", "").strip() for line in lines if line.startswith("1)") or line.startswith("2)") or line.startswith("3)")][6:9]
-
         lines = report_content.split('\n')
         strengths = [line.replace("1)", "").replace("2)", "").replace("3)", "").strip() for line in lines if line.startswith("1)") or line.startswith("2)") or line.startswith("3)")][:3]
         improvements = [line.replace("1)", "").replace("2)", "").replace("3)", "").strip() for line in lines if line.startswith("1)") or line.startswith("2)") or line.startswith("3)")][3:6]
@@ -53,9 +75,9 @@ def generate_report(request):
 
         # ChatReport에 저장
         chat_report = ChatReport.objects.create(
-            history_id=chat.history_id,
-            user_id=chat.userid,
-            chat_time=0,  # chat_time은 필요한 로직에 맞게 수정
+            history_id=history_id,
+            user_id=chats.first().userid,   # 첫 번째 chat의 사용자 id를 가져온다.
+            chat_time=0,  # chat_time은 일단 0으로 넣어놨다.
             cons=' '.join(improvements),
             pros=' '.join(strengths),
             summary=' '.join(summary)
@@ -69,105 +91,3 @@ def generate_report(request):
         })
     else:
         return JsonResponse({"error": "POST 요청만 지원합니다."}, status=400)
-
-
-
-
-
-
-
-
-# 문장 프롬프트 실패작작
-
-# @csrf_exempt
-# def generate_report(request):
-#     if request.method == 'POST':
-#         data = json.loads(request.body)
-#         chat_id = data.get('chat_id')
-        
-#         # Chat 데이터 가져오기
-#         chat = get_object_or_404(Chat, pk=chat_id)
-#         conversation_data = chat.content
-        
-#         # OpenAI API 호출
-#         prompt = (
-#             "다음 대화를 분석하고 강점 3가지, 약점 3가지, 총평 3문장을 존댓말로 작성해 주세요. 각 항목은 완성된 문장으로 작성해 주세요.\n\n"
-#             f"대화 내용:\n{conversation_data}\n\n"
-#             "강점 (정확히 3가지):\n"
-#             "1) \n"
-#             "2) \n"
-#             "3) \n\n"
-#             "약점 (정확히 3가지):\n"
-#             "1) \n"
-#             "2) \n"
-#             "3) \n\n"
-#             "총평 (정확히 3문장):\n"
-#             "1) \n"
-#             "2) \n"
-#             "3) \n"
-#         )
-        
-#         response = openai.ChatCompletion.create(
-#             model="gpt-4",
-#             messages=[
-#                 {"role": "system", "content": "당신은 대화 분석 전문가입니다. 사용자의 대화를 분석하고 존댓말로 피드백을 제공하세요."},
-#                 {"role": "user", "content": prompt}
-#             ]
-#         )
-        
-#         report_content = response.choices[0].message['content']
-        
-#         def extract_items(section_text):
-#             # 섹션 제목과 번호 제거
-#             lines = section_text.split('\n')
-#             items = []
-#             for line in lines:
-#                 # 숫자), 섹션 제목 등을 제거하고 실제 내용만 추출
-#                 if line.strip() and not line.startswith(('강점', '약점', '총평')):
-#                     cleaned = line.strip()
-#                     # 번호 제거
-#                     if cleaned.startswith(('1)', '2)', '3)')):
-#                         cleaned = cleaned[2:].strip()
-#                     if cleaned:
-#                         items.append(cleaned)
-#             return items
-        
-#         # 결과 파싱
-#         sections = report_content.split('\n\n')
-#         strengths = []
-#         improvements = []
-#         summary = []
-        
-#         for section in sections:
-#             if '강점' in section:
-#                 strengths = extract_items(section)
-#             elif '약점' in section:
-#                 improvements = extract_items(section)
-#             elif '총평' in section:
-#                 summary = extract_items(section)
-        
-#         # 각 섹션이 정확히 3개의 항목을 가지도록 보장
-#         if len(strengths) != 3 or len(improvements) != 3 or len(summary) != 3:
-#             return JsonResponse({"error": "분석 결과가 올바른 형식이 아닙니다."}, status=400)
-        
-#         # ChatReport에 저장
-#         chat_report = ChatReport.objects.create(
-#             history_id=chat.history_id,
-#             user_id=chat.userid,
-#             chat_time=0,  # chat_time은 필요한 로직에 맞게 수정
-#             cons=' '.join(improvements),
-#             pros=' '.join(strengths),
-#             summary=' '.join(summary)
-#         )
-        
-#         return JsonResponse({
-#             "report_id": chat_report.report_id,
-#             "pros": strengths,
-#             "cons": improvements,
-#             "summary": summary
-#         })
-#     else:
-#         return JsonResponse({"error": "POST 요청만 지원합니다."}, status=400)
-
-
-
