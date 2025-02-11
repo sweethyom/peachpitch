@@ -6,12 +6,14 @@ import { Link } from "react-router-dom";
 
 type ModalProps = {
     isOpen: boolean; // 모달 열림 상태
-    onClose: () => void; // 닫기 버튼 클릭 이벤트
-    children?: React.ReactNode; // 추가적인 child 요소
+    // onClose: () => void; // 닫기 버튼 클릭 이벤트
     setSelectedKeyword: (keyword: string) => void; // 키워드 저장 함수
+    children?: React.ReactNode; // 추가적인 child 요소
+    // onKeywordSelected: (keyword: string) => void;
 };
 
-function Keyword({ isOpen, onClose, children, setSelectedKeyword }: ModalProps) {
+
+function Keyword({ isOpen, setSelectedKeyword}: ModalProps) {
     if (!isOpen) return null;
 
     const [keywords, setKeywords] = useState<string[]>([]);
@@ -39,9 +41,25 @@ function Keyword({ isOpen, onClose, children, setSelectedKeyword }: ModalProps) 
         setVisibleCount((prev) => Math.min(prev + 5, 15)); // 5개씩 추가 표시, 최대 15개까지
     };
 
-    const handleKeywordClick = (keyword: string) => {
-        setSelectedKeywordState(keyword);
-        setSelectedKeyword(keyword); // 부모 컴포넌트에 선택된 키워드 전달
+    const handleKeywordClick = async (keyword: string) => {
+        setSelectedKeywordState(keyword); // 로컬 상태 업데이트
+        setSelectedKeyword(keyword); // 부모 컴포넌트(`videoChatPage.tsx`) 상태 업데이트
+        // onKeywordSelected(keyword); // 상대방이 키워드를 선택했음을 부모에 전달
+
+        // 선택한 키워드를 서버에 전달 (예제 API 호출)
+        try {
+            await fetch("/api/setKeyword", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ keyword }),
+            });
+            console.log(`📡 서버에 키워드(${keyword}) 저장 완료`);
+        } catch (error) {
+            console.error("❌ 키워드 저장 중 오류 발생:", error);
+        }
+
+        // 키워드 선택 후 모달 닫기
+        // onClose();
     };
 
     return (
@@ -49,7 +67,7 @@ function Keyword({ isOpen, onClose, children, setSelectedKeyword }: ModalProps) 
             <div className={styles.modal}>
                 <div className={styles.modal__header}>
                     <Link to="/main">
-                        <img src={closeBtn} className={styles.modal__header__close} onClick={onClose} />
+                        <img src={closeBtn} className={styles.modal__header__close} />
                     </Link>
                     <p className={styles.modal__header__logo}>PeachPitch</p>
                 </div>
@@ -74,8 +92,8 @@ function Keyword({ isOpen, onClose, children, setSelectedKeyword }: ModalProps) 
                                     }`}
                                 onClick={() => handleKeywordClick(keyword)}
                                 style={{
-                                    visibility: index < visibleCount ? "visible" : "hidden",
-                                    opacity: index < visibleCount ? 1 : 0,
+                                    // visibility: index < visibleCount ? "visible" : "hidden",
+                                    // opacity: index < visibleCount ? 1 : 0,
                                     transition: "opacity 0.3s ease-in-out"
                                 }}>
                                 {keyword}
@@ -85,7 +103,7 @@ function Keyword({ isOpen, onClose, children, setSelectedKeyword }: ModalProps) 
                 </div>
 
                 {/* main에서 이동 링크 관리 */}
-                <div className={styles.modal__btn}>{children}</div>
+                {/* <div className={styles.modal__btn}>{children}</div> */}
             </div>
         </div>
     );

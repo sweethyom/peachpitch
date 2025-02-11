@@ -33,11 +33,14 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
     // ✅ 로그인 상태 확인 함수
     const checkLoginStatus = () => {
+        const token = localStorage.getItem("accessToken");
         const email = localStorage.getItem("userEmail");
 
-        if (email) {
+        if (token && email) {
             setIsLoggedIn(true);
-            setUserId(email.split("@")[0]);
+            // const email = localStorage.getItem("userEmail");
+            // setUserId(email ? email.split("@")[0] : null);
+            setUserId(email.includes("@") ? email.split("@")[0] : email);
         } else {
             setIsLoggedIn(false);
             setUserId(null);
@@ -51,7 +54,8 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
         return () => {
             window.removeEventListener("storage", checkLoginStatus);
         };
-    }, []);
+    }, [isLoggedIn]); 
+
 
     // ✅ 아이디 크기를 가져와서 모달창 너비 설정 (최소 130px)
     useEffect(() => {
@@ -69,7 +73,9 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
         });
 
         document.cookie = "refresh=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+        localStorage.removeItem("accessToken");
         localStorage.removeItem("userEmail");
+        localStorage.removeItem("userId");
         setIsLoggedIn(false);
         setUserId(null);
         navigate("/login");
@@ -90,9 +96,9 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                     {isLoggedIn ? (
                         <>
                             <Link
-                            to="/report"
-                            onClick={() => (document.body.style.backgroundColor = 'var(--color-white-000)')}
-                        >
+                                to="/report"
+                                onClick={() => (document.body.style.backgroundColor = 'var(--color-white-000)')}
+                            >
                                 <span className={styles.header__navi__item}>report</span>
                             </Link>
 

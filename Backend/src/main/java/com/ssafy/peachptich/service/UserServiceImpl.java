@@ -80,6 +80,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ResponseEntity<ResponseDto<Map<String, Boolean>>> checkEmail(String email){
+        Map<String, Boolean> responseData = new HashMap<>();
+
+        Boolean exist = userRepository.findByEmail(email).isPresent();
+        String message = null;
+
+        if(exist){
+            responseData.put("result", false);
+            message = "The email is already subscribed to.";
+        } else{
+            responseData.put("result", true);
+            message = "The email is available.";
+        }
+
+        return ResponseEntity.ok()
+                .body(new ResponseDto<>(message, responseData));
+    }
+
+
+    @Override
     @Transactional
     public ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
                                                                             Authentication authentication) {          // 회원 탈퇴
