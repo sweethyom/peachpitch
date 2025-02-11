@@ -70,28 +70,23 @@ echo "${AFTER_S_COLOR} springboot 서버가 실행되었습니다 (포트: ${AFT
 echo "${AFTER_D_COLOR} django 서버가 실행되었습니다 (포트: ${AFTER_D_PORT})"
 
 # 2. 새 버전 서버 응답 확인
-# for cnt in `seq 1 10`;
-# do
-#     echo "서버 응답을 확인 중... (${cnt}/10)"
-#     UP=$(curl -s http://127.0.0.1:${AFTER_PORT}/api/health-check)
-#     if [ "${UP}" != "OK" ]; then
-#         sleep 10
-#         echo "peachpitch api health check"
-#         UP2=$(curl -s https://peachpitch.site/api/health-check)
-#         if [ "${UP2}" == "OK" ]; then
-#             break
-#         fi
-#         continue
-#     else
-#         break
-#     fi
-# done
+for cnt in `seq 1 10`;
+do
+    echo "서버 응답을 확인 중... (${cnt}/10)"
+    UP=$(docker exec bluegreen-${AFTER_S_PORT} curl -s http://localhost:${AFTER_S_PORT}/trial/health-check)
+    if [ "${UP}" != "OK" ]; then
+        sleep 10
+        continue
+    else
+        break
+    fi
+done
 
 # # 10번 시도 후에도 응답이 없으면 실패 처리
-# if [ $cnt -eq 10 ]; then
-#     echo "서버에 문제가 있습니다..."
-#     exit 1
-# fi
+if [ $cnt -eq 10 ]; then
+    echo "서버에 문제가 있습니다..."
+    exit 1
+fi
 
 # 3. Nginx 설정 파일 수정 (포트 변경)
 echo "Nginx 설정 파일 업데이트..."
@@ -101,16 +96,16 @@ echo "Nginx 설정 파일 업데이트..."
 
 # Nginx 설정 파일 경로
 # NGINX_CONF_PATH="/home/ubuntu/nginx_conf/default.conf"
-NGINX_CONF_DIR="/home/ubuntu/nginx_conf"
-NGINX_CONF_PATH="${NGINX_CONF_DIR}/default.conf"
+# NGINX_CONF_DIR="/home/ubuntu/nginx_conf"
+# NGINX_CONF_PATH="${NGINX_CONF_DIR}/default.conf"
 
-if [ "$AFTER_S_COLOR" = "8081" ]; then
-    echo "Blue 환경으로 Nginx 설정 파일 교체..."
-    cp ${NGINX_CONF_DIR}/defaultblue.conf $NGINX_CONF_PATH
-else
-    echo "Green 환경으로 Nginx 설정 파일 교체..."
-    cp ${NGINX_CONF_DIR}/defaultgreen.conf $NGINX_CONF_PATH
-fi
+# if [ "$AFTER_S_COLOR" = "8081" ]; then
+#     echo "Blue 환경으로 Nginx 설정 파일 교체..."
+#     cp ${NGINX_CONF_DIR}/defaultblue.conf $NGINX_CONF_PATH
+# else
+#     echo "Green 환경으로 Nginx 설정 파일 교체..."
+#     cp ${NGINX_CONF_DIR}/defaultgreen.conf $NGINX_CONF_PATH
+# fi
 
 # 기존 포트를 새로운 포트로 교체
 #sudo sed -i "s/server 172.20.0.1:${BEFORE_S_PORT};/server 172.20.0.1:${AFTER_S_PORT};/" $NGINX_CONF_PATH

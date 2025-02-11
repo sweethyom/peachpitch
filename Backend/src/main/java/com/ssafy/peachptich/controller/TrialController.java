@@ -21,6 +21,11 @@ public class TrialController {
         this.trialService = trialService;
     }
 
+    @GetMapping("/health-check")
+    public String healthCheck(){
+        return "OK";
+    }
+
     @PostMapping("/check")
     public ResponseEntity<TrialResponse> checkTrial(@RequestBody TrialRequest request) {
         return ResponseEntity.ok(trialService.checkTrialAccess(request.getFingerprint()));
