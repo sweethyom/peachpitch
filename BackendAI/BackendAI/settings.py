@@ -34,6 +34,11 @@ DATABASES = {
     }
 }
 
+# Redis 설정
+REDIS_HOST = 'localhost'
+REDIS_PORT = 6379
+REDIS_DB = 1  # 사용할 DB 번호
+
 # Redis 연결 설정
 CACHES = {
     "default": {

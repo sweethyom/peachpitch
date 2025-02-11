@@ -7,8 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import SpeakingHabits
-from reportAI.models import Chat
-from reportAI.models import Totalreport
+from reportAI.models import Chat, Totalreport, User
 
 # OpenAI API Key 설정
 openai.api_key = settings.OPENAI_API_KEY
@@ -79,16 +78,33 @@ class WordAnalysisView(APIView):
             # stopwords, 0 값 필터링 적용
             filtered_result = filter_stopwords_and_zero(result_data)
 
-            total_report = Totalreport.objects.filter(user_id=chats.first().userid).first()
-            if not total_report:
-                return Response({"error": "해당 사용자에 대한 Totalreport가 없습니다."}, status=status.HTTP_404_NOT_FOUND)
-            
-            for word, count in filtered_result.items():
-                SpeakingHabits.objects.update_or_create(
+            # 사용자 정보 가져오기 (Chat의 첫 데이터 기준)
+            user_instance = User.objects.filter(userid=chats.first().userid).first()
+            if not user_instance:
+                return Response({"error": "해당 사용자 정보가 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
+
+            # Totalreport 존재 여부 확인, 없으면 생성 => 이 부분 논리 맞는지 백이랑 체크
+            total_report, created = Totalreport.objects.get_or_create(
+                user=user_instance,
+                defaults={
+                    'anscount': 0,
+                    'questcount': 0,
+                    'totalchattime': 0
+                }
+            )
+
+            # SpeakingHabits 누적
+            for word, new_count in filtered_result.items():
+                habit, created = SpeakingHabits.objects.get_or_create(
                     word=word,
-                    defaults={'count': count, 'total_report': total_report}
+                    total_report=total_report,
+                    defaults={'count': new_count}
                 )
-            return Response({"message": "분석 완료", "data": result_data}, status=status.HTTP_200_OK)
+                if not created:
+                    habit.count += new_count
+                    habit.save()
+
+            return Response({"message": "분석 완료", "data": filtered_result}, status=status.HTTP_200_OK)
         
         except json.JSONDecodeError:
             return Response({"error": "AI 분석 결과를 JSON으로 파싱할 수 없습니다."}, status=status.HTTP_400_BAD_REQUEST)
