@@ -1,9 +1,18 @@
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 import json
 import requests
+
 from .chatbot import generate_initial_message, generate_reply
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django_redis import get_redis_connection
+
+from datetime import datetime
+
+
+
+
 
 # 구글 API 설정
 GOOGLE_API_KEY = settings.GOOGLE_API_KEY
@@ -29,6 +38,9 @@ def start_conversation(request):
         try:
             data = json.loads(request.body)
             keyword = data.get('keyword', '')
+            # 내일 프론트랑 합치면서 chathistory_id를 들고 올 것
+            # chat_history_id = data.get('chatHistoryId') 
+            session_id = request.session.session_key or request.session.create()
 
             if not keyword:
                 return JsonResponse({'error': '키워드를 입력하세요.'}, status=400)
@@ -41,6 +53,25 @@ def start_conversation(request):
             if search_content:
                 initial_message += "\n\n최근 검색 결과:\n" + search_content
             
+
+            # Redis에 저장
+            redis_client = get_redis_connection("default")
+            chat_data = {
+                "role": "assistant",
+                "content": initial_message,
+                "timestamp": str(datetime.now())
+            }  
+
+            print('redis 객체만들기 완료')
+
+            # 세션별로 대화 저장
+            redis_key = f"chat:{session_id}:messages"
+            redis_client.rpush(redis_key, json.dumps(chat_data))
+
+            print('redis에 세션별 저장 완료')
+            # 24시간 후 만료되도록 설정(후에 변경)
+            redis_client.expire(redis_key, 60*60*24)
+
             # 히스토리에 추가
             conversation_history.clear()  # 새로운 대화 시작 시 이전 기록 초기화
             conversation_history.append({"role": "user", "content": f"키워드: {keyword}"})
@@ -60,9 +91,31 @@ def continue_conversation(request):
         try:
             data = json.loads(request.body)
             user_message = data.get('message', '')
+            # 내일 프론트랑 합치면서 chathistory_id를 들고 올 것
+            # chat_history_id = data.get('chatHistoryId') 
+            session_id = request.session.session_key or request.session.create()
 
             if not user_message:
                 return JsonResponse({'error': '사용자 메시지를 입력하세요.'}, status=400)
+            
+            # Redis에 저장
+            redis_client = get_redis_connection("default")
+            chat_data = {
+                "role": "user",
+                "content": user_message,
+                "timestamp": str(datetime.now())
+            }  
+
+            print('사용자 응답 redis 객체만들기 완료')
+
+            # 세션별로 대화 저장
+            redis_key = f"chat:{session_id}:messages"
+            redis_client.rpush(redis_key, json.dumps(chat_data))
+
+            print('redis에 사용자 응답 세션별 저장 완료')
+
+            # 24시간 후 만료되도록 설정(후에 변경)
+            redis_client.expire(redis_key, 60*60*24)
 
             # 사용자 메시지 히스토리에 추가
             conversation_history.append({"role": "user", "content": user_message})
@@ -78,6 +131,23 @@ def continue_conversation(request):
 
             # GPT로부터 응답 생성
             bot_reply = generate_reply(conversation_history)
+
+            # Redis에 저장
+            redis_client = get_redis_connection("default")
+            chat_data = {
+                "role": "assistant",
+                "content": bot_reply,
+                "timestamp": str(datetime.now())
+            }  
+
+            print('bot 대답 redis 객체만들기 완료')
+
+            # 세션별로 대화 저장
+            redis_key = f"chat:{session_id}:messages"
+            redis_client.rpush(redis_key, json.dumps(chat_data))
+
+            print('redis에 bot 대답 세션별 저장 완료')
+
 
             # 챗봇 응답 히스토리에 추가
             conversation_history.append({"role": "assistant", "content": bot_reply})
