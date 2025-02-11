@@ -35,9 +35,4 @@ public class NaverResponse implements OAuthResponse{
     public String getBirth(){
         return attribute.get("birthyear").toString() + "-" + attribute.get("birthday").toString();
     }
-
-    @Override
-    public String getSnsId(){
-        return attribute.get("id").toString();
-    }
 }

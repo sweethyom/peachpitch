@@ -15,6 +15,4 @@ public interface OAuthResponse {
 
     // 사용자 생일
     String getBirth();
-
-    String getSnsId();
 }
