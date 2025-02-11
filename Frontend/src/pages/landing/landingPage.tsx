@@ -62,7 +62,7 @@ function LandingPage() {
             case 2:
             case 3:
                 return {
-                    keyword: "오늘의 스몰토키 키워드",
+                    keyword: "오늘의 스몰토크 키워드",
                     title: "매일 새롭게 주어지는 키워드 <br /> 로 대화하면 나도 이제 스몰 <br /> 토크 장인?!",
                 };
             default:
