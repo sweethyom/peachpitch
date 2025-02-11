@@ -13,6 +13,10 @@ import { SiNaver } from "react-icons/si";
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
 
+import Google from '@/components/login/Google'
+import Kakao from '@/components/login/Kakao'
+import Naver from '@/components/login/Naver'
+
 function loginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -101,8 +105,14 @@ function loginPage() {
 
             <p className={styles.login__sns}>다른 서비스로 로그인</p>
             <div className={styles.login__sns__item}>
-              <FaGoogle style={{ fontSize: '40px' }} />
-              <RiKakaoTalkFill style={{ fontSize: '50px' }} />
+              <a href="http://localhost:8080/api/users/login/social/google">
+                <FaGoogle style={{ fontSize: '40px' }} />
+              </a>
+              {/* <FaGoogle style={{ fontSize: '40px' }} /> */}
+              <a href="http://localhost:8080/api/users/login/social/kakao">
+                <RiKakaoTalkFill style={{ fontSize: '50px' }} />
+              </a>
+
               <SiNaver style={{ fontSize: '36px' }} />
             </div>
 
