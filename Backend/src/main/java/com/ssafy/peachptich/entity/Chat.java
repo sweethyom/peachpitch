@@ -26,6 +26,7 @@ public class Chat {
     @Column(name="userId", nullable = false)
     private Long userId;
 
+    // 합치기 전 nullable = false 추가
     @ManyToOne
     @JoinColumn(name="history_id")
     private ChatHistory chatHistory;

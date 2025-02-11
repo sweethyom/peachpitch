@@ -75,7 +75,7 @@ def generate_report(request):
 
         # ChatReport에 저장
         chat_report = ChatReport.objects.create(
-            history_id=history_id,
+            history_id=history_id, # db저장용이므로 history_id 활성화 되면 주석 풀기.
             user_id=chats.first().userid,   # 첫 번째 chat의 사용자 id를 가져온다.
             chat_time=0,  # chat_time은 일단 0으로 넣어놨다.
             cons=' '.join(improvements),
