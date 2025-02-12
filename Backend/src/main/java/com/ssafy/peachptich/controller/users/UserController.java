@@ -61,8 +61,9 @@ public class UserController {
     }
 
     @GetMapping("/api/users/check-login")
-    public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request) {
-        return userServiceimpl.checkLoginStatus(request);
+    public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request,
+                                                                             Authentication authentication) {
+        return userServiceimpl.checkLoginStatus(request, authentication);
     }
 
 }

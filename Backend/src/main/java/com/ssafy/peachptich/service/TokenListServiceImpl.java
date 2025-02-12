@@ -83,4 +83,18 @@ public class TokenListServiceImpl implements TokenListService {
             log.error("Failed to remove token - key: {}, error: {}", key, e.getMessage());
         }
     }
+    
+    // key 값에 해당하는 value 반환
+    @Override
+    public String getToken(String key){
+        try {
+            if (key == null){
+                throw new IllegalArgumentException("Key cannot be null");
+            }
+            return redisTemplate.opsForValue().get(key);
+        } catch (Exception e){
+            log.error("Failed to get token - key: {}, error: {}", key, e.getMessage());
+            return null;
+        }
+    }
 }
