@@ -1,7 +1,7 @@
 package com.ssafy.peachptich.service;
 
 import com.ssafy.peachptich.dto.request.AudioChatRequest;
-import com.ssafy.peachptich.dto.request.VideoChatRequest;
+import com.ssafy.peachptich.dto.request.CloseRequest;
 import com.ssafy.peachptich.dto.response.ChatRoomResponse;
 import com.ssafy.peachptich.dto.response.HintResponse;
 import com.ssafy.peachptich.dto.response.VideoChatRoomResponse;
@@ -138,5 +138,14 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
 
         // 방에 있는 둘에게 키워드 전송
         messagingTemplate.convertAndSend("/sub/chat/" + historyId, response);
+    }
+
+    // 세션 나가면 종료
+    @Override
+    public void closeSession(CloseRequest closeRequest) throws OpenViduJavaClientException, OpenViduHttpException {
+        System.out.println("세션 종료");
+        Session session = openvidu.getActiveSession(closeRequest.getSessionId());
+        chatHistoryService.updateStatus(closeRequest.getHistoryId()); // 비활성화
+        session.close();
     }
 }
