@@ -33,6 +33,13 @@ function MainPage() {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [permissionAlert, setPermissionAlert] = useState<string | null>(null);
 
+  // 소셜 로그인 accessToken
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+    return localStorage.getItem('accessToken') !== null;
+  });
+
+  const [rank, setRank] = useState<string[] | null>(null);
+
   // ✅ 핑거프린트 생성 함수
   const generateFingerprint = async () => {
     try {
@@ -44,6 +51,20 @@ function MainPage() {
       console.error('Fingerprint generation failed:', error);
     }
   };
+
+  // 랭킹 데이터를 불러오기
+  useEffect(()=>{
+    axios.get("http://localhost:8080/api/main/rank")
+        .then((response) => {
+          const keywords = response.data.data.rank.map((item: { keyword: string }) => item.keyword);
+          setRank(keywords);
+          console.log(rank);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+
+  }, []);
 
   // ✅ "오늘의 토킹" 데이터를 불러오기
   useEffect(() => {
@@ -179,6 +200,49 @@ function MainPage() {
     navigate("/chat/video");
   };
 
+  // 소셜 로그인 확인
+  useEffect(() => {
+    const checkSocialLogin = async () => {
+      if (localStorage.getItem("socialLoginAttempt")) {
+        try {
+          const response = await fetch("http://localhost:8080/api/users/check-login", {
+            method: "GET",
+            credentials: "include",
+          });
+
+          if (!response.ok) throw new Error("로그인 확인 실패");
+
+          const accessToken = response.headers.get("access") || null;
+          const email = response.headers.get("email") || null;
+          const userId = response.headers.get("userId") || null;
+
+          console.log("🔑 access:", accessToken);
+          console.log("📧 email:", email);
+          console.log("🆔 userId:", userId);
+
+          if (accessToken) {
+            localStorage.setItem("accessToken", accessToken);
+            localStorage.setItem("userEmail", email || "");
+            localStorage.setItem("userId", userId || "");
+            setIsLoggedIn(true);
+
+            // ✅ storage 이벤트 트리거하여 Header.tsx 업데이트
+            window.dispatchEvent(new Event("storage"));
+          }
+
+          localStorage.removeItem("socialLoginAttempt");
+        } catch (error) {
+          console.error("🚨 로그인 상태 확인 실패:", error);
+          localStorage.removeItem("socialLoginAttempt");
+        }
+      }
+    };
+
+    checkSocialLogin();
+  }, []);
+
+
+
   return (
       <>
         <Header />
@@ -213,32 +277,33 @@ function MainPage() {
             <div className={styles.main__keyword}>
               <p className={styles.main__keyword__title}>🔥 현재 가장 인기 있는 키워드 🔥</p>
               <div className={styles.main__keyword__list}>
-                <div className={styles.item}>
-                  <img className={styles.item__medal} src={medal1} />
-                  <p className={styles.item__keyword}>취미</p>
-                </div>
-                <div className={styles.item}>
-                  <img className={styles.item__medal} src={medal2} />
-                  <p className={styles.item__keyword}>여행</p>
-                </div>
-                <div className={styles.item}>
-                  <img className={styles.item__medal} src={medal3} />
-                  <p className={styles.item__keyword}>티타임</p>
-                </div>
+                {rank && rank.length >= 3 ? (
+                    rank.slice(0, 3).map((keyword, index) => (
+                        <div className={styles.item} key={index}>
+                          <img
+                              className={styles.item__medal}
+                              src={index === 0 ? medal1 : index === 1 ? medal2 : medal3}
+                          />
+                          <p className={styles.item__keyword}>{keyword}</p>
+                        </div>
+                    ))
+                ) : (
+                    <div>아직 랭킹이 없음</div>
+                )}
               </div>
             </div>
           </div>
-          <Footer />
+          <Footer/>
         </div>
 
 
         {/* ✅ 결제 완료 모달 */}
-        {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />}
+        {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal}/>}
 
         {/* ✅ 로그인 성공 후 GreenAlert 유지 */}
         {showWelcomeAlert && (
             <div>
-              <GreenAlert message="로그인에 성공하였습니다. 환영합니다." onClose={() => setShowWelcomeAlert(false)} />
+              <GreenAlert message="로그인에 성공하였습니다. 환영합니다." onClose={() => setShowWelcomeAlert(false)}/>
             </div>
         )}
 

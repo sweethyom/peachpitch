@@ -144,3 +144,21 @@
     background-color: var(--color-yellow-500);
     color: white;
 }
+
+
+.btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 135px;
+    height: 52px;
+    background-color: var(--color-brown-200);
+    // border: solid var(--color-white-600) 1px;
+    color: var(--color-white-000);
+    font-weight: 500;
+    font-size: 16px;
+    border-radius: 12px;
+
+    cursor: pointer;
+}

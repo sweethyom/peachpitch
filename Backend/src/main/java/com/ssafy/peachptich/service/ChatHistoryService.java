@@ -8,4 +8,5 @@ public interface ChatHistoryService {
     Long addVideoChatHistory(Long user1Id, Long user2Id, String user1Name, String user2Name);
     void updateKeywordByUserId(Long historyId, Long userId, Long keywordId);
     void updateFeedbackByUserId(FeedbackRequest feedbackRequest, Long userId);
+    ChatHistory getChatHistory(Long historyId);
 }

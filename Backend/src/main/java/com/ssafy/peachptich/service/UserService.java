@@ -15,6 +15,13 @@ public interface UserService {
     Optional<User> joinProcess(JoinRequest joinRequest);
     ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
                                                                             Authentication authentication);
-    Long getUserId(String email);
-    String getUserEmail(Long userId);
+
+    ResponseEntity<ResponseDto<Map<String, Boolean>>> checkEmail(String email);
+
+    public Optional<User> getUserByEmail(String email);
+    public Optional<User> getUserByUserId(Long userId);
+
+    public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request);
+
 }
+
