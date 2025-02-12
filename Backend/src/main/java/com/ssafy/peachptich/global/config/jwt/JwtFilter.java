@@ -45,7 +45,6 @@ public class JwtFilter extends OncePerRequestFilter {
     // 로그인, 회원가입 API URL이 포함되는지 확인하는 함수
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException{
         String path = request.getRequestURI();
-//        System.out.println((path.equals("/") || excludedPaths.stream().anyMatch(path::startsWith)));
         return (path.equals("/") || excludedPaths.stream().anyMatch(path::startsWith));
     }
 
@@ -95,7 +94,7 @@ public class JwtFilter extends OncePerRequestFilter {
         User userEntity = userRepository.findByEmail(userEmail).orElseThrow(() ->
                 new UsernameNotFoundException("User not found with email: " + userEmail)
         );
-        System.out.println("JWTFilter에서 userId = " + userEntity.getUserId() + ", userEmail = " + userEntity.getEmail() + ", role = " + userEntity.getRole() + ", birth = " + userEntity.getBirth());
+        log.info("JWTFilter에서 userId = " + userEntity.getUserId() + ", userEmail = " + userEntity.getEmail() + ", role = " + userEntity.getRole() + ", birth = " + userEntity.getBirth());
 
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
         

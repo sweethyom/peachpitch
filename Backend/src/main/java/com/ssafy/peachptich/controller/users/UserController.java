@@ -2,6 +2,7 @@ package com.ssafy.peachptich.controller.users;
 
 import com.ssafy.peachptich.dto.request.JoinRequest;
 import com.ssafy.peachptich.dto.response.ResponseDto;
+import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.service.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,8 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -42,18 +45,24 @@ public class UserController {
                 .orElseThrow(() -> new ResponseDto.DuplicateEmailException("Email already exists"));
     }
 
-    //TODO
-    // 이메일 중복 확인
-    // @GetMapping("/api/users/check")
-    // PathVariables(String email)
+    @GetMapping("/api/users/check")
+    public ResponseEntity<ResponseDto<Map<String, Boolean>>> checkEmail(@RequestParam String email) throws IOException {
+        log.info("이메일 중복 확인: " + email);
+        return userServiceimpl.checkEmail(email);
+    }
 
 
     //TODO
     // 회원 탈퇴 기능 구현
     @GetMapping("/api/users/delete")
-//    public ResponseEntity<String> withdrawProcess(@AuthenticationPrincipal CustomUserDetails userDetails){
-        public ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
+    public ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
                                                                                 Authentication authentication){
         return userServiceimpl.withdrawProcess(request, response, authentication);
     }
+
+    @GetMapping("/api/users/check-login")
+    public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request) {
+        return userServiceimpl.checkLoginStatus(request);
+    }
+
 }

@@ -2,32 +2,42 @@ import { useState, useEffect } from "react";
 import styles from "./styles/Keyword.module.scss";
 
 import closeBtn from "@/assets/icons/modal__close.png";
-
-import axios from "axios";
 import { Link } from "react-router-dom";
 
 type ModalProps = {
     children?: React.ReactNode;
     setSelectedKeyword: (keyword: string) => void;
+    setSelectedKeywordId: (id: number) => void; // id 전달 함수 추가
     onClose: () => void;
 };
 
-function Keyword({ children, setSelectedKeyword }: ModalProps) {
-    // if (!isOpen) return null;
+// Keyword 객체 타입 정의
+type KeywordItem = {
+    id: number;
+    name: string;
+};
 
-    const [keywords, setKeywords] = useState<string[]>([]);
+function Keyword({ children, setSelectedKeyword, setSelectedKeywordId, onClose }: ModalProps) {
+    // 키워드 배열의 타입을 KeywordItem[]으로 수정
+    const [keywords, setKeywords] = useState<KeywordItem[]>([]);
     const [visibleCount, setVisibleCount] = useState(5); // 처음 5개만 표시
     const [selectedKeyword, setSelectedKeywordState] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchKeywords = async () => {
             try {
-                const response = await fetch("/data/keywords.json");
-                const data = await response.json();
-
+                const response = await fetch("http://localhost:8080/api/chat/ai/keywords/add");
+                const responseJson = await response.json();
+                const data = responseJson.data;
+                console.log(data);
                 if (data.keywords && data.keywords.length > 0) {
-                    const shuffledKeywords = [...data.keywords].sort(() => 0.5 - Math.random());
-                    setKeywords(shuffledKeywords.slice(0, 15));
+                    // data의 keywordId와 keyword를 추출하여 KeywordItem 객체 배열로 저장
+                    setKeywords(
+                        data.keywords.map((item: { keywordId: number; keyword: string }) => ({
+                            id: item.keywordId,
+                            name: item.keyword,
+                        }))
+                    );
                 }
             } catch (error) {
                 console.error("키워드 로딩 오류:", error);
@@ -37,14 +47,15 @@ function Keyword({ children, setSelectedKeyword }: ModalProps) {
         fetchKeywords();
     }, []);
 
-
     const handleAddKeyword = () => {
         setVisibleCount((prev) => Math.min(prev + 5, 15)); // 5개씩 추가 표시, 최대 15개까지
     };
 
-    const handleKeywordClick = (keyword: string) => {
-        setSelectedKeywordState(keyword);
-        setSelectedKeyword(keyword); // 부모 컴포넌트에 선택된 키워드 전달
+    // 키워드 객체 전체를 받아 처리
+    const handleKeywordClick = (keyword: KeywordItem) => {
+        setSelectedKeywordState(keyword.name);
+        setSelectedKeyword(keyword.name); // 부모 컴포넌트에 선택된 키워드 전달
+        setSelectedKeywordId(keyword.id); // 부모 컴포넌트에 선택된 키워드 id 전달
     };
 
     return (
@@ -58,30 +69,28 @@ function Keyword({ children, setSelectedKeyword }: ModalProps) {
                 </div>
                 <p className={styles.modal__header__title}>키워드 선택하기</p>
                 <div className={styles.modal__contents}>
-
                     <div className={styles.modal__contents__add}>
                         {visibleCount < 15 && (
-                            <div
-                                className={styles.modal__contents__btn}
-                                onClick={handleAddKeyword}>
+                            <div className={styles.modal__contents__btn} onClick={handleAddKeyword}>
                                 키워드 추가하기
                             </div>
                         )}
                     </div>
-
                     <div className={styles.modal__keywords}>
                         {keywords.map((keyword, index) => (
                             <div
-                                key={index}
-                                className={`${styles.modal__keywords__item} ${selectedKeyword === keyword ? styles.selected : ""
-                                    }`}
+                                key={keyword.id}
+                                className={`${styles.modal__keywords__item} ${
+                                    selectedKeyword === keyword.name ? styles.selected : ""
+                                }`}
                                 onClick={() => handleKeywordClick(keyword)}
                                 style={{
                                     visibility: index < visibleCount ? "visible" : "hidden",
                                     opacity: index < visibleCount ? 1 : 0,
-                                    transition: "opacity 0.3s ease-in-out"
-                                }}>
-                                {keyword}
+                                    transition: "opacity 0.3s ease-in-out",
+                                }}
+                            >
+                                {keyword.name}
                             </div>
                         ))}
                     </div>

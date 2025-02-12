@@ -4,11 +4,14 @@ import com.ssafy.peachptich.global.config.jwt.*;
 import com.ssafy.peachptich.repository.RefreshRepository;
 import com.ssafy.peachptich.repository.UserRepository;
 import com.ssafy.peachptich.service.CustomOAuth2UserService;
+import com.ssafy.peachptich.service.TokenBlacklistService;
+import com.ssafy.peachptich.service.TokenListService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,13 +31,12 @@ import java.util.Collections;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-    private final AuthenticationConfiguration authenticationConfiguration;
-    private final TokenProvider tokenProvider;
-    private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOauthSuccessHandler customOauthSuccessHandler;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final TokenListService tokenListService;
+    private final TokenBlacklistService tokenBlacklistService;
 
 
 //    @Bean
@@ -65,7 +67,7 @@ public class SecurityConfig {
                                 .requestMatchers("/ws/**", "/ws/room/**").permitAll() // WebSocket 엔드포인트
                                 .requestMatchers("/pub/**", "/sub/**").permitAll() // STOMP 메시징 경로
                                 .requestMatchers("/api/main/**", "/api/index", "/api/users/login", "/api/users/signup", "/api/pay/ready", "/api/pay/completed",
-                                        "/api/chat/ai/keywords/**", "/api/chat/ai/check", "/api/users/coupon/**", "/error", "/api/chat/report/**").permitAll()
+                                        "/api/chat/ai/keywords/**", "/api/chat/ai/check", "/api/users/coupon/**", "/error", "/api/chat/report/**", "/api/users/check").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
@@ -99,7 +101,7 @@ public class SecurityConfig {
                         configuration.setMaxAge(3600L);
 
                         //configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-                        configuration.setExposedHeaders(Arrays.asList("Authorization", "access"));
+                        configuration.setExposedHeaders(Arrays.asList("Authorization", "access", "userId", "email"));
                         return configuration;
                     }
                 })));
@@ -124,12 +126,19 @@ public class SecurityConfig {
 
         // CustomLogoutFilter 등록
         http
-                .addFilterBefore(new CustomLogoutFilter(tokenProvider, refreshRepository), LogoutFilter.class);
+                .addFilterBefore(new CustomLogoutFilter(tokenProvider, tokenListService, tokenBlacklistService), LogoutFilter.class);
 
         //필터 추가 LoginFilter()는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         // AuthenticationManager()와 JWTUtil 인수 전달
         http
-                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), tokenProvider, userRepository, refreshRepository, authManager), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration),
+                        tokenProvider,
+                        userRepository,
+                        authManager,
+                        redisTemplate,
+                        tokenListService,
+                        tokenBlacklistService
+                        ),UsernamePasswordAuthenticationFilter.class);
 
         http
                 .sessionManagement((session) -> session

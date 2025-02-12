@@ -37,7 +37,7 @@ function VoiceChatPage() {
 
   /* 키워드 상태 */
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
-
+  const [selectedKeywordId, setSelectedKeywordId] = useState<number | null>(null);
   /* 음성 인식 관련 상태 */
   const [isListening, setIsListening] = useState(false);
   const { transcript, resetTranscript, listening } = useSpeechRecognition();
@@ -45,6 +45,8 @@ function VoiceChatPage() {
   /* 대화 저장 */
   const [messageHistory, setMessageHistory] = useState<{ role: string, message: string }[]>([]);
   const [currentMessage, setCurrentMessage] = useState<string>('');
+
+  const [historyId, setHistoryId] = useState<number | null>(null);
 
   useEffect(() => {
     if (listening && transcript !== currentMessage) {
@@ -60,6 +62,7 @@ function VoiceChatPage() {
 
   /* 키워드 선택 후 대화 시작 */
   const handleStartClick = async () => {
+
     if (!selectedKeyword) {
       setShowAlert(true);
       return;
@@ -67,10 +70,26 @@ function VoiceChatPage() {
     setIsKeywordOpen(false);
 
     try {
+      const userJwtFromStorage = localStorage.getItem("accessToken");
+      console.log(userJwtFromStorage);
+
       const response = await axios.post('http://127.0.0.1:8000/ai/start/', {
         keyword: selectedKeyword,
       });
+
+      const config = userJwtFromStorage  ? { headers: { access: `${userJwtFromStorage}` } }
+          : {}; // 토큰이 없으면 headers 설정 안 함
+
+      const responseFromSpring = await axios.post(
+          'http://localhost:8080/api/chat/ai/keywords',
+          { keywordId: selectedKeywordId }, // Body 데이터
+          config // 헤더 설정
+      );
+
       const aiResponse = response.data.message;
+      const hintResponse = responseFromSpring.data;
+      console.log(hintResponse); // historyId, hints, keyword 포함
+      setHistoryId(hintResponse.historyId); // 대화 내역 id 저장
       setMessageHistory(prev => [...prev, { role: 'ai', message: aiResponse }]);
       // setMessageHistory(prev => [...prev, { role: 'ai', message: response.data.message }]);
       playTTS(aiResponse); // 구글 tts 재생
@@ -373,7 +392,7 @@ function VoiceChatPage() {
 
       {/* 키워드 모달 */}
       {isKeywordOpen && (
-        <KeywordModal setSelectedKeyword={setSelectedKeyword} onClose={() => setIsKeywordOpen(false)}>
+        <KeywordModal setSelectedKeyword={setSelectedKeyword} setSelectedKeywordId={setSelectedKeywordId} onClose={() => setIsKeywordOpen(false)}>
           <div className={styles.btn} onClick={handleStartClick}>시작하기</div>
         </KeywordModal>
       )}
