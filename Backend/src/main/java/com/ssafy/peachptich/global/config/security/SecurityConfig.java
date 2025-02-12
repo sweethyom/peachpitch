@@ -111,7 +111,7 @@ public class SecurityConfig {
 
         // JWTFilter 등록
         http
-                .addFilterBefore(new JwtFilter(tokenProvider, userRepository), CustomLoginFilter.class);
+                .addFilterBefore(new JwtFilter(tokenProvider, userRepository, tokenBlacklistService), CustomLoginFilter.class);
 
         //oauth2
         http

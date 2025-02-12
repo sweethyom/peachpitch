@@ -4,6 +4,7 @@ import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.repository.UserRepository;
 import com.ssafy.peachptich.service.CustomUserDetailsService;
+import com.ssafy.peachptich.service.TokenBlacklistService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -37,6 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
+    private final TokenBlacklistService tokenBlacklistService;
 
     // 토큰 검증 결과를 건너뛸 API URL들
     private final List<String> excludedPaths = Arrays.asList("/login", "/join");
@@ -57,6 +59,15 @@ public class JwtFilter extends OncePerRequestFilter {
         // 토큰이 없다면 다음 필터로 넘김
         if (accessToken == null){
             filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 토큰이 blackList에 존재하는지 확인
+        boolean isBlacked = tokenBlacklistService.isContainToken("BL:AT:" + accessToken);
+        if(isBlacked) {
+            PrintWriter writer = response.getWriter();
+            writer.print("aleady logged out. Please sign in.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
 
@@ -88,7 +99,6 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         // userEmail, role 값 획득
-
         String userEmail = tokenProvider.getUserEmail(accessToken);
 
         User userEntity = userRepository.findByEmail(userEmail).orElseThrow(() ->

@@ -25,7 +25,7 @@ public class TokenBlackBlacklistServiceImpl implements TokenBlacklistService {
         return allItems.stream()
                 .anyMatch(item -> item.equals(value));
     }
-
+    
     @Override
     public List<String> getTokenBlackList(){
         return redisTemplate.opsForList().range(REDIS_BLACK_LIST_KEY, 0, -1);
