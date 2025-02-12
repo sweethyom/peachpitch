@@ -64,7 +64,7 @@ fi
 REACT_CONTAINER="my-react"
 echo "React 서버 실행..."
 remove_existing_container $REACT_CONTAINER
-docker-compose -p my-react -f /home/ubuntu/S12P11D201/Frontend2/docker-compose.yml up -d --force-recreate --remove-orphans
+docker-compose -p my-react -f /home/ubuntu/S12P11D201/Frontend2/docker-compose.yml up -d --build
 
 echo "${AFTER_S_COLOR} springboot 서버가 실행되었습니다 (포트: ${AFTER_S_PORT})"
 echo "${AFTER_D_COLOR} django 서버가 실행되었습니다 (포트: ${AFTER_D_PORT})"
@@ -95,9 +95,9 @@ echo "Nginx 설정 파일 업데이트..."
 # echo "배포 완료!"
 
 # Nginx 설정 파일 경로
-# NGINX_CONF_PATH="/home/ubuntu/nginx_conf/default.conf"
-# NGINX_CONF_DIR="/home/ubuntu/nginx_conf"
-# NGINX_CONF_PATH="${NGINX_CONF_DIR}/default.conf"
+NGINX_CONF_PATH="/home/ubuntu/nginx_conf/default.conf"
+NGINX_CONF_DIR="/home/ubuntu/nginx_conf"
+NGINX_CONF_PATH="${NGINX_CONF_DIR}/default.conf"
 
 if [ "$AFTER_S_COLOR" = "8081" ]; then
     echo "Blue 환경으로 Nginx 설정 파일 교체..."
