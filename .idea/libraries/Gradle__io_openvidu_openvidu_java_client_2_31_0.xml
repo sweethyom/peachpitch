@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: io.openvidu:openvidu-java-client:2.31.0" type="java-imported" external-system-id="GRADLE">
+    <properties groupId="io.openvidu" artifactId="openvidu-java-client" version="2.31.0" />
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/io.openvidu/openvidu-java-client/2.31.0/825d2be39765b3ed88887919e33df3bae69cca80/openvidu-java-client-2.31.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
