@@ -3,6 +3,8 @@ package com.ssafy.peachptich.global.config.jwt;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.repository.RefreshRepository;
+import com.ssafy.peachptich.service.TokenBlacklistService;
+import com.ssafy.peachptich.service.TokenListService;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -13,17 +15,19 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final TokenProvider tokenProvider;
-    private final RefreshRepository refreshRepository;
+    private final TokenListService tokenListService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
@@ -79,6 +83,39 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
+        // Redis의 BlackList 내에 토큰이 존재하지 않는 경우
+        /*
+            if (!tokenBlacklistService.isContainToken(refresh)){
+                // BlackList를 추가함
+                tokenBlacklistService.addTokenToList(refresh);
+                List<Object> blackList = tokenBlacklistService.getTokenBlackList();
+                log.debug("blackList에 refresh 토큰 추가 -> blackList: " + blackList);
+
+                // response status code
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+        */
+
+        // redis에 저장되어 있는지 확인
+        String userEmail = tokenProvider.getUserEmail(refresh);
+        boolean isExist = tokenListService.isContainToken("RT:" + userEmail);
+        if(!isExist){
+            // response status code
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        
+        // 로그아웃 진행
+        // refresh token을 redis에서 제거
+        tokenListService.removeToken("RT:" + userEmail);
+        
+        // access token을 blackList에 추가
+        String access = request.getHeader("access");
+        tokenBlacklistService.addTokenToList(access);
+        
+        /*
+        // 여기부터 기존 코드
         // DB에 저장되어 있는지 확인
         Boolean isExist = refreshRepository.existsByRefresh(refresh);
         if (!isExist) {
@@ -90,12 +127,12 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // 로그아웃 진행
         // Refresh Token을 DB에서 제거
         refreshRepository.deleteByRefresh(refresh);
+        
+         */
 
         // Refresh Token Cookie 값 0 설정
         Cookie cookie = new Cookie("refresh", null);
         cookie.setMaxAge(0);
-        //TODO
-        // 이건 뭐지?
         cookie.setPath("/");
 
         // JSON 응답 생성
