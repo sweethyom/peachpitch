@@ -53,7 +53,6 @@
             justify-content: center;
             font-weight: 700;
             font-size: 32px;
-            margin-bottom: 35px;
         }
     }
 
@@ -135,4 +134,19 @@
             border-radius: 12px;
         }
     }
+}
+
+.free {
+    display: flex;
+    background-color: var(--color-white-000);
+    justify-content: center;
+    padding: 10px 0;
+    // margin-bottom: 30px;
+
+    border: solid var(--color-white-400) 1px;
+    border-radius: 15px;
+    margin: 20px 50px;
+
+    font-weight: 500;
+    font-size: 18px;
 }

@@ -17,6 +17,7 @@ import CompletePay from '@/components/modal/SuccessPay';
 
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
+import StartChat from '@/components/modal/StartChat'
 
 function MainPage() {
   const defaultMessage = "포시랍네요. 광수님 좀 포시랍네요."
@@ -72,8 +73,8 @@ function MainPage() {
   useEffect(() => {
     axios.post("http://localhost:8080/api/main/randomscript")
       .then(response => {
-        const content = response.data.data.content; 
-        setRandomTalks(prev => [...prev, content]); 
+        const content = response.data.data.content;
+        setRandomTalks(prev => [...prev, content]);
         setCurrentTalk(content);
       })
       .catch(error => console.error('Error fetching random script:', error));
@@ -145,15 +146,11 @@ function MainPage() {
     setShowCompletePay(false);
   };
 
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+
   // ✅ AI 채팅 접근 핸들러
   const handleAIChatClick = async (e: React.MouseEvent) => {
     e.preventDefault();
-
-    const hasPermission = await checkPermissions();
-    if (!hasPermission) {
-      setAlertMessage("마이크 및 카메라 권한을 허용해야 합니다!");
-      return;
-    }
 
     // if (!fingerprint) {
     //   console.error('Fingerprint not generated');
@@ -166,7 +163,10 @@ function MainPage() {
     // });
 
     // if (response.data.canAccess) {
-    navigate('/chat/ai');
+    const hasCoupon = await checkCouponAvailability();
+    if (hasCoupon) {
+      setIsChatModalOpen(true);
+    }
     // } else {
     // setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
     // navigate('/login');
@@ -175,6 +175,12 @@ function MainPage() {
     // console.error('Trial check failed:', error);
     // setAlertMessage("서비스 이용에 문제가 발생했습니다.");
     // }
+
+    const hasPermission = await checkPermissions();
+    if (!hasPermission) {
+      setAlertMessage("마이크 및 카메라 권한을 허용해야 합니다!");
+      return;
+    }
   };
 
   // ✅ 마이크 및 카메라 권한 체크 함수
@@ -241,7 +247,35 @@ function MainPage() {
     checkSocialLogin();
   }, []);
 
+  // AI 접근 모달창 닫기
+  const handleCloseChatModal = () => {
+    setIsChatModalOpen(false);
+  };
 
+  const handleStartChat = () => {
+    setIsChatModalOpen(false);
+    navigate('/chat/ai');
+  };
+
+  // 쿠폰 관련
+  const checkCouponAvailability = async () => {
+    try {
+      // const response = await axios.get(`http://localhost:8080/api/users/coupon/${userId}`);
+      const response = await axios.get(`http://localhost:8080/api/users/coupon/1`);
+      
+      console.log("쿠폰수: " + response.data);
+      
+      if (response.data < 1) {
+        setAlertMessage("이용권이 부족합니다.");
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error('쿠폰 확인 실패:', error);
+      setAlertMessage("쿠폰 확인 중 오류가 발생했습니다.");
+      return false;
+    }
+  };
 
   return (
     <>
@@ -264,6 +298,14 @@ function MainPage() {
                 <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
               </div>
             </Link>
+
+            {/* StartChat 모달 */}
+            {isChatModalOpen && (
+              <StartChat isOpen={isChatModalOpen} onClose={handleCloseChatModal} onStart={handleStartChat} />
+            )}
+            {alertMessage && (
+              <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
+            )}
 
             <Link to="#" onClick={handleVideoChatClick} className={styles.main__link}>
               <div className={styles.main__chat__video}>
