@@ -8,12 +8,15 @@ import com.ssafy.peachptich.entity.Refresh;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.repository.RefreshRepository;
 import com.ssafy.peachptich.repository.UserRepository;
+import com.ssafy.peachptich.service.TokenBlacklistService;
+import com.ssafy.peachptich.service.TokenListService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -21,19 +24,23 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 //@RequiredArgsConstructor
 @Slf4j
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final TokenProvider tokenProvider;
-    private final RefreshRepository refreshRepository;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
+    private final RedisTemplate<String, String> redisTemplate;
+    private final TokenListService tokenListService;
+    private final TokenBlacklistService tokenBlacklistService;
     private static final AntPathRequestMatcher CUSTOM_LOGIN_PATH_MATCHER = new AntPathRequestMatcher("/api/users/login", "POST");
 
 //    @PostConstruct          // 초기화 로직 작성
@@ -43,13 +50,16 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 //    }
 
     public CustomLoginFilter(AuthenticationManager authenticationManager, TokenProvider tokenProvider, UserRepository userRepository,
-                             RefreshRepository refreshRepository, AuthenticationManager authenticationManager1){
+                             AuthenticationManager authenticationManager1, RedisTemplate<String, String> redisTemplate,
+                             TokenListService tokenListService, TokenBlacklistService tokenBlacklistService){
         // 부모 클래스의 생성자를 통해 AuthenticationManager 설정
         super(authenticationManager);
         this.tokenProvider = tokenProvider;
-        this.refreshRepository = refreshRepository;
         this.userRepository = userRepository;
         this.authenticationManager = authenticationManager1;
+        this.redisTemplate = redisTemplate;
+        this.tokenListService = tokenListService;
+        this.tokenBlacklistService = tokenBlacklistService;
         setRequiresAuthenticationRequestMatcher(CUSTOM_LOGIN_PATH_MATCHER);
     }
 
@@ -93,6 +103,9 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
                 throw new DisabledException("Account is deactivated. Please contact support.");
             }
 
+            // 탈퇴한 회원이 아니라면 redis에 저장된 토큰 내역 확인
+
+
             // 탈퇴한 회원이 아니라면 role 은 일단 null로!
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userEmail, password, null);
 
@@ -133,9 +146,26 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             String access = tokenProvider.createJwt("access", userEmail, role, 600000L);
             String refresh = tokenProvider.createJwt("refresh", userEmail, role, 86400000L);
 
+            //TODO
+            // Redis에 이미 발행된 access/refresh 토큰이 존재하는지 확인
+            boolean hasExistingToken = tokenListService.isContainToken("RT:" + userEmail);
+
+            // 이미 발행된 토큰이 존재한다면
+            if (hasExistingToken){
+               List<String> tokenList = tokenListService.getTokenList("RT:" + userEmail);
+               if (!CollectionUtils.isEmpty(tokenList)){
+                   tokenList.forEach(token -> {
+                               String tokenValue = token;
+                               tokenBlacklistService.addTokenToList(tokenValue);
+                               tokenListService.removeToken("RT:" + userEmail);
+                           });
+               }
+            }
+
             try {
-                // refresh Token 서버 저장
-                addRefresh(userEmail, refresh, 86400000L);
+                // access token과 refresh Token Redis 저장
+                //addToken(userEmail, access, 600000L);
+                addToken(userEmail, refresh, 86400000L);
             } catch (Exception e) {
                 throw new TokenStorageException("Failed to store refresh token: " + e.getMessage());
             }
@@ -174,16 +204,13 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         return cookie;
     }
 
-
-    private void addRefresh(String userEmail, String refresh, Long expiredMs) {
-        Date date = new Date(System.currentTimeMillis() + expiredMs);
-
-        Refresh refreshEntity = new Refresh();
-        refreshEntity.setUserEmail(userEmail);
-        refreshEntity.setRefresh(refresh);
-        refreshEntity.setExpiration(date.toString());
-
-        refreshRepository.save(refreshEntity);
+    private void addToken(String userEmail, String value, Long expiredMs) {
+        redisTemplate.opsForValue().set(
+            "RT:" + userEmail,       // key 값
+                value,                // value
+                System.currentTimeMillis() + expiredMs,     // 만료 시간
+                TimeUnit.MICROSECONDS
+        );
     }
 
     @Override
@@ -194,12 +221,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     public static class TokenStorageException extends RuntimeException {
         public TokenStorageException(String message) {
-            super(message);
-        }
-    }
-
-    public static class ResponseWriteException extends RuntimeException {
-        public ResponseWriteException(String message) {
             super(message);
         }
     }

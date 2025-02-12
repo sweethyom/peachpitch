@@ -16,6 +16,7 @@ public class Item {
     private String name;
 
     @Column(nullable = false)
+
     private Integer price;
 
     @Enumerated(EnumType.STRING)

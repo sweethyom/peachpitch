@@ -36,11 +36,12 @@ import java.util.Optional;
 @Slf4j
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final RefreshRepository refreshRepository;
     private final ItemRepository itemRepository;
     private final HaveCouponRepository haveCouponRepository;
     private final TokenProvider tokenProvider;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final TokenListService tokenListService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     public Optional<User> joinProcess(JoinRequest joinRequest) {
         String userEmail = joinRequest.getEmail();
@@ -81,6 +82,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseDto<Map<String, Boolean>>> checkEmail(String email){
+        log.info("여기 입력");
         Map<String, Boolean> responseData = new HashMap<>();
 
         Boolean exist = userRepository.findByEmail(email).isPresent();
@@ -162,6 +164,26 @@ public class UserServiceImpl implements UserService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
             }
 
+            // Redis에 저장되어 있는지 확인
+            boolean isExist = tokenListService.isContainToken("RT:" + userEmail);
+            if(!isExist){
+                // 응답 메시지와 데이터를 포함한 ResponseDto 생성
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("error", "refresh token is not available.");
+
+                ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
+                        "Bad Request: The token does not exist in database",
+                        responseData
+                );
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
+            }
+
+            tokenListService.removeToken("RT:" + userEmail);
+            tokenBlacklistService.addTokenToList(refresh);
+
+            /*
+            // 기존 코드
             // DB에 저장되어 있는지 확인
             Boolean isExist = refreshRepository.existsByRefresh(refresh);
             if (!isExist) {
@@ -179,7 +201,7 @@ public class UserServiceImpl implements UserService {
 
             // refresh Token을 DB에서 제거
             refreshRepository.deleteByRefresh(refresh);
-
+             */
             // 회원 상태(status) false 전환
             User userEntity = userRepository.findByEmail(userEmail).get();
             userEntity.setStatus(false);
@@ -225,8 +247,13 @@ public class UserServiceImpl implements UserService {
         // @Transactional 어노테이션을 사용하여 JPA가 트랜잭션 내에서 자동으로 변경 사항을 flush하여 DB에 반영함
     }
 
+    @Override
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> getUserByUserId(Long userId){
+        return userRepository.findByUserId(userId);
     }
 
     public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request){
