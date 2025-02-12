@@ -6,8 +6,7 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import SpeakingHabits
-from reportAI.models import Chat, Totalreport, User
+from reportAI.models import Chat, TotalReport, User, SpeakingHabits
 
 # OpenAI API Key 설정
 openai.api_key = settings.OPENAI_API_KEY
@@ -79,17 +78,17 @@ class WordAnalysisView(APIView):
             filtered_result = filter_stopwords_and_zero(result_data)
 
             # 사용자 정보 가져오기 (Chat의 첫 데이터 기준)
-            user_instance = User.objects.filter(userid=chats.first().userid).first()
+            user_instance = User.objects.filter(user_id=chats.first().user_id).first()
             if not user_instance:
                 return Response({"error": "해당 사용자 정보가 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
 
-            # Totalreport 존재 여부 확인, 없으면 생성 => 이 부분 논리 맞는지 백이랑 체크
-            total_report, created = Totalreport.objects.get_or_create(
+            # TotalReport 존재 여부 확인, 없으면 생성 => 이 부분 논리 맞는지 백이랑 체크
+            total_report, created = TotalReport.objects.get_or_create(
                 user=user_instance,
                 defaults={
-                    'anscount': 0,
-                    'questcount': 0,
-                    'totalchattime': 0
+                    'ans_count': 0,
+                    'quest_count': 0,
+                    'total_chat_time': 0
                 }
             )
 
