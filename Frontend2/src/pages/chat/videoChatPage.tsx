@@ -60,7 +60,7 @@ function videoChatPage() {
     setUserJwt(userJwtFromStorage || "");
     console.log("stomp call " + userJwt);
     const stompClient = new Client({
-      brokerURL: "ws://peachpitch.site/ws/room",
+      brokerURL: "wss://peachpitch.site/ws/room",
       connectHeaders: {
         access: `${userJwt}`,
       },
