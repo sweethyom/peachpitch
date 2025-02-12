@@ -20,7 +20,7 @@ public class SpeakingHabits {
     @ColumnDefault("0")
     private Integer count;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name="total_report_id", nullable = false)
     private TotalReport totalReport;
 

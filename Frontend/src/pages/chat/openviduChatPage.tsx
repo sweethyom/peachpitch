@@ -17,12 +17,12 @@ const VideoChatPage: React.FC = () => {
     const [isLeaveOpen, setIsLeaveOpen] = useState<boolean>(false);
     const toggleLeave = () => setIsLeaveOpen((prev) => !prev);
 
-    /* 키워드 모달창 */
-    const [isKeywordOpen, setIsKeywordOpen] = useState<boolean>(true);
-    const toggleKeyword = () => setIsKeywordOpen((prev) => !prev);
+    /* 키워드 모달창 - 매칭 후에 뜨도록 초기 상태 false로 변경 */
+    const [isKeywordOpen, setIsKeywordOpen] = useState<boolean>(false);
 
     /* 키워드 상태 */
     const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
+    const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
     /* alert 창 */
     const [showAlert, setShowAlert] = useState<boolean>(false);
@@ -48,15 +48,13 @@ const VideoChatPage: React.FC = () => {
     const [isMatching, setIsMatching] = useState<boolean>(false);
 
     const [userJwt, setUserJwt] = useState<string>("");
+    const [historyId, setHistoryId] = useState<number | null>(null);
 
-    /* 시작하기 버튼 클릭 시 */
-    const handleStartClick = (): void => {
-        if (!selectedKeyword) {
-            setShowAlert(true);
-            return;
+    useEffect(() => {
+        if (isCompleted) {
+            setIsKeywordOpen(false);
         }
-        setIsKeywordOpen(false); // 키워드가 선택된 경우 모달 닫기
-    };
+    }, [isCompleted]);
 
     useEffect(() => {
         const userJwtFromStorage = localStorage.getItem("accessToken");
@@ -70,16 +68,19 @@ const VideoChatPage: React.FC = () => {
             reconnectDelay: 5000,
             onConnect: () => {
                 console.log("✅ STOMP 연결됨");
-                stompClient.subscribe(`/user/sub/call`, (message) => {
+                stompClient.subscribe("/user/sub/call", (message) => {
                     console.log("📩 받은 메시지:", message.body);
-                    console.log(message.body);
                     const response = JSON.parse(message.body);
-                    const data = response;
-                    if (data.status === "waiting") {
+                    if (response.status === "waiting") {
                         console.log("🔄 매칭 대기 중...");
-                    } else if (data.status === "matched") {
-                        console.log("🎉 매칭 완료! 토큰:", data.token);
-                        setToken(data.token);
+                    } else if (response.status === "matched") {
+                        console.log("🎉 매칭 완료! 토큰:", response.token);
+                        setToken(response.token);
+                        setHistoryId(response.historyId); // 대화 내역 id 저장
+
+                        // 🌟 매칭 완료되었으므로 웹소켓 연결 해제
+                        console.log("🛑 웹소켓 연결 종료");
+                        stompClient.deactivate();
                     }
                 });
                 // STOMP 연결이 성공하면 자동으로 매칭 요청
@@ -102,23 +103,12 @@ const VideoChatPage: React.FC = () => {
         };
     }, [userJwt]);
 
-    /*const requestMatching = (): void => {
-        if (!client || !client.connected) {
-            console.error("❌ WebSocket 연결 안 됨!");
-            return;
-        }
-
-        console.log("🔍 매칭 시도 중...");
-        setIsMatching(true);
-
-        client.publish({
-            destination: "/pub/request",
-        });
-    };*/
-
     useEffect(() => {
         if (token) {
             console.log("📡 OpenVidu 세션 시작");
+            // 매칭이 완료되었으므로 키워드 모달을 열기.
+            setIsKeywordOpen(true);
+            if(isCompleted) setIsCompleted(false);
             const ov = new OpenVidu();
             const newSession: Session = ov.initSession();
 
@@ -187,7 +177,7 @@ const VideoChatPage: React.FC = () => {
             <div className={styles.chat}>
                 {/* 채팅 헤더 부분 */}
                 <div className={styles.chat__header}>
-                    <p className={styles.chat__header__title}>1:1 매칭 스몰토크</p>
+                    <p className={styles.chat__header__title}>1:1 매칭 스몰토크(오픈비듀)</p>
                     {/* 대화 나가기 아이콘 */}
                     <img
                         src={leaveBtn}
@@ -201,15 +191,13 @@ const VideoChatPage: React.FC = () => {
                         <button onClick={leaveSession}>세션 종료</button>
                         <div id="video-container">
                             {publisher && (
-                                <div
-                                    className="stream-container col-md-6 col-xs-6"
-                                >
+                                <div className="stream-container col-md-6 col-xs-6">
                                     <UserVideoComponent streamManager={publisher}/>
                                 </div>
                             )}
                             {subscribers.map((sub) => (
                                 <div
-                                    key={sub.stream.connection.connectionId} // 고유한 키 사용
+                                    key={sub.stream.connection.connectionId}
                                     className="stream-container col-md-6 col-xs-6"
                                 >
                                     <span>{sub.stream.connection.data}</span>
@@ -220,43 +208,9 @@ const VideoChatPage: React.FC = () => {
                     </>
                 ) : (
                     <>
-                    {/*<input
-                            type="text"
-                            placeholder="Enter User Jwt"
-                            value={userJwt}
-                            onChange={(e) => setUserJwt(e.target.value)}
-                        />
-                        */}
                         <p>{isMatching ? "매칭 중입니다. 잠시만 기다려 주세요..." : "매칭 버튼을 눌러주세요."}</p>
-
                     </>
                 )}
-                {/* 상대방 웹캠
-                <div className={styles.chat__other}>
-                    <div className={styles.chat__other__video}>
-                        <WebcamComponent />
-                    </div>
-                    <div className={styles.chat__other__bubble}>
-                        <div className={styles.bubble__left}>
-                            {selectedKeyword || "여행"}에 대해 이야기 나누기 좋아요! 최근에 가장 기억에 남는 일이 있으신가요?
-                        </div>
-                    </div>
-                </div>
-                */}
-
-                {/* 사용자 웹캠
-                <div className={styles.chat__user}>
-                    <div className={styles.chat__user__bubble}>
-                        <div className={styles.bubble__right}>
-                            최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                        </div>
-                    </div>
-                    <div className={styles.chat__user__video}>
-                        <WebcamComponent />
-                    </div>
-                </div>
-                */}
-                {/* 음성챗 */}
                 <div className={styles.chat__input}>
                     <p className={styles.chat__input__content}>
                         최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
@@ -268,17 +222,14 @@ const VideoChatPage: React.FC = () => {
             {/* 키워드 모달 */}
             <KeywordModal
                 isOpen={isKeywordOpen}
-                onClose={toggleKeyword}
                 setSelectedKeyword={setSelectedKeyword}
-            >
-                <div className={styles.btn} onClick={handleStartClick}>
-                    시작하기
-                </div>
-            </KeywordModal>
+                setIsCompleted={setIsCompleted}
+                historyId={historyId}
+           />
 
             {/* 키워드 선택안했을 경우 뜨는 alert창 */}
             {showAlert && (
-                <div style={{ zIndex: 9999 }}>
+                <div style={{zIndex: 9999 }}>
                     <RedAlert
                         message="키워드를 선택해주세요!"
                         onClose={() => setShowAlert(false)}
