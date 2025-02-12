@@ -9,6 +9,6 @@ public class CorsMvcConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry corsRegistry) {
         corsRegistry.addMapping("/**")
                 .exposedHeaders("Set-Cookie")
-                .allowedOrigins("http://peachpitch.site");
+                .allowedOrigins("https://peachpitch.site");
     }
 }

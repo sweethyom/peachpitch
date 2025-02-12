@@ -82,7 +82,7 @@ function VoiceChatPage() {
         : {}; // 토큰이 없으면 headers 설정 안 함
 
       const responseFromSpring = await axios.post(
-        'http://peachpitch.site/api/chat/ai/keywords',
+        'https://peachpitch.site/api/chat/ai/keywords',
         { keywordId: selectedKeywordId }, // Body 데이터
         config // 헤더 설정
       );
@@ -103,7 +103,7 @@ function VoiceChatPage() {
         return;
       }
 
-      const response = await axios.post('http://peachpitch.site/ai/start/', {
+      const response = await axios.post('https://peachpitch.site/ai/start/', {
         keyword: selectedKeyword,
         history_id: historyIdFromResponse,
       });
@@ -220,7 +220,7 @@ function VoiceChatPage() {
     if (turnCount > 0) {
       try {
         console.log("📡 AI 서버에 요청 중...");
-        const response = await axios.post("http://peachpitch.site/ai/chat/", {
+        const response = await axios.post("https://peachpitch.site/ai/chat/", {
           message: modifiedMessage,
           history_id: historyId
         });

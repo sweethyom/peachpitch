@@ -54,7 +54,7 @@ function MainPage() {
 
   // 랭킹 데이터를 불러오기
   useEffect(()=>{
-    axios.get("http://peachpitch.site/api/main/rank")
+    axios.get("https://peachpitch.site/api/main/rank")
         .then((response) => {
           const keywords = response.data.data.rank.map((item: { keyword: string }) => item.keyword);
           setRank(keywords);
@@ -205,7 +205,7 @@ function MainPage() {
     const checkSocialLogin = async () => {
       if (localStorage.getItem("socialLoginAttempt")) {
         try {
-          const response = await fetch("http://peachpitch.site/api/users/check-login", {
+          const response = await fetch("https://peachpitch.site/api/users/check-login", {
             method: "GET",
             credentials: "include",
           });
