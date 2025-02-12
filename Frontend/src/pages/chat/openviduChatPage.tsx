@@ -224,7 +224,7 @@ const VideoChatPage: React.FC = () => {
                 isOpen={isKeywordOpen}
                 setSelectedKeyword={setSelectedKeyword}
                 setIsCompleted={setIsCompleted}
-                historyId={historyId}
+                historyId={historyId ?? 0}
            />
 
             {/* 키워드 선택안했을 경우 뜨는 alert창 */}
