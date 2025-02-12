@@ -223,16 +223,73 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
         }
         // @Transactional 어노테이션을 사용하여 JPA가 트랜잭션 내에서 자동으로 변경 사항을 flush하여 DB에 반영함
-
     }
 
-    @Override
-    public Long getUserId(String email) {
-        return userRepository.findByEmail(email).get().getUserId();
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
-    @Override
-    public String getUserEmail(Long userId) {
-        return userRepository.findByUserId(userId).get().getEmail();
+    public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request){
+        String accessToken = request.getHeader("access");
+
+        if (accessToken == null || accessToken.isEmpty()) {
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("message", "Access token is missing");
+
+            ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
+                    "Access token does not exist.",
+                    responseData
+            );
+            return ResponseEntity.status(401).body(responseDto);
+        }
+
+        try {
+            // accessToken에서 email 추출
+            String email = tokenProvider.getUserEmail(accessToken);
+
+            // 이메일로 사용자 조회
+            Optional<User> userOptional = getUserByEmail(email);
+            if (userOptional.isEmpty()) {
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("message", "User not found");
+
+                ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
+                        "User not found",
+                        responseData
+                );
+                return ResponseEntity.status(401).body(responseDto);
+            }
+
+            // 정상적인 User 객체 가져오기
+            User user = userOptional.get();
+            Long userId = user.getUserId();
+
+            // JSON 응답 반환
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("message", "User is authenticated");
+            responseData.put("data", Map.of(
+                    "userId", userId,
+                    "email", email,
+                    "access", accessToken // JSON 응답에 accessToken 포함
+            ));
+
+            ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
+                    "User is authenticated",
+                    responseData
+            );
+
+            return ResponseEntity.ok().body(responseDto);
+        } catch (Exception e) {
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("message", "Invalid or expired token");
+
+            ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
+                    "Invalid or expired token",
+                    responseData
+            );
+            
+            return ResponseEntity.status(401).body(responseDto);
+        }
     }
+
 }
