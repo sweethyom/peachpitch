@@ -113,6 +113,7 @@ fi
 # Nginx 컨테이너에 업데이트된 설정 파일 복사
 # docker cp $NGINX_CONF_PATH my-nginx:/etc/nginx/conf.d/default.conf
 # docker restart my-nginx
+docker exec my-nginx nginx -s reload
 
 # 4. 이전 환경(블루 서버) 중지 및 정리 (중복 방지)
 echo "${BEFORE_S_COLOR} springboot 서버 중지 (포트: ${BEFORE_S_PORT})"
