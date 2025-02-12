@@ -20,6 +20,7 @@ public class AudioChatServiceImpl implements AudioChatService {
     private final RandomName randomName;
     private final ChatHistoryService chatHistoryService;
     private final UserKeywordService userKeywordService;
+    private final CouponService couponService;
 
     @Override
     public boolean isAvailable(TrialRequest trialRequest, CustomUserDetails userDetails) {
@@ -28,10 +29,9 @@ public class AudioChatServiceImpl implements AudioChatService {
             return trialService.checkTrialAccess(trialRequest.getFingerprint()).isCanAccess();
         } else {
             //로그인 유저는 쿠폰 확인
-            //Long userId = userDetails.getUserId();
-            //쿠폰 갯수 확인
-            //log.info("couponEa: {}" , couponEa);
-            return true;
+            Long userId = userDetails.getUserId();
+            System.out.println("쿠폰 갯수= " + couponService.getAvailableCoupons(userId));
+            return couponService.getAvailableCoupons(userId) > 0;
         }
     }
 
@@ -51,6 +51,8 @@ public class AudioChatServiceImpl implements AudioChatService {
             String name = randomName.getRandomName();
             Long historyId = chatHistoryService.addAudioChatHistory(userId, keywordId, name);
             userKeywordService.saveOrUpdate(userId, keywordId);
+            couponService.useCoupon(userId);
+            System.out.println("쿠폰 사용");
             chatRoomResponse = ChatRoomResponse.builder()
                     .hints(hints)
                     .keyword(keyword)
