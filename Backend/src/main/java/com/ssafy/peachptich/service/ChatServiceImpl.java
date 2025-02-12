@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.ChatRequest;
+import com.ssafy.peachptich.dto.request.UserChatRequest;
 import com.ssafy.peachptich.entity.Chat;
 import com.ssafy.peachptich.entity.ChatHistory;
 import com.ssafy.peachptich.repository.ChatHistoryRepository;
@@ -25,9 +26,12 @@ import java.util.List;
 @Service
 public class ChatServiceImpl implements ChatService{
     private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, Object> objectRedisTemplate;
     private final ChatRepository chatRepository;
     private final ObjectMapper objectMapper;
     private final ChatHistoryRepository chatHistoryRepository;
+    private static  final String CHAT_KEY_PREFIX = "chat:";
+
 
     @Override
     @Transactional
@@ -44,7 +48,7 @@ public class ChatServiceImpl implements ChatService{
             List<String> messages = redisTemplate.opsForList().range(redisKey, 0, -1);
 
             if (messages == null || messages.isEmpty()) {
-                log.warn("세션 {}의 저장할 채팅 메시지가 없습니다.", chatRequest.getHistoryId());
+                log.warn("대화내역 {}의 저장할 채팅 메시지가 없습니다.", chatRequest.getHistoryId());
                 return;
             }
 
@@ -87,10 +91,27 @@ public class ChatServiceImpl implements ChatService{
 //        return null;
 //    }
 //
-//    @Override
-//    public Chat getRandomChat() {
-//        return null;
-//    }
+    @Override
+    public Chat getRandomChat() {
+        return chatRepository.findRandomChat();
+    }
+
+    @Override
+    public void saveUserChat(Long historyId, String message, Long userId) {
+        try {
+            String key = CHAT_KEY_PREFIX + historyId + ":messages";
+            UserChatRequest userChatRequest = new UserChatRequest(historyId, message, userId);
+
+            // 저장 전 로그 추가
+            log.info("Saving chat - Key: {}, Request: {}", key, userChatRequest);
+
+            objectRedisTemplate.opsForList().leftPush(key, userChatRequest);
+        } catch (Exception e) {
+            log.error("Error saving chat: ", e);
+            throw new RuntimeException("Failed to save chat to Redis", e);
+        }
+    }
+
 //
 //    @Override
 //    public List<Chat> getChatsByUserId(Long userId) {
