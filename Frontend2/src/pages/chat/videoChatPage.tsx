@@ -60,7 +60,7 @@ function videoChatPage() {
     setUserJwt(userJwtFromStorage || "");
     console.log("stomp call " + userJwt);
     const stompClient = new Client({
-      brokerURL: "ws://localhost:8080/ws/room",
+      brokerURL: "ws://peachpitch.site/ws/room",
       connectHeaders: {
         access: `${userJwt}`,
       },
@@ -251,9 +251,9 @@ function videoChatPage() {
       </div>
 
       {/* 키워드 모달 */}
-      <KeywordModal isOpen={isKeywordOpen} setSelectedKeyword={handleKeywordSelection}>
+      {/* <KeywordModal isOpen={isKeywordOpen} setSelectedKeyword={handleKeywordSelection}>
         <div className={styles.btn} onClick={() => selectedKeyword ? setIsKeywordOpen(false) : setShowAlert(true)}>시작하기</div>
-      </KeywordModal>
+      </KeywordModal> */}
 
       {/* 키워드 선택안했을 경우 뜨는 alert창 */}
       {

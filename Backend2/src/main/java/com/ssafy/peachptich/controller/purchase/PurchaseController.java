@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/pay")
 @SessionAttributes({"tid", "orderNum", "totalPrice"})  // 추가
-@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true", methods = {
+@CrossOrigin(origins = "http://peachpitch.site", allowedHeaders = "*", allowCredentials = "true", methods = {
         RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE
 })
 public class PurchaseController {

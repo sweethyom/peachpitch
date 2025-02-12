@@ -32,7 +32,7 @@ function ChatEnd({ isOpen, onClose, historyId }: ModalProps) {
         }
 
         try {
-            await axios.post("http://localhost:8080/api/chat/report/save", 
+            await axios.post("http://peachpitch.site/api/chat/report/save", 
                 { historyId }, 
                 { headers: { access: accessToken } }
             );
