@@ -99,13 +99,13 @@ echo "Nginx 설정 파일 업데이트..."
 # NGINX_CONF_DIR="/home/ubuntu/nginx_conf"
 # NGINX_CONF_PATH="${NGINX_CONF_DIR}/default.conf"
 
-# if [ "$AFTER_S_COLOR" = "8081" ]; then
-#     echo "Blue 환경으로 Nginx 설정 파일 교체..."
-#     cp ${NGINX_CONF_DIR}/defaultblue.conf $NGINX_CONF_PATH
-# else
-#     echo "Green 환경으로 Nginx 설정 파일 교체..."
-#     cp ${NGINX_CONF_DIR}/defaultgreen.conf $NGINX_CONF_PATH
-# fi
+if [ "$AFTER_S_COLOR" = "8081" ]; then
+    echo "Blue 환경으로 Nginx 설정 파일 교체..."
+    cp ${NGINX_CONF_DIR}/defaultblue.conf $NGINX_CONF_PATH
+else
+    echo "Green 환경으로 Nginx 설정 파일 교체..."
+    cp ${NGINX_CONF_DIR}/defaultgreen.conf $NGINX_CONF_PATH
+fi
 
 # 기존 포트를 새로운 포트로 교체
 #sudo sed -i "s/server 172.20.0.1:${BEFORE_S_PORT};/server 172.20.0.1:${AFTER_S_PORT};/" $NGINX_CONF_PATH
