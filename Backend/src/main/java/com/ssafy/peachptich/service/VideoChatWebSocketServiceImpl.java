@@ -46,7 +46,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
     //웹소켓 방식
     @Override
     public void handleVideoChatWebSocket(String userEmail) throws OpenViduHttpException, OpenViduJavaClientException {
-        Long userId = userService.getUserId(userEmail); //현재 userId
+        Long userId = userService.getUserByEmail(userEmail).get().getUserId(); //현재 userId
         if (waitingUsers.isEmpty()) {
             //첫번째 사용자 대기열에 추가
             waitingUsers.add(userId);
@@ -59,7 +59,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
             //두번째 사용자가 들어오면 매칭 진행
             Long matchedUserId = waitingUsers.poll();
             //String matchedUserEmail = userRepository.findById(matchedUserId).get().getEmail();
-            String matchedUserEmail = userService.getUserEmail(matchedUserId);
+            String matchedUserEmail = userService.getUserByUserId(matchedUserId).get().getEmail();
             //오픈비듀 객체, 연결 생성
             Session session = openvidu.createSession();
 
@@ -102,7 +102,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
     public void handleVideoChatKeyword(AudioChatRequest videoChatRequest, Long historyId, String userEmail) {
         Long keywordId = videoChatRequest.getKeywordId();
         //Long historyId = videoChatRequest.getHistoryId();
-        Long userId = userService.getUserId(userEmail); //현재 userId
+        Long userId = userService.getUserByEmail(userEmail).get().getUserId(); //현재 userId
         String keyword = keywordService.getKeyword(keywordId);
 
         // 키워드 업데이트
