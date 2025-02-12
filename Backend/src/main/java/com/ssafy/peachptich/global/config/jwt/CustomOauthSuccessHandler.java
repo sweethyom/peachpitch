@@ -46,27 +46,27 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         GrantedAuthority auth = iterator.next();
         String role = auth.getAuthority();
 
-        String access = tokenProvider.createJwt("access", userEmail, role, 60*60*60L);
-        String refresh = tokenProvider.createJwt("refresh", userEmail, role, 24*60*60L);
-
-        // Redis에 이미 발행된 access/refresh 토큰이 존재하는지 확인
-        boolean hasExistingToken = tokenListService.isContainToken("RT:" + userEmail);
+        // Redis에 이미 발행된 refresh 토큰이 존재하는지 확인
+        boolean hasExistingToken = tokenListService.isContainToken("RT:RT:" + userEmail);
 
         // 이미 발행된 토큰이 존재한다면
         if (hasExistingToken){
-            List<String> tokenList = tokenListService.getTokenList("RT:" + userEmail);
-            if (!CollectionUtils.isEmpty(tokenList)){
-                tokenList.forEach(token -> {
-                    String tokenValue = token;
-                    tokenBlacklistService.addTokenToList(tokenValue);
-                    tokenListService.removeToken("RT:" + userEmail);
-                });
+            String access = tokenListService.getToken("RT:AT:" + userEmail);
+            if (access != null) {
+                tokenBlacklistService.addTokenToList("BL:AT:" + access);
             }
+            tokenListService.removeToken("RT:AT:" + userEmail);
+            tokenListService.removeToken("RT:RT:" + userEmail);
         }
 
+        // 새로운 토큰 발행
+        String access = tokenProvider.createJwt("access", userEmail, role, 60*60*60L);
+        String refresh = tokenProvider.createJwt("refresh", userEmail, role, 24*60*60L);
+        
+        // redis에 access token과 refresh token 저장
         try{
-            //addToken(userEmail, access, 60*60*60L);
-            addToken(userEmail, refresh, 86400000L);
+            addToken("RT:AT:" + userEmail, access, 60*60*60L);
+            addToken("RT:RT:" + userEmail, refresh, 86400000L);
         } catch (Exception e){
             throw new CustomLoginFilter.TokenStorageException("Faied to store refresh token: " + e.getMessage());
         }
@@ -82,7 +82,8 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         response.setCharacterEncoding("UTF-8");
         response.setHeader("access", access);
         response.addCookie(createCookie("refresh", refresh));
-        response.sendRedirect("http://localhost:5173/main");        // redirect 주소
+        // response.sendRedirect("http://localhost:5173/main");        // redirect 주소
+        response.sendRedirect("http://localhost:8080/");        // redirect 주소
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(response.getWriter(), responseDto);
@@ -98,12 +99,12 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         return cookie;
     }
 
-    private void addToken(String userEmail, String value, Long expiredMs) {
+    private void addToken(String key, String value, Long expiredMs) {
         redisTemplate.opsForValue().set(
-                "RT:" + userEmail,       // key 값
-                value,                // value
-                System.currentTimeMillis() + expiredMs,     // 만료 시간
-                TimeUnit.MICROSECONDS
+            key,                    // key 값
+            value,                // value
+            System.currentTimeMillis() + expiredMs,     // 만료 시간
+            TimeUnit.MICROSECONDS
         );
     }
 }
