@@ -71,30 +71,49 @@ function VoiceChatPage() {
 
     try {
       const userJwtFromStorage = localStorage.getItem("accessToken");
+
+      if (!userJwtFromStorage) {
+        console.error("No access token found, please log in.");
+        return;
+      }
+
       console.log(userJwtFromStorage);
+      const config = userJwtFromStorage ? { headers: { access: `${userJwtFromStorage}` } }
+        : {}; // 토큰이 없으면 headers 설정 안 함
+
+      const responseFromSpring = await axios.post(
+        'http://localhost:8080/api/chat/ai/keywords',
+        { keywordId: selectedKeywordId }, // Body 데이터
+        config // 헤더 설정
+      );
+
+      if (responseFromSpring.status === 401) {
+        console.error("Access token expired. Redirecting to login.");
+        return;
+      }
+
+      const hintResponse = responseFromSpring.data;
+      const historyIdFromResponse = hintResponse.data.historyId;
+
+      console.log("Extracted historyId:", historyIdFromResponse);
+      setHistoryId(historyIdFromResponse); // 대화 내역 id 저장
+
+      if (!historyIdFromResponse) {
+        console.error("historyId is null or undefined, check backend response.");
+        return;
+      }
 
       const response = await axios.post('http://127.0.0.1:8000/ai/start/', {
         keyword: selectedKeyword,
+        history_id: historyIdFromResponse,
       });
 
-      const config = userJwtFromStorage  ? { headers: { access: `${userJwtFromStorage}` } }
-          : {}; // 토큰이 없으면 headers 설정 안 함
-
-      const responseFromSpring = await axios.post(
-          'http://localhost:8080/api/chat/ai/keywords',
-          { keywordId: selectedKeywordId }, // Body 데이터
-          config // 헤더 설정
-      );
-
       const aiResponse = response.data.message;
-      const hintResponse = responseFromSpring.data;
-      console.log(hintResponse); // historyId, hints, keyword 포함
-      setHistoryId(hintResponse.historyId); // 대화 내역 id 저장
-      setMessageHistory(prev => [...prev, { role: 'ai', message: aiResponse }]);
-      // setMessageHistory(prev => [...prev, { role: 'ai', message: response.data.message }]);
-      playTTS(aiResponse); // 구글 tts 재생
-    } catch (error) {
-      console.error('Error starting conversation:', error);
+
+      setMessageHistory((prev) => [...prev, { role: "ai", message: aiResponse }]);
+      playTTS(aiResponse);
+    } catch (error: any) {
+      console.error("Error starting conversation:", error.response?.data || error.message);
     }
   };
 
@@ -188,6 +207,7 @@ function VoiceChatPage() {
         console.log("📡 AI 서버에 요청 중...");
         const response = await axios.post("http://127.0.0.1:8000/ai/chat/", {
           message: modifiedMessage,
+          history_id: historyId
         });
 
         const aiResponse = response.data.message;
@@ -256,7 +276,7 @@ function VoiceChatPage() {
   const navigate = useNavigate();
 
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
-  const [turnCount, setTurnCount] = useState(10);
+  const [turnCount, setTurnCount] = useState(2);
   const [isChatEnd, setIsChatEnd] = useState(false);
   const [isOverlay, setIsOverlay] = useState(false);
 
@@ -326,7 +346,8 @@ function VoiceChatPage() {
       )}
 
       {/* 대화 종료 모달 */}
-      <ChatEnd isOpen={isChatEnd} onClose={endChat} />
+      {/* <ChatEnd isOpen={isChatEnd} onClose={endChat} /> */}
+      <ChatEnd isOpen={isChatEnd} onClose={endChat} historyId={historyId} />
 
       <div className={styles.menu}>
         <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} turnCount={turnCount} />
