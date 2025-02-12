@@ -2,6 +2,10 @@ package com.ssafy.peachptich.controller.chat;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.ChatRequest;
+import com.ssafy.peachptich.dto.request.UserChatRequest;
+import com.ssafy.peachptich.dto.response.RandomScriptResponse;
+import com.ssafy.peachptich.dto.response.ResponseDto;
+import com.ssafy.peachptich.entity.Chat;
 import com.ssafy.peachptich.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,15 +14,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/chat/report")
+@RequestMapping("/api")
 public class ChatController {
     private final ChatService chatService;
 
     // 대화내용 db에 저장하기
-    @PostMapping("/save")
+    @PostMapping("chat/save")
     public ResponseEntity<Void> saveChatContent(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody ChatRequest chatrequest) {
@@ -39,9 +45,25 @@ public class ChatController {
         }
     }
 
+    @PostMapping("/main/randomscript")
+    public ResponseEntity<ResponseDto<RandomScriptResponse>> showRandomScript() {
+        // 랜덤 채팅 가져오기
+        Chat randomChat = chatService.getRandomChat();
+
+        // Response DTO로 변환
+        RandomScriptResponse response = RandomScriptResponse.builder()
+                .chatId(randomChat.getChatId())
+                .content(randomChat.getContent())
+                .build();
+
+        return ResponseEntity.ok()
+                .body(new ResponseDto<>("Randomchat showed successfully", response));
+    }
+
+    @PostMapping("chat/video/save")
+    public ResponseEntity<String> saveChat(@RequestBody UserChatRequest userChatRequest) {
+        chatService.saveUserChat(userChatRequest.getHistoryId(), userChatRequest.getMessage(), userChatRequest.getUserId());
+        return ResponseEntity.ok("Chat saved in redis");
+    }
+
 }
-    // 대화내용 가져오기
-    // 하나는 랜덤스크립트로
-    // 하나는 리포트
-    // 리포트 1. 전체 리포트
-    // 리포트 2. 대화 상세 리포트

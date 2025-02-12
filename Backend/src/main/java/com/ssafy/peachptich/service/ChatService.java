@@ -21,7 +21,9 @@ public interface ChatService {
     void saveChatContent(ChatRequest chatRequest, CustomUserDetails userDetails);
 //    List<Chat> getAllChats();
 //    Chat getChatDetail(Long chatId);
-//    Chat getRandomChat();
+    Chat getRandomChat();
+    // 사용자대화 redis 저장
+    void saveUserChat(Long historyId, String message, Long userId);
 //    /**
 //     * 특정 유저의 채팅 내용 조회 (필요한 경우)
 //     */

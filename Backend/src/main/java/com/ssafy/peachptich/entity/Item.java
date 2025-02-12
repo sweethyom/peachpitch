@@ -22,10 +22,6 @@ public class Item {
     @Column(nullable = false)
     private ItemType type;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Category category;
-
 
     @Builder
     public Item(String name, Integer price, ItemType type) {
@@ -49,17 +45,5 @@ public class Item {
             return this == FREE || this == PAID;
         }
     }
-    
-    @Getter
-    public enum Category {
-        MASK("마스크"), 
-        BACKGROUND("배경"), 
-        COUPON("이용권");
 
-        private final String description;
-
-        Category(String description) {
-            this.description = description;
-        }
-    }
 }
