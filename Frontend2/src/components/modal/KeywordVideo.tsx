@@ -61,7 +61,7 @@ function Keyword({isOpen, setSelectedKeyword, historyId, setIsCompleted}: ModalP
         const userJwtFromStorage = localStorage.getItem("accessToken");
         if (isOpen && historyId) {
             const client = new Client({
-                brokerURL: "wss://peachpitch.site/ws/room",
+                brokerURL: "wss://peachpitch.site/api/ws",
                 connectHeaders: {
                     access: `${userJwtFromStorage}`,
                 },
