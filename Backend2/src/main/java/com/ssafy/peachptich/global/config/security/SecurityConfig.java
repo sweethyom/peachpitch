@@ -115,7 +115,7 @@ public class SecurityConfig {
         http
                 .oauth2Login((oauth2) -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint
-                                .baseUri("/api/users/login/social"))
+                                .baseUri("//social"))
                         .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
                         .successHandler(customOauthSuccessHandler)

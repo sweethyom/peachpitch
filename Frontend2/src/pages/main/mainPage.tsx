@@ -113,7 +113,7 @@ function MainPage() {
     const handlePaymentMessage = (event: MessageEvent) => {
       console.log("📩 결제 완료 메시지 수신:", event.data, "from:", event.origin);
 
-      const allowedOrigins = ["http://localhost:8080", "http://localhost:5173"];
+      const allowedOrigins = ["https:peachpitch.site"];
       if (!allowedOrigins.includes(event.origin)) return;
 
       if (event.data === 'paymentSuccess') {

@@ -45,7 +45,7 @@ function loginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://peachpitch.site/api/users/login', {
+      const response = await fetch('https://peachpitch.site/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
