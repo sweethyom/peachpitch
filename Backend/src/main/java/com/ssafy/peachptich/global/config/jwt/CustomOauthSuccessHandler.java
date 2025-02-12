@@ -5,24 +5,31 @@ import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.Refresh;
 import com.ssafy.peachptich.repository.RefreshRepository;
+import com.ssafy.peachptich.service.TokenBlacklistService;
+import com.ssafy.peachptich.service.TokenListService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
 public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final TokenProvider tokenProvider;
-    private final RefreshRepository refreshRepository;
+    private final TokenListService tokenListService;
+    private final TokenBlacklistService tokenBlacklistService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -32,6 +39,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
         String userEmail = customUserDetails.getName();
+        Long userId = customUserDetails.getUserId();
 
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         Iterator<? extends GrantedAuthority> iterator = authorities.iterator();
@@ -41,8 +49,24 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String access = tokenProvider.createJwt("access", userEmail, role, 60*60*60L);
         String refresh = tokenProvider.createJwt("refresh", userEmail, role, 24*60*60L);
 
+        // Redis에 이미 발행된 access/refresh 토큰이 존재하는지 확인
+        boolean hasExistingToken = tokenListService.isContainToken("RT:" + userEmail);
+
+        // 이미 발행된 토큰이 존재한다면
+        if (hasExistingToken){
+            List<String> tokenList = tokenListService.getTokenList("RT:" + userEmail);
+            if (!CollectionUtils.isEmpty(tokenList)){
+                tokenList.forEach(token -> {
+                    String tokenValue = token;
+                    tokenBlacklistService.addTokenToList(tokenValue);
+                    tokenListService.removeToken("RT:" + userEmail);
+                });
+            }
+        }
+
         try{
-            addRefresh(userEmail, refresh, 86400000L);
+            //addToken(userEmail, access, 60*60*60L);
+            addToken(userEmail, refresh, 86400000L);
         } catch (Exception e){
             throw new CustomLoginFilter.TokenStorageException("Faied to store refresh token: " + e.getMessage());
         }
@@ -74,14 +98,12 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         return cookie;
     }
 
-    private void addRefresh(String userEmail, String refresh, Long expiredMs) {
-        Date date = new Date(System.currentTimeMillis() + expiredMs);
-
-        Refresh refreshEntity = new Refresh();
-        refreshEntity.setUserEmail(userEmail);
-        refreshEntity.setRefresh(refresh);
-        refreshEntity.setExpiration(date.toString());
-
-        refreshRepository.save(refreshEntity);
+    private void addToken(String userEmail, String value, Long expiredMs) {
+        redisTemplate.opsForValue().set(
+                "RT:" + userEmail,       // key 값
+                value,                // value
+                System.currentTimeMillis() + expiredMs,     // 만료 시간
+                TimeUnit.MICROSECONDS
+        );
     }
 }
