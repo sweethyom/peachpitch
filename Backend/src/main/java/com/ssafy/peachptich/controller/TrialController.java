@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
 @RequestMapping("/api/trial")
@@ -20,11 +19,6 @@ public class TrialController {
     @Autowired
     public TrialController(TrialService trialService) {
         this.trialService = trialService;
-    }
-
-    @GetMapping("/health-check")
-    public String healthCheck(){
-        return "OK";
     }
 
     @PostMapping("/check")
