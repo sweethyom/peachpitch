@@ -23,7 +23,7 @@ public class Chat {
     @Column(name="content", columnDefinition = "varchar(500)")
     private String content;
 
-    @Column(name="userId", nullable = false)
+    @Column(name="user_id", nullable = false)
     private Long userId;
 
     // 합치기 전 nullable = false 추가
