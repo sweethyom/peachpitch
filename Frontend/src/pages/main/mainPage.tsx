@@ -19,9 +19,11 @@ import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
 
 function MainPage() {
+  const defaultMessage = "포시랍네요. 광수님 좀 포시랍네요."
+
   const [randomTalks, setRandomTalks] = useState<string[]>([]);
-  const [currentTalk, setCurrentTalk] = useState('');
-  const [nextTalk, setNextTalk] = useState('');
+  const [currentTalk, setCurrentTalk] = useState(defaultMessage);
+  const [nextTalk, setNextTalk] = useState(defaultMessage);
   const [rotate, setRotate] = useState(false);
 
   const [showCompletePay, setShowCompletePay] = useState(false);
@@ -53,37 +55,35 @@ function MainPage() {
   };
 
   // 랭킹 데이터를 불러오기
-  useEffect(()=>{
+  useEffect(() => {
     axios.get("http://localhost:8080/api/main/rank")
-        .then((response) => {
-          const keywords = response.data.data.rank.map((item: { keyword: string }) => item.keyword);
-          setRank(keywords);
-          console.log(rank);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
+      .then((response) => {
+        const keywords = response.data.data.rank.map((item: { keyword: string }) => item.keyword);
+        setRank(keywords);
+        console.log(rank);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      });
 
   }, []);
 
   // ✅ "오늘의 토킹" 데이터를 불러오기
   useEffect(() => {
-    fetch('/data/random_talks.json')
-        .then(response => response.json())
-        .then(data => {
-          setRandomTalks(data.random_talks);
-          if (data.random_talks.length > 0) {
-            setCurrentTalk(data.random_talks[Math.floor(Math.random() * data.random_talks.length)]);
-          }
-        })
-        .catch(error => console.error('Error fetching random talks:', error));
+    axios.post("http://localhost:8080/api/main/randomscript")
+      .then(response => {
+        const content = response.data.data.content; 
+        setRandomTalks(prev => [...prev, content]); 
+        setCurrentTalk(content);
+      })
+      .catch(error => console.error('Error fetching random script:', error));
   }, []);
 
   // ✅ 5초마다 "오늘의 토킹" 변경
   useEffect(() => {
     const interval = setInterval(() => {
       if (randomTalks.length > 0) {
-        setNextTalk(randomTalks[Math.floor(Math.random() * randomTalks.length)]);
+        setNextTalk(randomTalks[Math.floor(Math.random() * randomTalks.length)] || defaultMessage);
         setRotate(true);
 
         setTimeout(() => {
@@ -244,79 +244,79 @@ function MainPage() {
 
 
   return (
-      <>
-        <Header />
-        <div className={styles.page}>
-          <div className={styles.main}>
-            {/* ✅ 오늘의 토킹 섹션 */}
-            <div className={styles.main__random}>
-              <p className={styles.main__random__title}>오늘의 토킹</p>
-              <p className={`${styles.main__random__content} ${rotate ? styles.rotateOut : styles.rotateIn}`}>
-                {currentTalk}
-              </p>
-            </div>
+    <>
+      <Header />
+      <div className={styles.page}>
+        <div className={styles.main}>
+          {/* ✅ 오늘의 토킹 섹션 */}
+          <div className={styles.main__random}>
+            <p className={styles.main__random__title}>오늘의 토킹</p>
+            <p className={`${styles.main__random__content} ${rotate ? styles.rotateOut : styles.rotateIn}`}>
+              {currentTalk || defaultMessage}
+            </p>
+          </div>
 
-            {/* ✅ AI 채팅 & 1:1 매칭 */}
-            <div className={styles.main__chat}>
-              <Link to="#" onClick={handleAIChatClick} className={styles.main__link}>
-                <div className={styles.main__chat__voice}>
-                  <p className={styles.voice}>AI와 스몰토킹</p>
-                  <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
-                </div>
-              </Link>
-
-              <Link to="#" onClick={handleVideoChatClick} className={styles.main__link}>
-                <div className={styles.main__chat__video}>
-                  <p className={styles.video}>1:1 매칭 스몰토킹</p>
-                  <p className={styles.video__description}>사람과의 스몰토킹 너두 할 수 있어!</p>
-                </div>
-              </Link>
-            </div>
-
-            {/* ✅ 인기 키워드 섹션 */}
-            <div className={styles.main__keyword}>
-              <p className={styles.main__keyword__title}>🔥 현재 가장 인기 있는 키워드 🔥</p>
-              <div className={styles.main__keyword__list}>
-                {rank && rank.length >= 3 ? (
-                    rank.slice(0, 3).map((keyword, index) => (
-                        <div className={styles.item} key={index}>
-                          <img
-                              className={styles.item__medal}
-                              src={index === 0 ? medal1 : index === 1 ? medal2 : medal3}
-                          />
-                          <p className={styles.item__keyword}>{keyword}</p>
-                        </div>
-                    ))
-                ) : (
-                    <div>아직 랭킹이 없음</div>
-                )}
+          {/* ✅ AI 채팅 & 1:1 매칭 */}
+          <div className={styles.main__chat}>
+            <Link to="#" onClick={handleAIChatClick} className={styles.main__link}>
+              <div className={styles.main__chat__voice}>
+                <p className={styles.voice}>AI와 스몰토킹</p>
+                <p className={styles.voice__description}>AI와 부담없이 스몰토킹 해볼까?</p>
               </div>
+            </Link>
+
+            <Link to="#" onClick={handleVideoChatClick} className={styles.main__link}>
+              <div className={styles.main__chat__video}>
+                <p className={styles.video}>1:1 매칭 스몰토킹</p>
+                <p className={styles.video__description}>사람과의 스몰토킹 너두 할 수 있어!</p>
+              </div>
+            </Link>
+          </div>
+
+          {/* ✅ 인기 키워드 섹션 */}
+          <div className={styles.main__keyword}>
+            <p className={styles.main__keyword__title}>🔥 현재 가장 인기 있는 키워드 🔥</p>
+            <div className={styles.main__keyword__list}>
+              {rank && rank.length >= 3 ? (
+                rank.slice(0, 3).map((keyword, index) => (
+                  <div className={styles.item} key={index}>
+                    <img
+                      className={styles.item__medal}
+                      src={index === 0 ? medal1 : index === 1 ? medal2 : medal3}
+                    />
+                    <p className={styles.item__keyword}>{keyword}</p>
+                  </div>
+                ))
+              ) : (
+                <div>아직 랭킹이 없음</div>
+              )}
             </div>
           </div>
-          <Footer/>
         </div>
+        <Footer />
+      </div>
 
 
-        {/* ✅ 결제 완료 모달 */}
-        {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal}/>}
+      {/* ✅ 결제 완료 모달 */}
+      {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />}
 
-        {/* ✅ 로그인 성공 후 GreenAlert 유지 */}
-        {showWelcomeAlert && (
-            <div>
-              <GreenAlert message="로그인에 성공하였습니다. 환영합니다." onClose={() => setShowWelcomeAlert(false)}/>
-            </div>
-        )}
+      {/* ✅ 로그인 성공 후 GreenAlert 유지 */}
+      {showWelcomeAlert && (
+        <div>
+          <GreenAlert message="로그인에 성공하였습니다. 환영합니다." onClose={() => setShowWelcomeAlert(false)} />
+        </div>
+      )}
 
-        {alertMessage && (
-            <div>
-              <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
-            </div>
-        )}
+      {alertMessage && (
+        <div>
+          <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
+        </div>
+      )}
 
-        {permissionAlert && (
-            <RedAlert message={permissionAlert} onClose={() => setPermissionAlert(null)} />
-        )}
-      </>
+      {permissionAlert && (
+        <RedAlert message={permissionAlert} onClose={() => setPermissionAlert(null)} />
+      )}
+    </>
   );
 }
 
