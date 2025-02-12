@@ -95,9 +95,9 @@ echo "Nginx 설정 파일 업데이트..."
 # echo "배포 완료!"
 
 # Nginx 설정 파일 경로
-# NGINX_CONF_PATH="/home/ubuntu/nginx_conf/default.conf"
-# NGINX_CONF_DIR="/home/ubuntu/nginx_conf"
-# NGINX_CONF_PATH="${NGINX_CONF_DIR}/default.conf"
+NGINX_CONF_PATH="/home/ubuntu/nginx_conf/default.conf"
+NGINX_CONF_DIR="/home/ubuntu/nginx_conf"
+NGINX_CONF_PATH="${NGINX_CONF_DIR}/default.conf"
 
 if [ "$AFTER_S_COLOR" = "8081" ]; then
     echo "Blue 환경으로 Nginx 설정 파일 교체..."
