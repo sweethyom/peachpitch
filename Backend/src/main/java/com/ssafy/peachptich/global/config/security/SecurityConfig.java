@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,6 +36,7 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomOauthSuccessHandler customOauthSuccessHandler;
+    private final RedisTemplate<String, String> redisTemplate;
 
 
 //    @Bean
@@ -99,7 +101,7 @@ public class SecurityConfig {
                         configuration.setMaxAge(3600L);
 
                         //configuration.setExposedHeaders(Collections.singletonList("Authorization"));
-                        configuration.setExposedHeaders(Arrays.asList("Authorization", "access"));
+                        configuration.setExposedHeaders(Arrays.asList("Authorization", "access", "userId", "email"));
                         return configuration;
                     }
                 })));
@@ -129,7 +131,7 @@ public class SecurityConfig {
         //필터 추가 LoginFilter()는 인자를 받음 (AuthenticationManager() 메소드에 authenticationConfiguration 객체를 넣어야 함) 따라서 등록 필요
         // AuthenticationManager()와 JWTUtil 인수 전달
         http
-                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), tokenProvider, userRepository, refreshRepository, authManager), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), tokenProvider, userRepository, refreshRepository, authManager, redisTemplate), UsernamePasswordAuthenticationFilter.class);
 
         http
                 .sessionManagement((session) -> session

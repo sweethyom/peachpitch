@@ -17,6 +17,9 @@ public interface UserService {
                                                                             Authentication authentication);
 
     ResponseEntity<ResponseDto<Map<String, Boolean>>> checkEmail(String email);
-    Long getUserId(String email);
-    String getUserEmail(Long userId);
+
+    public Optional<User> getUserByEmail(String email);
+
+    public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request);
 }
+

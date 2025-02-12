@@ -2,6 +2,7 @@ package com.ssafy.peachptich.controller.users;
 
 import com.ssafy.peachptich.dto.request.JoinRequest;
 import com.ssafy.peachptich.dto.response.ResponseDto;
+import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.service.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -57,4 +59,12 @@ public class UserController {
                                                                                 Authentication authentication){
         return userServiceimpl.withdrawProcess(request, response, authentication);
     }
+
+    //TODO
+    // 소셜 로그인 확인
+    @GetMapping("/api/users/check-login")
+    public ResponseEntity<Map<String, Object>> checkLoginStatus(HttpServletRequest request, HttpServletResponse response) {
+
+    }
+
 }
