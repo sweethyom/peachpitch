@@ -60,11 +60,9 @@ public class UserController {
         return userServiceimpl.withdrawProcess(request, response, authentication);
     }
 
-    //TODO
-    // 소셜 로그인 확인
     @GetMapping("/api/users/check-login")
-    public ResponseEntity<Map<String, Object>> checkLoginStatus(HttpServletRequest request, HttpServletResponse response) {
-
+    public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request) {
+        return userServiceimpl.checkLoginStatus(request);
     }
 
 }
