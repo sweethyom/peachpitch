@@ -33,6 +33,7 @@ conversation_turn = 0
 
 @csrf_exempt
 def start_conversation(request):
+    global conversation_turn
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -127,16 +128,17 @@ def continue_conversation(request):
             conversation_history.append({"role": "user", "content": user_message})
 
             if conversation_turn >= 10:
+                recent_conversation = conversation_history[7:]
+
                 final_prompt = {
                     "role": "system",
                     "content": "지금까지의 대화 내용을 참고해서 마무리 인사를 해주세요. "
                                "대화의 주제를 간단히 언급하고, 따뜻한 인사를 남겨주세요. "
                                "예를 들어, 고양이에 대한 대화였다면 '오늘 고양이에 대한 이야기 너무 즐거웠어! 다음에 또 만나!'와 같이 작성하세요."
                 }
-                final_message = generate_reply(conversation_history + [final_prompt])
+                final_message = generate_reply(recent_conversation + [final_prompt])
                 conversation_history.append({"role": "assistant", "content": final_message})
 
-                conversation_turn += 1
                 
                 chat_data = {
                     "role": "assistant",
@@ -156,9 +158,10 @@ def continue_conversation(request):
                 # if search_content:
                 #     bot_reply += "\n\n관련 정보:\n" + search_content
 
-                # GPT로부터 응답 생성
-                bot_reply = generate_reply(conversation_history)
-
+                # 챗봇 응답 히스토리에 추가
+                conversation_history.append({"role": "assistant", "content": bot_reply})
+                conversation_turn += 1
+                
                 # Redis에 저장
                 redis_client = get_redis_connection("default")
                 chat_data = {
@@ -176,8 +179,6 @@ def continue_conversation(request):
                 print('redis에 bot 대답 세션별 저장 완료')
 
 
-                # 챗봇 응답 히스토리에 추가
-                conversation_history.append({"role": "assistant", "content": bot_reply})
 
                 return JsonResponse({'message': bot_reply})
 
