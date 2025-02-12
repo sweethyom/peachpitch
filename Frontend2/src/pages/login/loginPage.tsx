@@ -16,7 +16,7 @@ import RedAlert from '@/components/alert/redAlert';
 function loginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   // alert창
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -64,7 +64,7 @@ function loginPage() {
       // 대소문자 상관없이 access 헤더 찾기
       const accessToken = headers["access"] || headers["Access"] || headers["ACCESS"];
 
-      const data = await response.json(); // ✅ JSON 데이터 파싱
+      // const data = await response.json(); // ✅ JSON 데이터 파싱
 
       if (response.ok) {
         if (accessToken) {
@@ -90,15 +90,15 @@ function loginPage() {
   };
 
   // 소셜 로그인
-  const handleSocialLogin = (provider: string) => {
+  const handleSocialLogin = (_provider: string) => {
     localStorage.setItem('socialLoginAttempt', 'true'); // ✅ 로그인 시도 기록 저장
 
     // ✅ 팝업 창 열기
-    const popup = window.open(
-      `http://peachpitch.site/api/users/login/social/${provider}`,
-      "Social Login",
-      "width=500,height=600"
-    );
+    // const popup = window.open(
+    //   `http://peachpitch.site/api/users/login/social/${provider}`,
+    //   "Social Login",
+    //   "width=500,height=600"
+    // );
 
     // ✅ 메시지 리스너 추가
     const receiveMessage = (event: MessageEvent) => {

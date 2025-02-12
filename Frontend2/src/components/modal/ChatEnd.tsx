@@ -8,7 +8,7 @@ type ModalProps = {
     historyId: number | null;
 };
 
-function ChatEnd({ isOpen, onClose, historyId }: ModalProps) {
+function ChatEnd({ isOpen, historyId }: ModalProps) {
     const navigate = useNavigate();
 
     if (!isOpen) return null;

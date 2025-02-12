@@ -27,10 +27,10 @@ const VideoChatPage: React.FC = () => {
     /* alert 창 */
     const [showAlert, setShowAlert] = useState<boolean>(false);
 
-    const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+    const [chatHistory, _setChatHistory] = useState<{ role: string; message: string }[]>([]);
 
     /* stomp client */
-    const [client, setClient] = useState<Client | null>(null);
+    const [_client, setClient] = useState<Client | null>(null);
 
     /* openvidu session */
     const [session, setSession] = useState<Session | null>(null);

@@ -31,10 +31,11 @@ const words = [
 // 옵션 설정
 const options = {
     rotations: 4, // 단어 회전 횟수
-    rotationAngles: [-90, 0], // 단어 회전 각도
-    fontSizes: [20, 80], // 단어 크기 범위
+    rotationAngles: [-90, 0] as [number, number], // 타입 명시
+    fontSizes: [20, 80] as [number, number], // ✅ 튜플로 변환
     fontFamily: "sans-serif", // 글꼴
 };
+
 
 function WordCloud() {
     return (

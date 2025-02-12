@@ -24,7 +24,7 @@ function joinPage() {
     birthdate: ''
   });
 
-  const [error, setError] = useState<string | null>(null); // 에러 메시지 상태
+  // const [error, setError] = useState<string | null>(null); // 에러 메시지 상태
 
   // 입력값 변경 핸들러 (e의 타입을 지정)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,7 +54,7 @@ function joinPage() {
       });
 
 
-      const data = await response.json();
+      // const data = await response.json();
 
       if (response.ok) {
         setAlertMessage('회원가입에 성공하였습니다.');
