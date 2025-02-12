@@ -164,8 +164,24 @@ public class UserServiceImpl implements UserService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
             }
 
-            // Redis에 저장되어 있는지 확인
-            boolean isExist = tokenListService.isContainToken("RT:" + userEmail);
+            // BlackList에 Access token이 저장되어 있는지 확인하고
+            String access = request.getHeader("access");
+            boolean isBlacked = tokenBlacklistService.isContainToken("BL:AT:" + access);
+            if (isBlacked) {
+                // 응답 메시지와 데이터를 포함한 ResponseDto 생성
+                Map<String, Object> responseData = new HashMap<>();
+                responseData.put("error", "invalid token");
+
+                ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
+                        "Bad Request: Token is not invalid",
+                        responseData
+                );
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
+            }
+
+            // Redis에 Refresh Token이 저장되어 있는지 확인
+            boolean isExist = tokenListService.isContainToken("RT:RT:" + refresh);
             if(!isExist){
                 // 응답 메시지와 데이터를 포함한 ResponseDto 생성
                 Map<String, Object> responseData = new HashMap<>();
@@ -179,8 +195,8 @@ public class UserServiceImpl implements UserService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
             }
 
-            tokenListService.removeToken("RT:" + userEmail);
-            tokenBlacklistService.addTokenToList(refresh);
+            tokenListService.removeToken("RT:RT:" + refresh);
+            tokenBlacklistService.addTokenToList("BL:AT:" + access);
 
             /*
             // 기존 코드
@@ -256,10 +272,12 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUserId(userId);
     }
 
-    public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request){
-        String accessToken = request.getHeader("access");
+    @Override
+    public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request, Authentication authentication){
+        String access = request.getHeader("access");
+        String userEmail = tokenProvider.getUserEmail(access);
 
-        if (accessToken == null || accessToken.isEmpty()) {
+        if (access == null || access.isEmpty()) {
             Map<String, Object> responseData = new HashMap<>();
             responseData.put("message", "Access token is missing");
 
@@ -270,12 +288,45 @@ public class UserServiceImpl implements UserService {
             return ResponseEntity.status(401).body(responseDto);
         }
 
-        try {
-            // accessToken에서 email 추출
-            String email = tokenProvider.getUserEmail(accessToken);
+        // BlackList와 Redis Token List 확인
+        boolean isBlacked = tokenBlacklistService.isContainToken("BL:AT:" + access);
+        boolean hasExistingToken = tokenListService.isContainToken("RT:AT:" + userEmail);
+        
+        // BlackList에 추가되어 있으면
+        if (isBlacked){
+            Map<String, Object> responseData = new HashMap<>();
+            responseData.put("message", "Already logged out. Need to logged in.");
 
+            ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
+                    "Already logged out. Need to logged in.",
+                    responseData
+            );
+            return ResponseEntity.status(401).body(responseDto);
+        }
+        
+        // Redis에 access token이 없으면
+        if (!hasExistingToken) {
+            Map<String, Object> responseData = new HashMap<>();
+            if (tokenListService.isContainToken("RT:RT:" + userEmail)) {
+                responseData.put("message", "need to reissue token.");
+                ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
+                        "please reissue token.",
+                        responseData
+                );
+                return ResponseEntity.status(401).body(responseDto);
+            } else {
+                responseData.put("message", "please sign in.");
+                ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
+                        "please sign in.",
+                        responseData
+                );
+                return ResponseEntity.status(401).body(responseDto);
+            }
+        }
+
+        try {
             // 이메일로 사용자 조회
-            Optional<User> userOptional = getUserByEmail(email);
+            Optional<User> userOptional = getUserByEmail(userEmail);
             if (userOptional.isEmpty()) {
                 Map<String, Object> responseData = new HashMap<>();
                 responseData.put("message", "User not found");
@@ -287,7 +338,7 @@ public class UserServiceImpl implements UserService {
                 return ResponseEntity.status(401).body(responseDto);
             }
 
-            // 정상적인 User 객체 가져오기
+            // User 객체 가져오기
             User user = userOptional.get();
             Long userId = user.getUserId();
 
@@ -296,8 +347,8 @@ public class UserServiceImpl implements UserService {
             responseData.put("message", "User is authenticated");
             responseData.put("data", Map.of(
                     "userId", userId,
-                    "email", email,
-                    "access", accessToken // JSON 응답에 accessToken 포함
+                    "email", userEmail,
+                    "access", access // JSON 응답에 accessToken 포함
             ));
 
             ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
