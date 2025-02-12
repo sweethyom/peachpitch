@@ -54,7 +54,7 @@ function MainPage() {
 
   // 랭킹 데이터를 불러오기
   useEffect(()=>{
-    axios.get("http://localhost:8080/api/main/rank")
+    axios.get("http://peachpitch.site/api/main/rank")
         .then((response) => {
           const keywords = response.data.data.rank.map((item: { keyword: string }) => item.keyword);
           setRank(keywords);
@@ -113,7 +113,7 @@ function MainPage() {
     const handlePaymentMessage = (event: MessageEvent) => {
       console.log("📩 결제 완료 메시지 수신:", event.data, "from:", event.origin);
 
-      const allowedOrigins = ["http://localhost:8080", "http://localhost:5173"];
+      const allowedOrigins = ["http://peachpitch.site"];
       if (!allowedOrigins.includes(event.origin)) return;
 
       if (event.data === 'paymentSuccess') {
@@ -205,7 +205,7 @@ function MainPage() {
     const checkSocialLogin = async () => {
       if (localStorage.getItem("socialLoginAttempt")) {
         try {
-          const response = await fetch("http://localhost:8080/api/users/check-login", {
+          const response = await fetch("http://peachpitch.site/api/users/check-login", {
             method: "GET",
             credentials: "include",
           });

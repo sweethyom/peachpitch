@@ -50,9 +50,9 @@ public class PurchaseServiceImpl implements PurchaseService{
             parameters.put("quantity", String.valueOf(ea));
             parameters.put("total_amount", String.valueOf(totalPrice));
             parameters.put("tax_free_amount", "0");
-            parameters.put("approval_url", "http://localhost:8080/api/pay/completed");
-            parameters.put("cancel_url", "http://localhost:8080/api/pay/cancel");
-            parameters.put("fail_url", "http://localhost:8080/api/pay/fail");
+            parameters.put("approval_url", "http://peachpitch.site/api/pay/completed");
+            parameters.put("cancel_url", "http://peachpitch.site/api/pay/cancel");
+            parameters.put("fail_url", "http://peachpitch.site/api/pay/fail");
 
             HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(parameters, this.getHeaders());
             String url = "https://open-api.kakaopay.com/online/v1/payment/ready";

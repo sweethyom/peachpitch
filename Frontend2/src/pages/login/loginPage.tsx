@@ -45,7 +45,7 @@ function loginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8080/api/users/login', {
+      const response = await fetch('http://peachpitch.site/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -95,14 +95,14 @@ function loginPage() {
 
     // ✅ 팝업 창 열기
     const popup = window.open(
-      `http://localhost:8080/api/users/login/social/${provider}`,
+      `http://peachpitch.site/api/users/login/social/${provider}`,
       "Social Login",
       "width=500,height=600"
     );
 
     // ✅ 메시지 리스너 추가
     const receiveMessage = (event: MessageEvent) => {
-      if (event.origin !== "http://localhost:8080") return; // ✅ 보안상 올바른 origin만 허용
+      if (event.origin !== "http://peachpitch.site") return; // ✅ 보안상 올바른 origin만 허용
 
       console.log("📩 팝업에서 메시지 수신:", event.data);
 
@@ -136,7 +136,7 @@ function loginPage() {
   // ✅ 로그인 상태 확인 (팝업 종료 후 실행)
   const checkSocialLogin = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/users/check-login", {
+      const response = await fetch("http://peachpitch.site/api/users/check-login", {
         method: "GET",
         credentials: "include",
       });

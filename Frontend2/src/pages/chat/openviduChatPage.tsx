@@ -61,7 +61,7 @@ const VideoChatPage: React.FC = () => {
         setUserJwt(userJwtFromStorage || "");
         console.log("stomp call " + userJwt);
         const stompClient = new Client({
-            brokerURL: "ws://localhost:8080/ws/room",
+            brokerURL: "ws://peachpitch.site/ws/room",
             connectHeaders: {
                 access: `${userJwt}`,
             },
@@ -223,8 +223,8 @@ const VideoChatPage: React.FC = () => {
             <KeywordModal
                 isOpen={isKeywordOpen}
                 setSelectedKeyword={setSelectedKeyword}
+                historyId={historyId ?? 0}
                 setIsCompleted={setIsCompleted}
-                historyId={historyId}
            />
 
             {/* 키워드 선택안했을 경우 뜨는 alert창 */}
