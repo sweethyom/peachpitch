@@ -21,7 +21,7 @@ type KeywordItem = {
     name: string;
 };
 
-function Keyword({isOpen, setSelectedKeyword, historyId, setIsCompleted, children}: ModalProps) {
+function Keyword({isOpen, setSelectedKeyword, historyId, setIsCompleted}: ModalProps) {
     if (!isOpen) return null;
     // 키워드 배열의 타입을 KeywordItem[]으로 수정
     const [keywords, setKeywords] = useState<KeywordItem[]>([]);

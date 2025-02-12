@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+// import axios from "axios";
 import styles from "./styles/Drawer.module.scss";
 
 import openBtn from "@/assets/icons/drawer_open.png";

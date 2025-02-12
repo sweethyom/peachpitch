@@ -9,14 +9,14 @@ import Drawer from '@/components/chat/DrawerVideo';
 import { useEffect, useState } from 'react';
 
 import RoomLeaveModal from '@/components/modal/RoomLeave';
-import KeywordModal from '@/components/modal/KeywordVideo';
+// import KeywordModal from '@/components/modal/KeywordVideo';
 import RedAlert from '@/components/alert/redAlert';
 
 import { Client } from "@stomp/stompjs";
 import { OpenVidu, Session, Publisher, Subscriber } from "openvidu-browser";
 
 // import Wait from "@/components/modal/Wait"
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 function videoChatPage() {
 
@@ -25,35 +25,35 @@ function videoChatPage() {
   const toggleLeave = () => setIsLeaveOpen(!isLeaveOpen);
 
   /* 키워드 모달창 */
-  const [isKeywordOpen, setIsKeywordOpen] = useState(true);
-  const toggleKeyword = () => setIsKeywordOpen(!isKeywordOpen);
+  // const [isKeywordOpen, setIsKeywordOpen] = useState(true);
+  // const toggleKeyword = () => setIsKeywordOpen(!isKeywordOpen);
 
   /* 키워드 상태 */
-  const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
+  const [selectedKeyword, _setSelectedKeyword] = useState<string | null>(null);
 
   /* alert 창 */
   const [showAlert, setShowAlert] = useState(false);
 
-  const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+  const [chatHistory, _setChatHistory] = useState<{ role: string; message: string }[]>([]);
 
   /* 시작하기 버튼 클릭 시 */
-  const handleStartClick = () => {
-    if (!selectedKeyword) {
-      setShowAlert(true);
-      return;
-    }
-    setIsKeywordOpen(false); // 키워드가 선택된 경우 모달 닫기
-  };
+  // const handleStartClick = () => {
+  //   if (!selectedKeyword) {
+  //     setShowAlert(true);
+  //     return;
+  //   }
+  //   setIsKeywordOpen(false); // 키워드가 선택된 경우 모달 닫기
+  // };
 
   /* OpenVidu 관련 */
-  const [client, setClient] = useState<Client | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
+  const [_client, setClient] = useState<Client | null>(null);
+  const [_session, setSession] = useState<Session | null>(null);
   const [publisher, setPublisher] = useState<Publisher | null>(null);
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
   const [token, setToken] = useState<string | null>(null);
-  const [isMatching, setIsMatching] = useState<boolean>(false);
+  const [_isMatching, setIsMatching] = useState<boolean>(false);
   const [userJwt, setUserJwt] = useState<string>("");
-  const [isWaiting, setIsWaiting] = useState(true);
+  const [_isWaiting, setIsWaiting] = useState(true);
 
   useEffect(() => {
     const userJwtFromStorage = localStorage.getItem("accessToken");
@@ -151,23 +151,23 @@ function videoChatPage() {
     }
   }, [token]);
 
-  const leaveSession = (): void => {
-    if (session) {
-      console.log("📴 세션 종료");
-      session.disconnect();
-      setSession(null);
-      setPublisher(null);
-      setSubscribers([]);
-      setToken(null);
-      setIsMatching(false);
-    }
-  };
+  // const leaveSession = (): void => {
+  //   if (session) {
+  //     console.log("📴 세션 종료");
+  //     session.disconnect();
+  //     setSession(null);
+  //     setPublisher(null);
+  //     setSubscribers([]);
+  //     setToken(null);
+  //     setIsMatching(false);
+  //   }
+  // };
 
-  const handleKeywordSelection = (keyword: string) => {
-    setSelectedKeyword(keyword);
-    setIsKeywordOpen(false);
-    setIsWaiting(true);
-  };
+  // const handleKeywordSelection = (keyword: string) => {
+  //   setSelectedKeyword(keyword);
+  //   setIsKeywordOpen(false);
+  //   setIsWaiting(true);
+  // };
 
   useEffect(() => {
     if (subscribers.length > 0) {
@@ -175,18 +175,18 @@ function videoChatPage() {
     }
   }, [subscribers]);
 
-  const navigate = useNavigate();
-  const handleLeave = () => {
-    if (session) {
-      session.disconnect();
-      setSession(null);
-      setPublisher(null);
-      setSubscribers([]);
-      setToken(null);
-      setIsMatching(false);
-    }
-    navigate("/main");
-  };
+  // const navigate = useNavigate();
+  // const handleLeave = () => {
+  //   if (session) {
+  //     session.disconnect();
+  //     setSession(null);
+  //     setPublisher(null);
+  //     setSubscribers([]);
+  //     setToken(null);
+  //     setIsMatching(false);
+  //   }
+  //   navigate("/main");
+  // };
 
   return (
     <div className={styles.page}>
