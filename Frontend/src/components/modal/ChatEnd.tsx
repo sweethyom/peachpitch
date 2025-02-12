@@ -1,12 +1,14 @@
 import styles from "./styles/ChatEnd.module.scss";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 type ModalProps = {
     isOpen: boolean;
     onClose: () => void;  // ✅ 모달 닫기 이벤트 추가
+    historyId: number | null;
 };
 
-function ChatEnd({ isOpen, onClose }: ModalProps) {
+function ChatEnd({ isOpen, onClose, historyId }: ModalProps) {
     const navigate = useNavigate();
 
     if (!isOpen) return null;
@@ -16,9 +18,29 @@ function ChatEnd({ isOpen, onClose }: ModalProps) {
         window.location.href = "/chat/ai";
     };
 
-    /* ✅ 종료 버튼 클릭 시 /report 페이지로 이동 */
-    const endChat = () => {
-        navigate("/report");
+    /* ✅ 종료 버튼 클릭 시 데이터 저장 후 /report 페이지로 이동 */
+    const endChat = async () => {
+        if (!historyId) {
+            console.error("No historyId available to save chat history.");
+            return;
+        }
+
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) {
+            console.error("No access token found, please log in.");
+            return;
+        }
+
+        try {
+            await axios.post("http://localhost:8080/api/chat/report/save", 
+                { historyId }, 
+                { headers: { access: accessToken } }
+            );
+
+            navigate("/report");
+        } catch (error) {
+            console.error("채팅이 저장이 안 됐습니다.");
+        }
     };
 
     return (
