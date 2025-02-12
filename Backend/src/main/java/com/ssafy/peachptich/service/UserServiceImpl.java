@@ -82,6 +82,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ResponseDto<Map<String, Boolean>>> checkEmail(String email){
+        log.info("여기 입력");
         Map<String, Boolean> responseData = new HashMap<>();
 
         Boolean exist = userRepository.findByEmail(email).isPresent();
@@ -164,7 +165,7 @@ public class UserServiceImpl implements UserService {
             }
 
             // Redis에 저장되어 있는지 확인
-            boolean isExist = tokenListService.isContainToken(userEmail);
+            boolean isExist = tokenListService.isContainToken("RT:" + userEmail);
             if(!isExist){
                 // 응답 메시지와 데이터를 포함한 ResponseDto 생성
                 Map<String, Object> responseData = new HashMap<>();
@@ -178,7 +179,7 @@ public class UserServiceImpl implements UserService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
             }
 
-            tokenListService.removeToken(userEmail, refresh);
+            tokenListService.removeToken("RT:" + userEmail);
             tokenBlacklistService.addTokenToList(refresh);
 
             /*
