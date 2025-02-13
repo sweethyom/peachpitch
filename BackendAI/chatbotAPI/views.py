@@ -71,9 +71,6 @@ def start_conversation(request):
                 }  
                 print('redis 객체만들기 완료')
 
-                # 세션별로 대화 저장
-                redis_key = f"chat:{history_id}:messages"
-                redis_client.rpush(redis_key, json.dumps(chat_data))
 
                 print('redis에 세션별 저장 완료')
                 # 24시간 후 만료되도록 설정(후에 변경)
@@ -164,8 +161,6 @@ def continue_conversation(request):
                         "timestamp": str(datetime.now())
                     }
                     print('bot 대답 redis 객체만들기 완료')
-                    redis_client.rpush(redis_key, json.dumps(chat_data))
-
 
                     # 세션별로 대화 저장
                     redis_key = f"chat:{history_id}:messages"
