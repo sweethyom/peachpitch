@@ -161,7 +161,7 @@ const VideoChatPage: React.FC = () => {
         setUserJwt(userJwtFromStorage || "");
 
         const stompClient = new Client({
-            brokerURL: "ws://localhost:8080/api/ws",
+            brokerURL: "wss://peachpitch.site/api/ws",
             connectHeaders: {
                 access: `${userJwt}`,
             },

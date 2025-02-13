@@ -57,7 +57,7 @@ function MainPage() {
 
   // 랭킹 데이터를 불러오기
   useEffect(() => {
-    axios.get("http://localhost:8080/api/main/rank")
+    axios.get("https://peachpitch.site/api/main/rank")
       .then((response) => {
         const keywords = response.data.data.rank.map((item: { keyword: string }) => item.keyword);
         setRank(keywords);
@@ -71,7 +71,7 @@ function MainPage() {
 
   // ✅ "오늘의 토킹" 데이터를 불러오기
   useEffect(() => {
-    axios.post("http://localhost:8080/api/main/randomscript")
+    axios.post("https://peachpitch.site/api/main/randomscript")
       .then(response => {
         const content = response.data.data.content;
         setRandomTalks(prev => [...prev, content]);
@@ -114,7 +114,7 @@ function MainPage() {
     const handlePaymentMessage = (event: MessageEvent) => {
       console.log("📩 결제 완료 메시지 수신:", event.data, "from:", event.origin);
 
-      const allowedOrigins = ["http://localhost:8080", "http://localhost:5173"];
+      const allowedOrigins = ["https://peachpitch.site", "https://peachpitch.site"];
       if (!allowedOrigins.includes(event.origin)) return;
 
       if (event.data === 'paymentSuccess') {
@@ -211,7 +211,7 @@ function MainPage() {
     const checkSocialLogin = async () => {
       if (localStorage.getItem("socialLoginAttempt")) {
         try {
-          const response = await fetch("http://localhost:8080/api/users/check-login", {
+          const response = await fetch("https://peachpitch.site/api/users/check-login", {
             method: "GET",
             credentials: "include",
           });
@@ -260,8 +260,8 @@ function MainPage() {
   // 쿠폰 관련
   const checkCouponAvailability = async () => {
     try {
-      // const response = await axios.get(`http://localhost:8080/api/users/coupon/${userId}`);
-      const response = await axios.get(`http://localhost:8080/api/users/coupon/1`);
+      // const response = await axios.get(`https://peachpitch.site/api/users/coupon/${userId}`);
+      const response = await axios.get(`https://peachpitch.site/api/users/coupon/1`);
       
       console.log("쿠폰수: " + response.data);
       

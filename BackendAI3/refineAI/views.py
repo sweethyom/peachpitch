@@ -115,7 +115,7 @@ def refine_and_trigger(request):
     
     # reportAI, wordAI 구동
     try:
-        report_ai_url = "http://localhost:8000/ai/users/reports/analysis/"
+        report_ai_url = "https://peachpitch.site/ai/users/reports/analysis/"
         report_response = requests.post(report_ai_url, json={"history_id": history_id})
         report_result = report_response.json()
     except Exception as e:
@@ -123,7 +123,7 @@ def refine_and_trigger(request):
         report_result = {"error": str(e)}
     
     try:
-        word_ai_url = "http://localhost:8000/ai/users/reports/words/"
+        word_ai_url = "https://peachpitch.site/ai/users/reports/words/"
         word_response = requests.post(word_ai_url, json={"history_id": history_id})
         word_result = word_response.json()
     except Exception as e:
