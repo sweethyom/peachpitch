@@ -29,7 +29,7 @@ import java.util.List;
 public class ChatController {
     private final ChatService chatService;
 
-    // 대화내용 db에 저장하기
+    // Django에서 redis에 저장한 AI 대화내용 db에 저장하기
     @PostMapping("chat/save")
     public ResponseEntity<Void> saveChatContent(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -51,6 +51,7 @@ public class ChatController {
         }
     }
 
+    // 랜덤 스크립트 기능
     @PostMapping("/main/randomscript")
     public ResponseEntity<ResponseDto<RandomScriptResponse>> showRandomScript() {
         // 랜덤 채팅 가져오기
@@ -66,12 +67,34 @@ public class ChatController {
                 .body(new ResponseDto<>("Randomchat showed successfully", response));
     }
 
-    @PostMapping("chat/video/save")
-    public ResponseEntity<String> saveChat(@RequestBody UserChatRequest userChatRequest) {
-        chatService.saveUserChat(userChatRequest.getHistoryId(), userChatRequest.getMessage(), userChatRequest.getUserId());
-        return ResponseEntity.ok("Chat saved in redis");
+    // 사용자와의 대화 redis 저장
+    @PostMapping("chat/video/save/temp")
+    public ResponseEntity<Void> saveChatTemp(@RequestBody UserChatRequest userChatRequest) {
+        chatService.saveUserChatTemp(userChatRequest);
+        return ResponseEntity.ok().build();
     }
-    
+
+    // redis에 저장한 사용자와의 대화 db저장
+    @PostMapping("chat/video/save")
+    public ResponseEntity<Void> saveChat(@RequestBody UserChatRequest userChatRequest){
+        log.debug("Request received: {}", userChatRequest);
+
+        if (userChatRequest.getUserId() == null) {
+            log.error("User ID is missing in the request");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        try {
+            chatService.saveUserChat(userChatRequest);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Failed to save chat content", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+
+
     // 대화 상세 리포트
     @GetMapping("users/reports/report")
     public ResponseEntity<ResponseDto<ReportResponse>> showReport(@RequestBody ReportRequest reportRequest) {
