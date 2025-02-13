@@ -21,7 +21,7 @@ public class SpeakingHabits {
     private Integer count;
 
     @ManyToOne
-    @JoinColumn(name="total_report_id", nullable = false)
+    @JoinColumn(name="total_report_id", nullable = false, unique = false)
     private TotalReport totalReport;
 
     @Builder

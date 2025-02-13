@@ -4,8 +4,12 @@ import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.ChatRequest;
 import com.ssafy.peachptich.dto.request.UserChatRequest;
 import com.ssafy.peachptich.dto.response.RandomScriptResponse;
+import com.ssafy.peachptich.dto.response.ReportResponse;
 import com.ssafy.peachptich.dto.response.ResponseDto;
+import com.ssafy.peachptich.dto.response.TotalReportResponse;
 import com.ssafy.peachptich.entity.Chat;
+import com.ssafy.peachptich.entity.ChatReport;
+import com.ssafy.peachptich.entity.TotalReport;
 import com.ssafy.peachptich.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +68,48 @@ public class ChatController {
     public ResponseEntity<String> saveChat(@RequestBody UserChatRequest userChatRequest) {
         chatService.saveUserChat(userChatRequest.getHistoryId(), userChatRequest.getMessage(), userChatRequest.getUserId());
         return ResponseEntity.ok("Chat saved in redis");
+    }
+    
+    // 대화 상세 리포트
+    @PostMapping("users/reports/report")
+    public ResponseEntity<ResponseDto<ReportResponse>> showReport() {
+        // 리포트 내용 가져오기
+        ChatReport chatReport = chatService.getReport();
+
+        // Response DTO로 변환
+        ReportResponse response = ReportResponse.builder()
+                .reportId(chatReport.getReportId())
+                .chatTime(chatReport.getChatTime())
+                .pros(chatReport.getPros())
+                .cons(chatReport.getCons())
+                .summary(chatReport.getSummary())
+                .createdAt(chatReport.getChatHistory().getCreatedAt())
+                .historyId(chatReport.getChatHistory().getHistoryId())
+                .userId(chatReport.getUser().getUserId())
+                .build();
+
+        return ResponseEntity.ok()
+                .body(new ResponseDto<>("Report showed successfully", response));
+
+    }
+
+    // 전체 리포트
+    @PostMapping("users/reports/totalreport")
+    public ResponseEntity<ResponseDto<TotalReportResponse>> showOverview() {
+        // 리포트 내용 가져오기
+        TotalReport totalReport = chatService.getTotalReport();
+        //
+        // Response DTO로 변환
+        TotalReportResponse response = TotalReportResponse.builder()
+                .totalReportId(totalReport.getTotalReportId())
+                .totalChatTime(totalReport.getTotalChatTime())
+                .ansCount(totalReport.getAnsCount())
+                .questCount(totalReport.getQuestCount())
+                .build();
+
+        return ResponseEntity.ok()
+                .body(new ResponseDto<>("Report showed successfully", response));
+
     }
 
 }
