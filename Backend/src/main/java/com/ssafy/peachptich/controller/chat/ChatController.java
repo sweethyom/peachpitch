@@ -2,6 +2,8 @@ package com.ssafy.peachptich.controller.chat;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.ChatRequest;
+import com.ssafy.peachptich.dto.request.ReportRequest;
+import com.ssafy.peachptich.dto.request.TotalReportRequest;
 import com.ssafy.peachptich.dto.request.UserChatRequest;
 import com.ssafy.peachptich.dto.response.RandomScriptResponse;
 import com.ssafy.peachptich.dto.response.ReportResponse;
@@ -72,9 +74,9 @@ public class ChatController {
     
     // 대화 상세 리포트
     @PostMapping("users/reports/report")
-    public ResponseEntity<ResponseDto<ReportResponse>> showReport() {
+    public ResponseEntity<ResponseDto<ReportResponse>> showReport(@RequestBody ReportRequest reportRequest) {
         // 리포트 내용 가져오기
-        ChatReport chatReport = chatService.getReport();
+        ChatReport chatReport = chatService.getReport(reportRequest.getUserId(), reportRequest.getHistoryId());
 
         // Response DTO로 변환
         ReportResponse response = ReportResponse.builder()
@@ -90,26 +92,16 @@ public class ChatController {
 
         return ResponseEntity.ok()
                 .body(new ResponseDto<>("Report showed successfully", response));
-
     }
 
     // 전체 리포트
     @PostMapping("users/reports/totalreport")
-    public ResponseEntity<ResponseDto<TotalReportResponse>> showOverview() {
-        // 리포트 내용 가져오기
-        TotalReport totalReport = chatService.getTotalReport();
-        //
-        // Response DTO로 변환
-        TotalReportResponse response = TotalReportResponse.builder()
-                .totalReportId(totalReport.getTotalReportId())
-                .totalChatTime(totalReport.getTotalChatTime())
-                .ansCount(totalReport.getAnsCount())
-                .questCount(totalReport.getQuestCount())
-                .build();
+    public ResponseEntity<ResponseDto<TotalReportResponse>> showOverview(@RequestBody TotalReportRequest totalReportRequest) {
+        // TotalReportResponse를 반환받음
+        TotalReportResponse response = chatService.getTotalReport(totalReportRequest.getUserId());
 
         return ResponseEntity.ok()
                 .body(new ResponseDto<>("Report showed successfully", response));
-
     }
 
 }
