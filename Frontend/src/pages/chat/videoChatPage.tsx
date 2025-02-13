@@ -30,30 +30,42 @@ function videoChatPage() {
 
   /* 키워드 상태 */
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
+  const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
   /* alert 창 */
   const [showAlert, setShowAlert] = useState(false);
 
   const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
 
-  /* 시작하기 버튼 클릭 시 */
-  const handleStartClick = () => {
-    if (!selectedKeyword) {
-      setShowAlert(true);
-      return;
-    }
-    setIsKeywordOpen(false); // 키워드가 선택된 경우 모달 닫기
-  };
-
   /* OpenVidu 관련 */
+  // const [isWaiting, setIsWaiting] = useState(true);
+
+  /* stomp client */
   const [client, setClient] = useState<Client | null>(null);
+
+  /* openvidu session */
   const [session, setSession] = useState<Session | null>(null);
+
+  /* stomp publisher */
   const [publisher, setPublisher] = useState<Publisher | null>(null);
+
+  /* stomp subscribers */
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+
+  /* openvidu token */
   const [token, setToken] = useState<string | null>(null);
-  const [isMatching, setIsMatching] = useState<boolean>(false);
-  const [userJwt, setUserJwt] = useState<string>("");
-  const [isWaiting, setIsWaiting] = useState(true);
+
+  /* matching 상태 */
+  const [isMatching, setIsMatching] = useState(false);
+
+  const [userJwt, setUserJwt] = useState("");
+  const [historyId, setHistoryId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (isCompleted) {
+      setIsKeywordOpen(false);
+    }
+  }, [isCompleted]);
 
   useEffect(() => {
     const userJwtFromStorage = localStorage.getItem("accessToken");
@@ -67,16 +79,19 @@ function videoChatPage() {
       reconnectDelay: 5000,
       onConnect: () => {
         console.log("✅ STOMP 연결됨");
-        stompClient.subscribe(`/user/sub/call`, (message) => {
+        stompClient.subscribe("/user/sub/call", (message) => {
           console.log("📩 받은 메시지:", message.body);
-          console.log(message.body);
           const response = JSON.parse(message.body);
-          const data = response;
-          if (data.status === "waiting") {
+          if (response.status === "waiting") {
             console.log("🔄 매칭 대기 중...");
-          } else if (data.status === "matched") {
-            console.log("🎉 매칭 완료! 토큰:", data.token);
-            setToken(data.token);
+          } else if (response.status === "matched") {
+            console.log("🎉 매칭 완료! 토큰:", response.token);
+            setToken(response.token);
+            setHistoryId(response.historyId); // 대화 내역 id 저장
+
+            // 🌟 매칭 완료되었으므로 웹소켓 연결 해제
+            console.log("🛑 웹소켓 연결 종료");
+            stompClient.deactivate();
           }
         });
         // STOMP 연결이 성공하면 자동으로 매칭 요청
@@ -102,6 +117,9 @@ function videoChatPage() {
   useEffect(() => {
     if (token) {
       console.log("📡 OpenVidu 세션 시작");
+      // 매칭이 완료되었으므로 키워드 모달을 열기.
+      setIsKeywordOpen(true);
+      if (isCompleted) setIsCompleted(false);
       const ov = new OpenVidu();
       const newSession: Session = ov.initSession();
 
@@ -123,12 +141,9 @@ function videoChatPage() {
               audio: true,
             });
 
-            const cloned = stream.clone(); // 이거 나중에 주석
-
-            // cloned 대신 stream쓰기
             const newPublisher: Publisher = ov.initPublisher(undefined, {
-              videoSource: cloned.getVideoTracks()[0],
-              audioSource: cloned.getAudioTracks()[0],
+              videoSource: stream.getVideoTracks()[0],
+              audioSource: stream.getAudioTracks()[0],
               publishAudio: true,
               publishVideo: true,
               resolution: "640x480",
@@ -163,30 +178,30 @@ function videoChatPage() {
     }
   };
 
-  const handleKeywordSelection = (keyword: string) => {
-    setSelectedKeyword(keyword);
-    setIsKeywordOpen(false);
-    setIsWaiting(true);
-  };
+  // const handleKeywordSelection = (keyword: string) => {
+  //   setSelectedKeyword(keyword);
+  //   setIsKeywordOpen(false);
+  //   setIsWaiting(true);
+  // };
 
-  useEffect(() => {
-    if (subscribers.length > 0) {
-      setIsWaiting(false);
-    }
-  }, [subscribers]);
+  // useEffect(() => {
+  //   if (subscribers.length > 0) {
+  //     setIsWaiting(false);
+  //   }
+  // }, [subscribers]);
 
-  const navigate = useNavigate();
-  const handleLeave = () => {
-    if (session) {
-      session.disconnect();
-      setSession(null);
-      setPublisher(null);
-      setSubscribers([]);
-      setToken(null);
-      setIsMatching(false);
-    }
-    navigate("/main");
-  };
+  // const navigate = useNavigate();
+  // const handleLeave = () => {
+  //   if (session) {
+  //     session.disconnect();
+  //     setSession(null);
+  //     setPublisher(null);
+  //     setSubscribers([]);
+  //     setToken(null);
+  //     setIsMatching(false);
+  //   }
+  //   navigate("/main");
+  // };
 
   return (
     <div className={styles.page}>
@@ -210,37 +225,27 @@ function videoChatPage() {
           />
         </div>
 
-        {/* 상대방 웹캠 */}
-        <div className={styles.chat__other}>
-          <div className={styles.chat__other__video}>
-            {/* <WebcamComponent /> */}
-            {publisher && (
-              <UserVideoComponent streamManager={publisher} />
-            )}
-          </div>
-          <div className={styles.chat__other__bubble}>
-            <div className={styles.bubble__left}>
-              {selectedKeyword || "여행"}에 대해 이야기 나누기 좋아요! 최근에 가장 기억에 남는 일이 있으신가요?
-            </div>
-          </div>
-        </div>
-
-        {/* 사용자 웹캠 */}
-        <div className={styles.chat__user}>
-          <div className={styles.chat__user__bubble}>
-            <div className={styles.bubble__right}>
-              최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-            </div>
-          </div>
-          <div className={styles.chat__user__video}>
-            {subscribers.map((sub) => (
-              <div key={sub.stream.connection.connectionId}>
-                {/* <span>{sub.stream.connection.data}</span> */}
-                <UserVideoComponent streamManager={sub} />
+        {session ? (
+          <div id="video-container">
+            {/* 상대방 웹캠 */}
+            <div className={styles.chat__other}>
+              <div className={styles.chat__other__video}>
+                {subscribers.map((sub) => (
+                  <UserVideoComponent key={sub.stream.connection.connectionId} streamManager={sub} />
+                ))}
               </div>
-            ))}
+            </div>
+
+            {/* 사용자 웹캠 */}
+            <div className={styles.chat__user}>
+              <div className={styles.chat__user__video}>
+                {publisher && <UserVideoComponent streamManager={publisher} />}
+              </div>
+            </div>
           </div>
-        </div>
+        ) : (
+          <p>{isMatching ? "매칭 중입니다. 잠시만 기다려 주세요..." : "매칭 버튼을 눌러주세요."}</p>
+        )}
 
         {/* 음성챗 */}
         <div className={styles.chat__input}>
@@ -251,9 +256,12 @@ function videoChatPage() {
       </div>
 
       {/* 키워드 모달 */}
-      <KeywordModal isOpen={isKeywordOpen} setSelectedKeyword={handleKeywordSelection}>
-        <div className={styles.btn} onClick={() => selectedKeyword ? setIsKeywordOpen(false) : setShowAlert(true)}>시작하기</div>
-      </KeywordModal>
+      <KeywordModal
+        isOpen={isKeywordOpen}
+        setSelectedKeyword={setSelectedKeyword}
+        setIsCompleted={setIsCompleted}
+        historyId={historyId ?? 0}
+      />
 
       {/* 키워드 선택안했을 경우 뜨는 alert창 */}
       {

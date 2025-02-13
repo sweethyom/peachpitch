@@ -64,10 +64,11 @@ public class SecurityConfig {
                                            AuthenticationConfiguration authenticationConfiguration) throws Exception {
         http
                 .authorizeHttpRequests((auth) -> auth
-                                .requestMatchers("/ws/**", "/ws/room/**").permitAll() // WebSocket 엔드포인트
+                                .requestMatchers("/api/ws/**").permitAll() // WebSocket 엔드포인트
                                 .requestMatchers("/pub/**", "/sub/**").permitAll() // STOMP 메시징 경로
                                 .requestMatchers("/api/main/**", "/api/index", "/api/users/login", "/api/users/signup", "/api/pay/ready", "/api/pay/completed",
-                                        "/api/chat/ai/keywords/**", "/api/chat/ai/check", "/api/users/coupon/**", "/error", "/api/chat/report/**", "/api/users/check").permitAll()
+                                        "/api/chat/ai/keywords/**", "/api/chat/ai/check", "/api/users/coupon/**", "/error", "/api/chat/report/**", "/api/users/check",
+                                        "/api/chat/video/close").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
@@ -111,7 +112,7 @@ public class SecurityConfig {
 
         // JWTFilter 등록
         http
-                .addFilterBefore(new JwtFilter(tokenProvider, userRepository), CustomLoginFilter.class);
+                .addFilterBefore(new JwtFilter(tokenProvider, userRepository, tokenBlacklistService), CustomLoginFilter.class);
 
         //oauth2
         http

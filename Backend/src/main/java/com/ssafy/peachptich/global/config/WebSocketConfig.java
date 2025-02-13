@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // 방에 접속하는 웹소켓
-        registry.addEndpoint("/ws/room")
+        registry.addEndpoint("/api/ws")
                 .setAllowedOriginPatterns("*");
     }
 

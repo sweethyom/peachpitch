@@ -16,10 +16,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -57,6 +61,13 @@ public class CustomLogoutFilter extends GenericFilterBean {
             if(cookie.getName().equals("refresh")) {
                 refresh = cookie.getValue();
                 log.info("in CustomLogoutFilter, refresh token = " + refresh);
+                log.info("Received cookie - name: " + cookie.getName()
+                        + ", value: " + cookie.getValue()
+                        + ", domain: " + cookie.getDomain()
+                        + ", path: " + cookie.getPath()
+                        + ", maxAge: " + cookie.getMaxAge()
+                        + ", secure: " + cookie.getSecure()
+                        + ", httpOnly: " + cookie.isHttpOnly());
             }
         }
 
@@ -97,22 +108,52 @@ public class CustomLogoutFilter extends GenericFilterBean {
             }
         */
 
-        // redis에 저장되어 있는지 확인
-        String userEmail = tokenProvider.getUserEmail(refresh);
-        boolean isExist = tokenListService.isContainToken("RT:" + userEmail);
-        if(!isExist){
+        // blackList 확인
+        String access = request.getHeader("access");
+
+        boolean isBlacked = tokenBlacklistService.isContainToken("BL:AT:" + access);
+        if(isBlacked) {
             // response status code
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
+                    .message("Already logged out. Need to logged in.")
+                    .data(null)
+                    .build();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(response.getWriter(), responseDto);
+            return;
+        }
+
+        // redis에 access 토큰이 있는지 확인
+        String userEmail = tokenProvider.getUserEmail(refresh);
+        boolean isExist = tokenListService.isContainToken("RT:AT:" + userEmail);
+        if(!isExist){           // 재로그인 필요
+            // response status code
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
+                    .message("invalid access token.")
+                    .data(null)
+                    .build();
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(response.getWriter(), responseDto);
             return;
         }
         
         // 로그아웃 진행
         // refresh token을 redis에서 제거
-        tokenListService.removeToken("RT:" + userEmail);
+        tokenListService.removeToken("RT:RT:" + userEmail);
         
         // access token을 blackList에 추가
-        String access = request.getHeader("access");
-        tokenBlacklistService.addTokenToList(access);
+        tokenBlacklistService.addTokenToList("BL:AT:" + access);
+        tokenListService.removeToken("RT:AT:" + userEmail);
         
         /*
         // 여기부터 기존 코드
@@ -131,9 +172,14 @@ public class CustomLogoutFilter extends GenericFilterBean {
          */
 
         // Refresh Token Cookie 값 0 설정
-        Cookie cookie = new Cookie("refresh", null);
+        Cookie cookie = new Cookie("refresh", "");
         cookie.setMaxAge(0);
-        cookie.setPath("/");
+        cookie.setPath("/");             // 로그인 시와 동일하게 설정
+        cookie.setHttpOnly(false);
+        cookie.setSecure(true);
+
+        // SecurityContext 클리어
+        SecurityContextHolder.clearContext();
 
         // JSON 응답 생성
         ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
@@ -144,6 +190,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // 응답 설정 및 전송
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
 

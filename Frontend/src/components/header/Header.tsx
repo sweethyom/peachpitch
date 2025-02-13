@@ -6,6 +6,7 @@ import styles from "./Header.module.scss";
 import logoIcon from "@/assets/icons/logo.png";
 import CouponModal from "@/components/modal/Coupon";
 import couponIcon from "@/assets/icons/coupon_icon.png";
+import axios from "axios";
 
 interface HeaderProps {
     isDark?: boolean;
@@ -82,6 +83,20 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
         window.dispatchEvent(new Event("storage"));
     };
 
+    // 쿠폰 확인
+    const [couponCount, setCouponCount] = useState<number>(0);
+    useEffect(() => {
+        const fetchCouponCount = async () => {
+            try {
+                const response = await axios.get("http://localhost:8080/api/users/coupon/1");
+                setCouponCount(response.data);
+            } catch (error) {
+                console.error("쿠폰 수 조회 실패:", error);
+            }
+        };
+
+        fetchCouponCount();
+    }, []);
     return (
         <div className={headerClass}>
             <div className={styles.header__content}>
@@ -104,7 +119,8 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
                             <div className={styles.header__navi__coupon} onClick={() => setIsCouponOpen(true)}>
                                 <img src={couponIcon} width={"30px"} />
-                                <p className={styles.header__navi__item}>1개</p>
+                                <p className={styles.header__navi__item}>{couponCount}개</p>
+                                {/* <p className={styles.header__navi__item}>1개</p> */}
                             </div>
 
                             {/* ✅ 아이디 클릭 시 드롭다운 모달 열기 */}

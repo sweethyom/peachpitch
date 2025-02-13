@@ -9,4 +9,5 @@ public interface ChatHistoryService {
     void updateKeywordByUserId(Long historyId, Long userId, Long keywordId);
     void updateFeedbackByUserId(FeedbackRequest feedbackRequest, Long userId);
     ChatHistory getChatHistory(Long historyId);
+    void updateStatus(Long historyId);
 }

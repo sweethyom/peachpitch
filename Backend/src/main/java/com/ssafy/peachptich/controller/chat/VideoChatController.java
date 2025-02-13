@@ -1,7 +1,9 @@
 package com.ssafy.peachptich.controller.chat;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
+import com.ssafy.peachptich.dto.request.CloseRequest;
 import com.ssafy.peachptich.dto.request.FeedbackRequest;
+import com.ssafy.peachptich.dto.request.CloseRequest;
 import com.ssafy.peachptich.dto.request.VideoChatRequest;
 import com.ssafy.peachptich.dto.response.*;
 import com.ssafy.peachptich.service.*;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class VideoChatController {
     private final VideoChatService videoChatService;
     private final ChatHistoryService chatHistoryService;
+    private final VideoChatWebSocketService videoChatWebSocketService;
 
     @PostMapping("/request")
     public ResponseEntity<ResponseDto<VideoChatRoomResponse>> requestVideoChatRoom(
@@ -43,8 +46,7 @@ public class VideoChatController {
     @PostMapping("/keywords")
     public ResponseEntity<ResponseDto<ChatRoomResponse>> requestVideoChatKeywords(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody VideoChatRequest videoChatRequest)
-    {
+            @RequestBody VideoChatRequest videoChatRequest) {
         //들어온 userId에 맞는 keywordId 저장, userKeyword 업데이트
         //keyword에 연결된 hints 반환
         Long userId = userDetails.getUserId();
@@ -58,11 +60,17 @@ public class VideoChatController {
     @PostMapping("/feedback")
     public ResponseEntity<ResponseDto<Void>> requestVideoChatFeedback(
             @AuthenticationPrincipal CustomUserDetails userDetails,
-            @RequestBody FeedbackRequest feedbackRequest)
-    {
+            @RequestBody FeedbackRequest feedbackRequest) {
         Long userId = userDetails.getUserId();
         chatHistoryService.updateFeedbackByUserId(feedbackRequest, userId);
         return ResponseEntity.ok().body(ResponseDto.<Void>builder().message("Successfully saved feedback").build());
     }
 
+    @PostMapping("/close")
+    public ResponseEntity<ResponseDto<Void>> requestVideoChatClose(
+            @RequestBody CloseRequest closeRequest
+    ) throws OpenViduJavaClientException, OpenViduHttpException {
+        videoChatWebSocketService.closeSession(closeRequest);
+        return ResponseEntity.ok().body(ResponseDto.<Void>builder().message("Successfully closed session").build());
+    }
 }

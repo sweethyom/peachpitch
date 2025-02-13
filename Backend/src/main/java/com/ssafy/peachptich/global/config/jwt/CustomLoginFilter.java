@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.LoginRequest;
 import com.ssafy.peachptich.dto.response.ResponseDto;
-import com.ssafy.peachptich.entity.Refresh;
 import com.ssafy.peachptich.entity.User;
-import com.ssafy.peachptich.repository.RefreshRepository;
 import com.ssafy.peachptich.repository.UserRepository;
 import com.ssafy.peachptich.service.TokenBlacklistService;
 import com.ssafy.peachptich.service.TokenListService;
@@ -24,7 +22,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
@@ -42,12 +39,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private final TokenListService tokenListService;
     private final TokenBlacklistService tokenBlacklistService;
     private static final AntPathRequestMatcher CUSTOM_LOGIN_PATH_MATCHER = new AntPathRequestMatcher("/api/users/login", "POST");
-
-//    @PostConstruct          // 초기화 로직 작성
-//    public void initialize(){
-//        setRequiresAuthenticationRequestMatcher(CUSTOM_LOGIN_PATH_MATCHER);
-//        setAuthenticationManager(authenticationManager);
-//    }
 
     public CustomLoginFilter(AuthenticationManager authenticationManager, TokenProvider tokenProvider, UserRepository userRepository,
                              AuthenticationManager authenticationManager1, RedisTemplate<String, String> redisTemplate,
@@ -103,8 +94,17 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
                 throw new DisabledException("Account is deactivated. Please contact support.");
             }
 
-            // 탈퇴한 회원이 아니라면 redis에 저장된 토큰 내역 확인
+            boolean hasExistingToken = tokenListService.isContainToken("RT:RT:" + userEmail);
 
+            // 이미 발행된 토큰이 존재한다면
+            if (hasExistingToken){
+                String access = tokenListService.getToken("RT:AT:" + userEmail);
+                if (access != null) {
+                    tokenBlacklistService.addTokenToList("BL:AT:" + access);
+                }
+                tokenListService.removeToken("RT:AT:" + userEmail);
+                tokenListService.removeToken("RT:RT:" + userEmail);
+            }
 
             // 탈퇴한 회원이 아니라면 role 은 일단 null로!
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userEmail, password, null);
@@ -124,7 +124,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
         return email.substring(0, 2) + "***" + email.substring(email.length() - 2);
     }
-
 
     @Override
     @ResponseBody
@@ -146,33 +145,17 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             String access = tokenProvider.createJwt("access", userEmail, role, 600000L);
             String refresh = tokenProvider.createJwt("refresh", userEmail, role, 86400000L);
 
-            //TODO
-            // Redis에 이미 발행된 access/refresh 토큰이 존재하는지 확인
-            boolean hasExistingToken = tokenListService.isContainToken("RT:" + userEmail);
-
-            // 이미 발행된 토큰이 존재한다면
-            if (hasExistingToken){
-               List<String> tokenList = tokenListService.getTokenList("RT:" + userEmail);
-               if (!CollectionUtils.isEmpty(tokenList)){
-                   tokenList.forEach(token -> {
-                               String tokenValue = token;
-                               tokenBlacklistService.addTokenToList(tokenValue);
-                               tokenListService.removeToken("RT:" + userEmail);
-                           });
-               }
-            }
-
             try {
                 // access token과 refresh Token Redis 저장
-                //addToken(userEmail, access, 600000L);
-                addToken(userEmail, refresh, 86400000L);
+                addToken("RT:AT:" + userEmail, access, 600000L);
+                addToken("RT:RT:" + userEmail, refresh, 86400000L);
             } catch (Exception e) {
                 throw new TokenStorageException("Failed to store refresh token: " + e.getMessage());
             }
 
             // JSON 응답 생성
-            // Map<String, Long> responseData = Map.of("userId", userId);
-            Map<String, Long> responseData = new HashMap<>();
+            Map<String, Long> responseData = Map.of("userId", userId);
+            // Map<String, Long> responseData = new HashMap<>();
             ResponseDto<Map<String, Long>> responseDto = ResponseDto.<Map<String, Long>>builder()
                     .message("User login success!")
                     .data(responseData)
@@ -197,19 +180,19 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private Cookie createCookie(String key, String value){
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60);     // 쿠키 생명 주기
-         cookie.setSecure(true);        // https 통신을 진행해야 하는 경우
-        // cookie.setPath("/");         // 쿠키가 적용될 범위
-        cookie.setHttpOnly(true);       // true: 클라이언트단에서 javascript로 해당 쿠키에 접근하지 못하게 막아줌
+        cookie.setSecure(true);        // https 통신을 진행해야 하는 경우
+        cookie.setPath("/");         // 쿠키가 적용될 범위
+        cookie.setHttpOnly(false);       // true: 클라이언트단에서 javascript로 해당 쿠키에 접근하지 못하게 막아줌
 
         return cookie;
     }
 
-    private void addToken(String userEmail, String value, Long expiredMs) {
+    private void addToken(String key, String value, Long expiredMs) {
         redisTemplate.opsForValue().set(
-            "RT:" + userEmail,       // key 값
-                value,                // value
-                System.currentTimeMillis() + expiredMs,     // 만료 시간
-                TimeUnit.MICROSECONDS
+            key,       // key 값
+            value,                // value
+            System.currentTimeMillis() + expiredMs,     // 만료 시간
+            TimeUnit.MICROSECONDS
         );
     }
 
