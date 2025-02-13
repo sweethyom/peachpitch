@@ -14,12 +14,15 @@ import FeedbackModal from "@/components/modal/Feedback"
 import Setting from "@/components/modal/Setting"
 
 type DrawerProps = {
-    selectedKeyword: string | null;
     chatHistory: { role: string; message: string }[];
+    selectedKeywords: string[] | null;
+    hints: Array<Array<{hint: string}>> | null;  // 2차원 배열 타입으로 수정
 };
 
-const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
+const Drawer = ({ selectedKeywords, hints, chatHistory }: DrawerProps) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [keyword1, setKeyword1] = useState<string | null>(null);
+    const [keyword2, setKeyword2] = useState<string | null>(null);
 
     // 드로어 토글
     const toggleDrawer = () => {
@@ -42,9 +45,6 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
         setChatOpen(!chatOpen);
     };
 
-    // 힌트
-    const [hints, setHints] = useState<string[]>([]);
-
     const hintSwitch = () => {
         setHintOn(!hintOn);
     };
@@ -54,26 +54,33 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
         setIsSettingOpen(!isSettingOpen);
     };
 
-    // ✅ 힌트 데이터 불러오기
     useEffect(() => {
-        const loadHints = async () => {
-            try {
-                const response = await fetch("/data/hints.json");
-                const data = await response.json();
-                if (selectedKeyword && data[selectedKeyword]) {
-                    setHints(data[selectedKeyword]);
-                } else {
-                    setHints([]);
-                }
-            } catch (error) {
-                console.error("힌트 데이터를 불러오는 중 오류가 발생했습니다:", error);
-            }
-        };
-
-        if (selectedKeyword) {
-            loadHints();
+        if(selectedKeywords && selectedKeywords.length==2){
+            setKeyword1(selectedKeywords[0]);
+            setKeyword2(selectedKeywords[1]);
         }
-    }, [selectedKeyword]);
+    }, [selectedKeywords]);
+
+    // ✅ 힌트 데이터 불러오기
+    // useEffect(() => {
+    //     const loadHints = async () => {
+    //         try {
+    //             const response = await fetch("/data/hints.json");
+    //             const data = await response.json();
+    //             if (selectedKeyword && data[selectedKeyword]) {
+    //                 setHints(data[selectedKeyword]);
+    //             } else {
+    //                 setHints([]);
+    //             }
+    //         } catch (error) {
+    //             console.error("힌트 데이터를 불러오는 중 오류가 발생했습니다:", error);
+    //         }
+    //     };
+    //
+    //     if (selectedKeyword) {
+    //         loadHints();
+    //     }
+    // }, [selectedKeyword]);
 
     useEffect(() => {
         if (limitOn) {
@@ -111,7 +118,6 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
                 {/* 공통 헤더 */}
                 <div className={styles.drawer__header}>
                     <img src={closeBtn} onClick={toggleDrawer} width={"12px"} height={"23px"} />
-                    <button onClick={toggleFeedback}>피드백</button>
                     <img src={settingBtn} width={"30px"} onClick={toggleSetting}/>
                 </div>
 
@@ -119,8 +125,8 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
 
                 {/* 키워드 표시 */}
                 <div className={styles.drawer__tag}>
-                    <p className={styles.drawer__tag__1}>{selectedKeyword || "여행"}</p>
-                    <p className={styles.drawer__tag__2} style={{ display: "none" }}></p>
+                    <p className={styles.drawer__tag__1}>{keyword1}</p>
+                    <p className={styles.drawer__tag__2}>{keyword2}</p>
 
                     {limitOn && (
                         <p className={styles.drawer__tag__limit}>
@@ -164,22 +170,26 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
 
                 {/* 힌트 리스트 */}
                 {hintOn && (
-                    <div className={styles.drawer__hint}>
-                        <div className={styles.drawer__hint__header}>
-                            <p className={styles.drawer__hint__header__title}>[{selectedKeyword}] 관련 질문</p>
+                    hints && hints.map((hintArray, arrayIndex) => (
+                        <div key={arrayIndex} className={styles.drawer__hint}>
+                            <div className={styles.drawer__hint__header}>
+                                <p className={styles.drawer__hint__header__title}>
+                                    [{selectedKeywords?.[arrayIndex]}] 관련 질문
+                                </p>
+                            </div>
+                            <ul className={styles.drawer__hint__list}>
+                                {hintArray.length > 0 ? (
+                                    hintArray.map((item, index) => (
+                                        <li key={index} className={styles.drawer__hint__list__item}>
+                                            {item.hint}
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className={styles.noHint}>관련 힌트가 없습니다.</li>
+                                )}
+                            </ul>
                         </div>
-                        <ul className={styles.drawer__hint__list}>
-                            {hints.length > 0 ? (
-                                hints.map((hint, index) => (
-                                    <li key={index} className={styles.drawer__hint__list__item}>
-                                        {hint}
-                                    </li>
-                                ))
-                            ) : (
-                                <li className={styles.noHint}>관련 힌트가 없습니다.</li>
-                            )}
-                        </ul>
-                    </div>
+                    ))
                 )}
 
                 {/* 채팅 */}
@@ -197,7 +207,7 @@ const Drawer = ({ selectedKeyword, chatHistory }: DrawerProps) => {
                     {/* Prompt 창 */}
                     {chatOpen && (
                         <div className={styles.drawer__chatting__prompt}>
-                            {chatHistory && chatHistory.length > 0 ? ( // ✅ chatHistory가 undefined/null인지 체크
+                        {chatHistory && chatHistory.length > 0 ? ( // ✅ chatHistory가 undefined/null인지 체크
                                 chatHistory.map((msg, index) => (
                                     <div key={index} className={msg.role === "ai" ? styles.bubble__left : styles.bubble__right}>
                                         {msg.message}
