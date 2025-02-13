@@ -15,7 +15,7 @@ from datetime import datetime
 GOOGLE_API_KEY = settings.GOOGLE_API_KEY
 GOOGLE_CX = settings.GOOGLE_CX
 
-# 구글 검색 함수
+# 구글 검색 함수: 최대 3개의 snippet을 반환합니다.
 def google_search(query):
     url = "https://www.googleapis.com/customsearch/v1"
     params = {"key": GOOGLE_API_KEY, "cx": GOOGLE_CX, "q": query}
@@ -26,8 +26,7 @@ def google_search(query):
     else:
         return []
 
-
-# 대화 히스토리 관리 
+# 대화 히스토리와 턴 관리
 conversation_history = []
 conversation_turn = 0
 
@@ -43,49 +42,33 @@ def start_conversation(request):
             if not keyword:
                 return JsonResponse({'error': '키워드를 입력하세요.'}, status=400)
 
-
-
-            # 구글 검색 결과 추가
-            search_results = google_search(keyword)
-            search_content = "\n".join(search_results) if search_results else ""
-
+            # 초기 메시지 생성
             initial_message = generate_initial_message(keyword)
-            
 
-            # 히스토리에 추가
-            conversation_history.clear()  # 새로운 대화 시작 시 이전 기록 초기화
+            # 새 대화 시작: 기존 히스토리 초기화 및 첫 메시지 기록
+            conversation_history.clear()
             conversation_turn = 1
             conversation_history.append({"role": "user", "content": f"키워드: {keyword}"})
             conversation_history.append({"role": "assistant", "content": initial_message})
         
+            # history_id가 제공되면 Redis에 저장
             if history_id:
-                # Redis 키 생성 전에 history_id 타입 확인
                 redis_key = f"chat:{history_id}:messages"
-                print("Redis key:", redis_key)
-
-                # Redis에 저장
                 redis_client = get_redis_connection("default")
                 chat_data = {
                     "role": "assistant",
                     "content": initial_message,
                     "timestamp": str(datetime.now())
-                }  
-                print('redis 객체만들기 완료')
-
-                # 세션별로 대화 저장
+                }
                 redis_client.rpush(redis_key, json.dumps(chat_data))
-
-                print('redis에 세션별 저장 완료')
-                # 24시간 후 만료되도록 설정(후에 변경)
-                redis_client.expire(redis_key, 60*60*24) 
+                redis_client.expire(redis_key, 60*60*24)
             
             return JsonResponse({'message': initial_message})
         
         except json.JSONDecodeError:
             return JsonResponse({'error': '유효한 JSON 형식이 아닙니다.'}, status=400)
-
+    
     return JsonResponse({'error': 'POST 요청만 지원합니다.'}, status=405)
-
 
 @csrf_exempt
 def continue_conversation(request):
@@ -94,91 +77,91 @@ def continue_conversation(request):
         try:
             data = json.loads(request.body)
             user_message = data.get('message', '')
-            history_id = data.get('history_id') 
+            history_id = data.get('history_id')
 
             if not user_message:
                 return JsonResponse({'error': '사용자 메시지를 입력하세요.'}, status=400)
             
-            # 사용자 메시지 히스토리에 추가
+            # 사용자 메시지를 대화 히스토리에 추가
             conversation_history.append({"role": "user", "content": user_message})
 
-            # history_id가 있을 때 Redis 저장
+            # history_id가 있을 경우, 사용자 메시지를 Redis에 저장
             if history_id:
-                # Redis에 저장
                 redis_client = get_redis_connection("default")
+                redis_key = f"chat:{history_id}:messages"
                 chat_data = {
                     "role": "user",
                     "content": user_message,
                     "timestamp": str(datetime.now())
-                }  
-
-                print('사용자 응답 redis 객체만들기 완료')
-
-                # 세션별로 대화 저장
-                redis_key = f"chat:{history_id}:messages"
+                }
                 redis_client.rpush(redis_key, json.dumps(chat_data))
-                
-                print('redis에 사용자 응답 세션별 저장 완료')
-                
-                # 24시간 후 만료되도록 설정(후에 변경)
                 redis_client.expire(redis_key, 60*60*24)
 
-
-            # 10턴 이상이면 종료 프롬프트 적용. 이것도 최적화 할까..
+            # ✅ **10턴 이상이면 바로 종료 메시지 생성 (불필요한 bot_reply 연산 방지)**
             if conversation_turn >= 10:
                 recent_conversation = conversation_history[7:]
-
                 final_prompt = {
                     "role": "system",
-                    "content": "지금까지의 대화 내용을 참고해서 마무리 인사를 해주세요. "
-                               "대화의 주제를 간단히 언급하고, 따뜻한 인사를 남겨주세요. "
-                               "예를 들어, 고양이에 대한 대화였다면 '오늘 고양이에 대한 이야기 너무 즐거웠어! 다음에 또 만나!'와 같이 작성하세요."
+                    "content": (
+                        "지금까지의 대화 내용을 참고해서 마무리 인사를 해주세요. "
+                        "대화의 주제를 간단히 언급하고, 따뜻한 인사를 남겨주세요. "
+                        "예를 들어, 고양이에 대한 대화였다면 '오늘 고양이에 대한 이야기 너무 즐거웠어! 다음에 또 만나!'와 같이 작성하세요."
+                    )
                 }
                 final_message = generate_reply(recent_conversation + [final_prompt])
                 conversation_history.append({"role": "assistant", "content": final_message})
-
                 return JsonResponse({'message': final_message})
-            
+
+            # ✅ **그 외의 경우 정상적으로 RAG 적용**
             else:
-                # GPT로부터 응답 생성
+                # 1️⃣ 우선 기본 답변 생성 (외부 검색 없이)
                 bot_reply = generate_reply(conversation_history)
-                
+
+                # 2️⃣ 기본 답변이 '모르' 계열 표현 포함 시, 검색 실행
+                if any(uncertain in bot_reply for uncertain in ["모르", "잘 모르", "알지 못"]):
+                    search_results = google_search(user_message)
+                    if search_results:
+                        search_content = "\n".join(search_results)
+                        # 검색 결과를 시스템 메시지로 추가해 대화 히스토리를 보강하고 재생성
+                        augmented_history = conversation_history + [{
+                            "role": "system",
+                            "content": f"참고자료 (구글 검색 결과):\n{search_content}"
+                        }]
+                        bot_reply = generate_reply(augmented_history)
+
+                import re
+
+                # 정규식 패턴으로 한번에 검사
                 if re.search(r"모르|잘 모르|알지 못", bot_reply):
                     search_results = google_search(user_message)
                     if search_results:
                         search_content = "\n".join(search_results)
                         augmented_history = conversation_history + [{
                             "role": "system",
-                            "content": f"참고자료 : \n{search_content}"
+                            "content": f"참고자료 (구글 검색 결과):\n{search_content}"
                         }]
                         bot_reply = generate_reply(augmented_history)
 
 
-                # 챗봇 응답 히스토리에 추가
+                # 3️⃣ 최종 답변을 히스토리에 추가 및 대화 턴 증가
                 conversation_history.append({"role": "assistant", "content": bot_reply})
                 conversation_turn += 1
-                
+
+                # 4️⃣ history_id가 있을 경우, 챗봇 응답을 Redis에 저장
                 if history_id:
-                    # Redis에 저장
                     redis_client = get_redis_connection("default")
+                    redis_key = f"chat:{history_id}:messages"
                     chat_data = {
                         "role": "assistant",
                         "content": bot_reply,
                         "timestamp": str(datetime.now())
                     }
-                    print('bot 대답 redis 객체만들기 완료')
-
-                    # 세션별로 대화 저장
-                    redis_key = f"chat:{history_id}:messages"
                     redis_client.rpush(redis_key, json.dumps(chat_data))
-
-                    print('redis에 bot 대답 세션별 저장 완료')
-                    # 24시간 후 만료되도록 설정(후에 변경)
                     redis_client.expire(redis_key, 60*60*24)
 
                 return JsonResponse({'message': bot_reply})
 
         except json.JSONDecodeError:
             return JsonResponse({'error': '유효한 JSON 형식이 아닙니다.'}, status=400)
-
+    
     return JsonResponse({'error': 'POST 요청만 지원합니다.'}, status=405)
