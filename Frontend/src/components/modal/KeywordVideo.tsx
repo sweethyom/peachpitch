@@ -8,6 +8,7 @@ import { Client } from "@stomp/stompjs";
 type ModalProps = {
     isOpen: boolean; // 모달 열림 상태
     setSelectedKeyword: (keyword: string) => void; // 키워드 저장 함수
+    setHints: React.Dispatch<React.SetStateAction<string[]>>; // 힌트 저장 함수
     historyId: number; // 현재 대화 내역 id
     setIsCompleted: (completed: boolean) => void; // 키워드 전부 선택되었는지 여부
     children?: React.ReactNode; // 추가적인 child 요소
@@ -18,7 +19,7 @@ type KeywordItem = {
     name: string;
 };
 
-function Keyword({ isOpen, setSelectedKeyword, historyId, setIsCompleted, children }: ModalProps) {
+function Keyword({ isOpen, setSelectedKeyword, historyId, setIsCompleted, setHints, children }: ModalProps) {
 
     // 키워드 목록과 관련 상태들
     const [keywords, setKeywords] = useState<KeywordItem[]>([]);
@@ -76,9 +77,11 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setIsCompleted, childr
                             // console.log("힌트 정보:", response.hints);
                             setSelectedKeyword(response.keyword);
                             setIsSelected(true);
+                            setHints(prev => prev ? [...prev, response.hints] :[response.hints]);
                         } else if (response.status === "completed") {
                             // 두 명 모두 키워드 선택 완료 → 최종 데이터 전달 및 모달 종료
                             setSelectedKeyword(response.keyword);
+                            setHints(prev => prev ? [...prev, response.hints] :[response.hints]);
                             // 힌트 전달 필요
                             setIsCompleted(true);
                             // 키워드 웹소켓 종료
