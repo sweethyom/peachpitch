@@ -16,7 +16,7 @@ import RedAlert from '@/components/alert/redAlert';
 function loginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   // alert창
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -63,7 +63,7 @@ function loginPage() {
 
       // 대소문자 상관없이 access 헤더 찾기
       const accessToken = headers["access"] || headers["Access"] || headers["ACCESS"];
-      const userId = headers["user_id"] || headers["userId"];
+      // const userId = headers["user_id"] || headers["userId"];
       const refreshToken = headers["refresh"] || headers["Refresh"] || headers["REFRESH"];
 
       console.log("accessToken = " , accessToken);

@@ -11,7 +11,7 @@ import icon_mouth from '../../assets/icons/feedback_mouth.png'
 import icon_score from '../../assets/icons/feedback_score.png'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 interface ChatReport {
   reportId: number;
@@ -23,7 +23,7 @@ interface ChatReport {
 function chatReportPage() {
 
   const { historyId } = useParams();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [reportData, setReportData] = useState<ChatReport | null>(null);
 
 

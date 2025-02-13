@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './styles/video.module.scss';
 
 import leaveBtn from '@/assets/icons/leave.png';
@@ -9,8 +9,8 @@ import RoomLeaveModal from '@/components/modal/RoomLeave';
 import KeywordModal from '@/components/modal/KeywordVideo';
 import RedAlert from '@/components/alert/redAlert';
 
-import {Client} from "@stomp/stompjs";
-import {OpenVidu, Session, Publisher, Subscriber} from "openvidu-browser";
+import { Client } from "@stomp/stompjs";
+import { OpenVidu, Session, Publisher, Subscriber } from "openvidu-browser";
 import axios from "axios";
 import FeedbackModal from "@components/modal/Feedback.tsx";
 
@@ -30,12 +30,13 @@ const VideoChatPage: React.FC = () => {
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [alertMessage, setAlertMessage] = useState<string>(""); //alert 재사용을 위한 메세지
 
-    const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+    const [chatHistory, _setChatHistory] = useState<{ role: string; message: string }[]>([]);
     const [selectedKeywords, setSelectedKeywords] = useState<string[] | null>(); // 사용자들이 고른 키워드
-    const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
+    const [hints, setHints] = useState<{ hint: string }[][]>([]); // 키워드에 따른 힌트
+
 
     /* stomp client */
-    const [client, setClient] = useState<Client | null>(null);
+    const [_client, setClient] = useState<Client | null>(null);
 
     /* openvidu session */
     const [session, setSession] = useState<Session | null>(null);
@@ -215,7 +216,7 @@ const VideoChatPage: React.FC = () => {
         if (session) {
             console.log("📴 세션 종료");
             session.disconnect();
-            closeSession(sessionId);
+            closeSession(sessionId ?? "");
         }
     };
 
@@ -238,9 +239,10 @@ const VideoChatPage: React.FC = () => {
             {/* 설정 메뉴바 */}
             <div className={styles.menu}>
                 <Drawer
-                        chatHistory={chatHistory}
-                        selectedKeywords={selectedKeywords}
-                        hints={hints}
+                    chatHistory={chatHistory}
+                    selectedKeywords={selectedKeywords || null}
+                    hints={hints}
+                    historyId={historyId ?? 0} // ✅ 기본값 0 할당
                 />
             </div>
 
@@ -262,7 +264,7 @@ const VideoChatPage: React.FC = () => {
                         <div id="video-container">
                             {publisher && (
                                 <div className="stream-container col-md-6 col-xs-6">
-                                    <UserVideoComponent streamManager={publisher}/>
+                                    <UserVideoComponent streamManager={publisher} />
                                 </div>
                             )}
                             {subscribers.map((sub) => (
@@ -271,14 +273,14 @@ const VideoChatPage: React.FC = () => {
                                     className="stream-container col-md-6 col-xs-6"
                                 >
                                     <span>{sub.stream.connection.data}</span>
-                                    <UserVideoComponent streamManager={sub}/>
+                                    <UserVideoComponent streamManager={sub} />
                                 </div>
                             ))}
                             <div className={styles.chat__input}>
                                 <p className={styles.chat__input__content}>
                                     최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
                                 </p>
-                                <img src={sstBtn} className={styles.chat__input__img} alt="sst button"/>
+                                <img src={sstBtn} className={styles.chat__input__img} alt="sst button" />
                             </div>
                         </div>
                     </>
@@ -296,13 +298,14 @@ const VideoChatPage: React.FC = () => {
                 isOpen={isKeywordOpen}
                 setSelectedKeyword={setSelectedKeyword}
                 setHints={setHints}
+                historyId={historyId ?? 0}
                 setIsCompleted={setIsCompleted}
-                historyId={historyId}
+
             />
 
             {/* 키워드 선택안했을 경우 뜨는 alert창 */}
             {showAlert && (
-                <div style={{zIndex: 9999}}>
+                <div style={{ zIndex: 9999 }}>
                     <RedAlert
                         message={alertMessage}
                         onClose={() => setShowAlert(false)}
@@ -311,7 +314,7 @@ const VideoChatPage: React.FC = () => {
             )}
 
             {showTimeAlert && (
-                <div style={{zIndex: 9999}}>
+                <div style={{ zIndex: 9999 }}>
                     <RedAlert
                         message="10초가 경과되었습니다!"
                         onClose={() => setShowTimeAlert(false)}
@@ -321,10 +324,10 @@ const VideoChatPage: React.FC = () => {
 
             {/* 대화 나가기 모달 */}
             <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} stopTTS={() => {
-            }}/>
+            }} />
 
             {/* 피드백 모달 */}
-            <FeedbackModal isOpen={isFeedbackOpen} historyId={historyId}/>
+            <FeedbackModal isOpen={isFeedbackOpen} historyId={historyId} />
         </div>
     );
 };

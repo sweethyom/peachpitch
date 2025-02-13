@@ -8,7 +8,7 @@ import { Client } from "@stomp/stompjs";
 type ModalProps = {
     isOpen: boolean; // 모달 열림 상태
     setSelectedKeyword: (keyword: string) => void; // 키워드 저장 함수
-    setHints: React.Dispatch<React.SetStateAction<string[]>>; // 힌트 저장 함수
+    setHints: React.Dispatch<React.SetStateAction<{ hint: string }[][]>>; // 힌트 저장 함수
     historyId: number; // 현재 대화 내역 id
     setIsCompleted: (completed: boolean) => void; // 키워드 전부 선택되었는지 여부
     children?: React.ReactNode; // 추가적인 child 요소
@@ -19,7 +19,7 @@ type KeywordItem = {
     name: string;
 };
 
-function Keyword({ isOpen, setSelectedKeyword, historyId, setIsCompleted, setHints, children }: ModalProps) {
+function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsCompleted }: ModalProps) {
 
     // 키워드 목록과 관련 상태들
     const [keywords, setKeywords] = useState<KeywordItem[]>([]);
@@ -29,7 +29,7 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setIsCompleted, setHin
 
     // STOMP 클라이언트 상태
     const [client, setClient] = useState<Client | null>(null);
-    const [isSelected, setIsSelected] = useState<boolean>(false);
+    const [_isSelected, setIsSelected] = useState<boolean>(false);
 
     // 사용자가 버튼을 클릭해서 키워드 선택을 완료했는지 여부
     const [hasSubmitted, setHasSubmitted] = useState<boolean>(false);
@@ -77,11 +77,11 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setIsCompleted, setHin
                             // console.log("힌트 정보:", response.hints);
                             setSelectedKeyword(response.keyword);
                             setIsSelected(true);
-                            setHints(prev => prev ? [...prev, response.hints] :[response.hints]);
+                            setHints(prev => prev ? [...prev, response.hints] : [response.hints]);
                         } else if (response.status === "completed") {
                             // 두 명 모두 키워드 선택 완료 → 최종 데이터 전달 및 모달 종료
                             setSelectedKeyword(response.keyword);
-                            setHints(prev => prev ? [...prev, response.hints] :[response.hints]);
+                            setHints(prev => prev ? [...prev, response.hints] : [response.hints]);
                             // 힌트 전달 필요
                             setIsCompleted(true);
                             // 키워드 웹소켓 종료
@@ -130,59 +130,58 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setIsCompleted, setHin
     return (
         <>
             {isOpen && (
-                    <div className={styles.overlay}>
-                        <div className={styles.modal}>
-                            <div className={styles.modal__header}>
-                                <Link to="/main">
-                                    <img src={closeBtn} className={styles.modal__header__close} alt="close"/>
-                                </Link>
-                                <p className={styles.modal__header__logo}>PeachPitch</p>
-                            </div>
-                            <p className={styles.modal__header__title}>키워드 선택하기</p>
-                            <div className={styles.modal__contents}>
-                                <div className={styles.modal__contents__add}>
-                                    {visibleCount < 15 && (
-                                        <div className={styles.modal__contents__btn} onClick={handleAddKeyword}>
-                                            키워드 추가하기
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className={styles.modal__keywords}>
-                                    {keywords.map((keyword, index) => (
-                                        <div
-                                            key={keyword.id}
-                                            className={`${styles.modal__keywords__item} ${
-                                                selectedKeyword === keyword.name ? styles.selected : ""
-                                            }`}
-                                            onClick={() => handleKeywordClick(keyword)}
-                                            style={{
-                                                visibility: index < visibleCount ? "visible" : "hidden",
-                                                opacity: index < visibleCount ? 1 : 0,
-                                                transition: "opacity 0.3s ease-in-out",
-                                            }}
-                                        >
-                                            {keyword.name}
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            {/* 버튼 영역: 아직 선택하지 않았다면 선택 버튼 보임,
-                            선택 후에는 모달 중앙에 대기 메시지 표시 */}
-                            {!hasSubmitted ? (
-                                <div className={styles.modal__btn}>
-                                    <div className={styles.btn} onClick={handleStart}>
-                                        선택하기
-                                    </div>
-                                </div>
-                            ) : (
-                                <div>
-                                    다른 사용자가 키워드를 고르고 있습니다.
-                                </div>
-                            )}
+                <div className={styles.overlay}>
+                    <div className={styles.modal}>
+                        <div className={styles.modal__header}>
+                            <Link to="/main">
+                                <img src={closeBtn} className={styles.modal__header__close} alt="close" />
+                            </Link>
+                            <p className={styles.modal__header__logo}>PeachPitch</p>
                         </div>
+                        <p className={styles.modal__header__title}>키워드 선택하기</p>
+                        <div className={styles.modal__contents}>
+                            <div className={styles.modal__contents__add}>
+                                {visibleCount < 15 && (
+                                    <div className={styles.modal__contents__btn} onClick={handleAddKeyword}>
+                                        키워드 추가하기
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className={styles.modal__keywords}>
+                                {keywords.map((keyword, index) => (
+                                    <div
+                                        key={keyword.id}
+                                        className={`${styles.modal__keywords__item} ${selectedKeyword === keyword.name ? styles.selected : ""
+                                            }`}
+                                        onClick={() => handleKeywordClick(keyword)}
+                                        style={{
+                                            visibility: index < visibleCount ? "visible" : "hidden",
+                                            opacity: index < visibleCount ? 1 : 0,
+                                            transition: "opacity 0.3s ease-in-out",
+                                        }}
+                                    >
+                                        {keyword.name}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                        {/* 버튼 영역: 아직 선택하지 않았다면 선택 버튼 보임,
+                            선택 후에는 모달 중앙에 대기 메시지 표시 */}
+                        {!hasSubmitted ? (
+                            <div className={styles.modal__btn}>
+                                <div className={styles.btn} onClick={handleStart}>
+                                    선택하기
+                                </div>
+                            </div>
+                        ) : (
+                            <div>
+                                다른 사용자가 키워드를 고르고 있습니다.
+                            </div>
+                        )}
                     </div>
-                )
+                </div>
+            )
             }
         </>
 

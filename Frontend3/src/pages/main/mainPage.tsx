@@ -28,7 +28,7 @@ function MainPage() {
   const [rotate, setRotate] = useState(false);
 
   const [showCompletePay, setShowCompletePay] = useState(false);
-  const [fingerprint, setFingerprint] = useState<string | null>(null);
+  const [_fingerprint, setFingerprint] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const [showWelcomeAlert, setShowWelcomeAlert] = useState(false);
@@ -37,7 +37,7 @@ function MainPage() {
   const [permissionAlert, setPermissionAlert] = useState<string | null>(null);
 
   // 소셜 로그인 accessToken
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
+  const [_isLoggedIn, setIsLoggedIn] = useState<boolean>(() => {
     return localStorage.getItem('accessToken') !== null;
   });
 
