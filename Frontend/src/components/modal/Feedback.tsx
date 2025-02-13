@@ -47,7 +47,7 @@ function Feedback({ isOpen, historyId }: ModalProps) {
 
 
     const handleSubmitFeedback = async () => {
-        if (isSubmitting || !historyId) return; // 중복 체크, historyId 체크
+        if (isSubmitting || !historyId || selected.length === 0) return; // 중복 체크, historyId 체크
 
         try {
             const userJwtFromStorage = localStorage.getItem("accessToken");
@@ -118,7 +118,10 @@ function Feedback({ isOpen, historyId }: ModalProps) {
                     <div
                         className={styles.modal__btn__leave}
                         onClick={handleSubmitFeedback}
-                        style={{cursor: isSubmitting ? 'not-allowed' : 'pointer'}}
+                        style={{
+                            cursor: isSubmitting || selected.length === 0 ? 'not-allowed' : 'pointer',
+                            opacity: selected.length === 0 ? 0.5 : 1
+                        }}
                     >
                         {isSubmitting ? '제출 중...' : '종료하기'}
                     </div>
