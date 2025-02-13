@@ -70,4 +70,6 @@ public class HaveCoupon {
         return ea > 0;
     }
 
+    public void setExpirationDate(LocalDateTime localDateTime) {
+    }
 }
