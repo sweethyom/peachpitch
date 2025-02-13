@@ -12,6 +12,7 @@ import RedAlert from '@/components/alert/redAlert';
 import {Client} from "@stomp/stompjs";
 import {OpenVidu, Session, Publisher, Subscriber} from "openvidu-browser";
 import axios from "axios";
+import FeedbackModal from "@components/modal/Feedback.tsx";
 
 const VideoChatPage: React.FC = () => {
     /* 대화 나가기 모달창 */
@@ -49,81 +50,30 @@ const VideoChatPage: React.FC = () => {
 
     /* matching 상태 */
     const [isMatching, setIsMatching] = useState<boolean>(false);
-    const [isClose, setIsClose] = useState<boolean>(false);
+    // const [isClose, setIsClose] = useState<boolean>(false);
 
     const [userJwt, setUserJwt] = useState<string>("");
     const [historyId, setHistoryId] = useState<number | null>(null);
+    const [showTimeAlert, setShowTimeAlert] = useState<boolean>(false); // 시간 측정
+
+    const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+    const toggleFeedback = () => { setIsFeedbackOpen(!isFeedbackOpen) };
 
     useEffect(() => {
-        if (isCompleted) {
+        console.log(selectedKeyword)
+    }, [selectedKeyword]);
+
+    useEffect(() => {
+        if (isCompleted && token) {
+            //console.log("선택된 키워드(전부 다 선택)" + selectedKeyword)
             setIsKeywordOpen(false);
+            initializeOpenViduSession();
         }
-    }, [isCompleted]);
+    }, [isCompleted, token]);
 
-    useEffect(() => {
-        const userJwtFromStorage = localStorage.getItem("accessToken");
-        setUserJwt(userJwtFromStorage || "");
-        console.log("stomp call " + userJwt);
-        const stompClient = new Client({
-            brokerURL: "ws://localhost:8080/ws/room",
-            connectHeaders: {
-                access: `${userJwt}`,
-            },
-            reconnectDelay: 5000,
-            onConnect: () => {
-                console.log("✅ STOMP 연결됨");
-                stompClient.subscribe("/user/sub/call", (message) => {
-                    console.log("📩 받은 메시지:", message.body);
-                    const response = JSON.parse(message.body);
-                    if (response.status === "waiting") {
-                        console.log("🔄 매칭 대기 중...");
-                    } else if (response.status === "matched") {
-                        console.log("🎉 매칭 완료! 토큰:", response.token);
-                        setToken(response.token);
-                        setHistoryId(response.historyId); // 대화 내역 id 저장
-
-                        // 🌟 매칭 완료되었으므로 웹소켓 연결 해제
-                        console.log("🛑 웹소켓 연결 종료");
-                        stompClient.deactivate();
-                    }
-                });
-                // STOMP 연결이 성공하면 자동으로 매칭 요청
-                console.log("🔍 매칭 시도 중...");
-                setIsMatching(true);
-                stompClient.publish({
-                    destination: "/pub/request",
-                });
-            },
-            onDisconnect: () => console.log("❌ STOMP 연결 종료됨"),
-            onStompError: (frame) => {
-                console.error("STOMP 에러:", frame);
-                setAlertMessage("STOMP 에러");
-                setShowAlert(true);
-                stompClient.deactivate();
-                //redirect main
-            },
-            onWebSocketError: (event) => {
-                console.error("WebSocket 에러:", event);
-                setAlertMessage("WebSocket 에러");
-                setShowAlert(true);
-                stompClient.deactivate();
-            }
-        });
-
-        stompClient.activate();
-        setClient(stompClient);
-
-        return () => {
-            stompClient.deactivate();
-        };
-    }, [userJwt]);
-
-    useEffect(() => {
+    const initializeOpenViduSession = () => {
         if (token) {
             console.log("📡 OpenVidu 세션 시작");
-            // 매칭이 완료되었으므로 키워드 모달을 열기.
-            setIsKeywordOpen(true);
-            if (isCompleted) setIsCompleted(false);
             const ov = new OpenVidu();
             const newSession: Session = ov.initSession();
 
@@ -134,14 +84,11 @@ const VideoChatPage: React.FC = () => {
                 setSubscribers((prev) => [...prev, subscriber]);
             });
 
-            // 상대방 스트림이 끊어졌을 때
             newSession.on("streamDestroyed", (event: any) => {
                 console.log("상대방 스트림 종료됨:", event);
-                if (session)
-                    session.disconnect();
+                if (session) session.disconnect();
             });
 
-            // sessionDisconnected에서 정리 작업 수행
             newSession.on("sessionDisconnected", (event: any) => {
                 console.log("❌ 세션 연결 종료됨:", event);
                 setSession(null);
@@ -158,7 +105,20 @@ const VideoChatPage: React.FC = () => {
                 .then(async () => {
                     console.log("✅ OpenVidu 연결 성공");
                     setSessionId(newSession.sessionId);
-                    // 🎥 getUserMedia로 미디어 권한 요청
+
+                    // Start 10-second timer
+                    setTimeout(() => {
+                        setShowTimeAlert(true);
+                    }, 10000);
+
+                    // 20초 지나면 keyword modal
+                    setTimeout(()=>{
+                        setIsFeedbackOpen(true);
+                        newSession.disconnect();
+                        closeSession(newSession.sessionId);
+                        //leaveSession()
+                    }, 20000);
+
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({
                             video: true,
@@ -188,15 +148,71 @@ const VideoChatPage: React.FC = () => {
             setSession(newSession);
             setIsMatching(false);
         }
-    }, [token]);
+    };
+
+    // STOMP client setup useEffect remains the same
+    useEffect(() => {
+        const userJwtFromStorage = localStorage.getItem("accessToken");
+        setUserJwt(userJwtFromStorage || "");
+
+        const stompClient = new Client({
+            brokerURL: "ws://localhost:8080/api/ws",
+            connectHeaders: {
+                access: `${userJwt}`,
+            },
+            reconnectDelay: 5000,
+            onConnect: () => {
+                console.log("✅ STOMP 연결됨");
+                stompClient.subscribe("/user/sub/call", (message) => {
+                    console.log("📩 받은 메시지:", message.body);
+                    const response = JSON.parse(message.body);
+                    if (response.status === "waiting") {
+                        console.log("🔄 매칭 대기 중...");
+                    } else if (response.status === "matched") {
+                        console.log("🎉 매칭 완료! 토큰:", response.token);
+                        setToken(response.token);
+                        setHistoryId(response.historyId);
+                        setIsKeywordOpen(true);
+                        console.log("🛑 웹소켓 연결 종료");
+                        stompClient.deactivate();
+                    }
+                });
+                console.log("🔍 매칭 시도 중...");
+                setIsMatching(true);
+                stompClient.publish({
+                    destination: "/pub/request",
+                });
+            },
+            onDisconnect: () => console.log("❌ STOMP 연결 종료됨"),
+            onStompError: (frame) => {
+                console.error("STOMP 에러:", frame);
+                setAlertMessage("STOMP 에러");
+                setShowAlert(true);
+                stompClient.deactivate();
+            },
+            onWebSocketError: (event) => {
+                console.error("WebSocket 에러:", event);
+                setAlertMessage("WebSocket 에러");
+                setShowAlert(true);
+                stompClient.deactivate();
+            }
+        });
+
+        stompClient.activate();
+        setClient(stompClient);
+
+        return () => {
+            stompClient.deactivate();
+        };
+    }, [userJwt]);
+
 
     const leaveSession = (): void => {
         if (session) {
             console.log("📴 세션 종료");
-            closeSession(sessionId);
             session.disconnect();
+            closeSession(sessionId);
         }
-
     };
 
     const closeSession = async (sessionId: string) => {
@@ -250,19 +266,21 @@ const VideoChatPage: React.FC = () => {
                                     <UserVideoComponent streamManager={sub}/>
                                 </div>
                             ))}
+                            <div className={styles.chat__input}>
+                                <p className={styles.chat__input__content}>
+                                    최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
+                                </p>
+                                <img src={sstBtn} className={styles.chat__input__img} alt="sst button"/>
+                            </div>
                         </div>
                     </>
                 ) : (
                     <>
-                        <p>{isMatching ? "매칭 중입니다. 잠시만 기다려 주세요..." : "매칭 버튼을 눌러주세요."}</p>
+                        {isMatching ? "매칭 중입니다. 잠시만 기다려 주세요..." : "끝났어"}
+
                     </>
                 )}
-                <div className={styles.chat__input}>
-                    <p className={styles.chat__input__content}>
-                        최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                    </p>
-                    <img src={sstBtn} className={styles.chat__input__img} alt="sst button"/>
-                </div>
+
             </div>
 
             {/* 키워드 모달 */}
@@ -271,7 +289,7 @@ const VideoChatPage: React.FC = () => {
                 setSelectedKeyword={setSelectedKeyword}
                 setIsCompleted={setIsCompleted}
                 historyId={historyId}
-           />
+            />
 
             {/* 키워드 선택안했을 경우 뜨는 alert창 */}
             {showAlert && (
@@ -283,9 +301,21 @@ const VideoChatPage: React.FC = () => {
                 </div>
             )}
 
+            {showTimeAlert && (
+                <div style={{zIndex: 9999}}>
+                    <RedAlert
+                        message="10초가 경과되었습니다!"
+                        onClose={() => setShowTimeAlert(false)}
+                    />
+                </div>
+            )}
+
             {/* 대화 나가기 모달 */}
             <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} stopTTS={() => {
             }}/>
+
+            {/* 피드백 모달 */}
+            <FeedbackModal isOpen={isFeedbackOpen} historyId={historyId} />
         </div>
     );
 };
