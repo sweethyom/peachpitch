@@ -38,6 +38,8 @@ function VoiceChatPage() {
   /* 키워드 상태 */
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
   const [selectedKeywordId, setSelectedKeywordId] = useState<number | null>(null);
+  const [hints, setHints] = useState<string[] |null>(null);
+
   /* 음성 인식 관련 상태 */
   const [isListening, setIsListening] = useState(false);
   const { transcript, resetTranscript, listening } = useSpeechRecognition();
@@ -94,6 +96,8 @@ function VoiceChatPage() {
 
       const hintResponse = responseFromSpring.data;
       const historyIdFromResponse = hintResponse.data.historyId || null;
+      const hints = hintResponse.data.hints; // 힌트 배열
+      setHints(hints)
 
       console.log("Extracted historyId:", historyIdFromResponse);
       setHistoryId(historyIdFromResponse); // 대화 내역 id 저장
@@ -350,7 +354,7 @@ function VoiceChatPage() {
       <ChatEnd isOpen={isChatEnd} onClose={endChat} historyId={historyId} />
 
       <div className={styles.menu}>
-        <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} turnCount={turnCount} />
+        <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} turnCount={turnCount} hints={hints}/>
       </div>
 
       <div className={styles.chat}>
@@ -417,8 +421,6 @@ function VoiceChatPage() {
           <div className={styles.btn} onClick={handleStartClick}>시작하기</div>
         </KeywordModal>
       )}
-
-
 
       {/* 키워드 미선택 시 alert */}
       {showAlert && (

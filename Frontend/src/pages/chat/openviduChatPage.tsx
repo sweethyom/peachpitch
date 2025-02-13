@@ -31,6 +31,8 @@ const VideoChatPage: React.FC = () => {
     const [alertMessage, setAlertMessage] = useState<string>(""); //alert 재사용을 위한 메세지
 
     const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+    const [selectedKeywords, setSelectedKeywords] = useState<string[] | null>(); // 사용자들이 고른 키워드
+    const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
 
     /* stomp client */
     const [client, setClient] = useState<Client | null>(null);
@@ -57,10 +59,12 @@ const VideoChatPage: React.FC = () => {
     const [showTimeAlert, setShowTimeAlert] = useState<boolean>(false); // 시간 측정
 
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
-    const toggleFeedback = () => { setIsFeedbackOpen(!isFeedbackOpen) };
 
     useEffect(() => {
-        console.log(selectedKeyword)
+        if (selectedKeyword) {  // null이 아닐 때만 추가
+            setSelectedKeywords(prev => prev ? [...prev, selectedKeyword] : [selectedKeyword]);
+            setHints(prev => [...prev]); // 새로운 배열 참조 생성
+        }
     }, [selectedKeyword]);
 
     useEffect(() => {
@@ -112,7 +116,7 @@ const VideoChatPage: React.FC = () => {
                     }, 10000);
 
                     // 20초 지나면 keyword modal
-                    setTimeout(()=>{
+                    setTimeout(() => {
                         setIsFeedbackOpen(true);
                         newSession.disconnect();
                         closeSession(newSession.sessionId);
@@ -233,7 +237,11 @@ const VideoChatPage: React.FC = () => {
         <div className={styles.page}>
             {/* 설정 메뉴바 */}
             <div className={styles.menu}>
-                <Drawer selectedKeyword={selectedKeyword} chatHistory={chatHistory}/>
+                <Drawer
+                        chatHistory={chatHistory}
+                        selectedKeywords={selectedKeywords}
+                        hints={hints}
+                />
             </div>
 
             <div className={styles.chat}>
@@ -287,6 +295,7 @@ const VideoChatPage: React.FC = () => {
             <KeywordModal
                 isOpen={isKeywordOpen}
                 setSelectedKeyword={setSelectedKeyword}
+                setHints={setHints}
                 setIsCompleted={setIsCompleted}
                 historyId={historyId}
             />
@@ -315,7 +324,7 @@ const VideoChatPage: React.FC = () => {
             }}/>
 
             {/* 피드백 모달 */}
-            <FeedbackModal isOpen={isFeedbackOpen} historyId={historyId} />
+            <FeedbackModal isOpen={isFeedbackOpen} historyId={historyId}/>
         </div>
     );
 };

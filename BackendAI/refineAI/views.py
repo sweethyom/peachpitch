@@ -13,11 +13,8 @@ import time
 openai.api_key = settings.OPENAI_API_KEY
 logger = logging.getLogger(__name__)
 
+# 문장 복원 및 누락 단어 보완완
 def restore_punctuation(text):
-    """
-    GPT-4 API를 이용해 문장 부호 복원과 누락된 단어 보완을 수행합니다.
-    실패 시 원본 텍스트를 반환합니다.
-    """
     prompt = f"다음 문장에 올바른 문장 부호와 누락된 단어를 복원해줘:\n{text}"
     try:
         response = openai.ChatCompletion.create(
@@ -28,29 +25,18 @@ def restore_punctuation(text):
             ],
             temperature=0
         )
-        restored_text = response.choices[0].message['content'].strip()
+        return response.choices[0].message['content'].strip()
     except Exception as e:
         logger.error(f"OpenAI API 호출 오류: {e}")
-        restored_text = text
-    return restored_text
+        return text
 
-# 비용 절감
+# 복원 텍스트 마지막 문자 "?"이면 질문으로 판단.
 def is_question(text):
-    """
-    복원된 텍스트의 마지막 문자가 '?'이면 질문으로 판단합니다.
-    """
     return text.strip().endswith('?')
 
+# refineAI 실행 후 reportAI & wordAI 구동, HTTP 요청 : 동기 방식
 @csrf_exempt
 def refine_and_trigger(request):
-    """
-    refineAI 엔드포인트
-      1. POST로 전달된 history_id에 해당하는 대화(Chat 엔티티)를 조회합니다.
-      2. Redis에 history_id 관련 데이터가 남아 있는지 확인 (Polling 방식)
-      3. 대화 데이터가 사라진 후, GPT-4 API를 이용해 문장 부호 및 누락 단어 보완을 수행하고 DB를 업데이트합니다.
-      4. 보완된 텍스트를 기준으로 질문/답변 개수를 TotalReport에 누적 업데이트합니다.
-      5. reportAI와 wordAI를 직접 HTTP 요청으로 실행 
-    """
     if request.method != 'POST':
         return JsonResponse({'error': 'POST 요청만 허용됩니다.'}, status=405)
     
@@ -67,6 +53,7 @@ def refine_and_trigger(request):
     except ChatHistory.DoesNotExist:
         return JsonResponse({'error': '해당 history_id의 대화 내역이 존재하지 않습니다.'}, status=404)
     
+    # Redis Polling
     redis_client = redis.Redis(
         host=settings.REDIS_HOST,
         port=settings.REDIS_PORT,
@@ -80,11 +67,11 @@ def refine_and_trigger(request):
     while redis_client.exists(redis_key):
         if time.time() - start_time > timeout:
             return JsonResponse({"error": "대기 시간 초과되었습니다. 나중에 다시 시도해주세요."}, status=408)
-        time.sleep(1)  # 1초 간격으로 Redis 상태 확인
+        time.sleep(1)
 
     # history_id에 연결된 모든 Chat 메시지 조회
     chats = Chat.objects.filter(history=history)
-    updated_count = 0   # 디버깅 용으로 만듦듦
+    updated_count = 0   # 디버깅 용으로 만듦
     new_question_count = 0
     new_answer_count = 0
     
