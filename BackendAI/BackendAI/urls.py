@@ -6,4 +6,5 @@ urlpatterns = [
     path('ai/', include('chatbotAPI.urls')),
     path('ai/users/reports/analysis/', include('reportAI.urls')),
     path('ai/users/reports/words/', include('wordAI.urls')),
+    path('ai/users/reports/refine/', include('refineAI.urls')),
 ]

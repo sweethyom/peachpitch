@@ -73,6 +73,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'corsheaders',
     'chatbotAPI',
+    'refineAI',
     'reportAI',
     'wordAI',
     'django.contrib.admin',

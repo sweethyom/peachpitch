@@ -1,7 +1,5 @@
 import openai
 import json
-import redis
-import time
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -45,23 +43,6 @@ class WordAnalysisView(APIView):
         
         if not history_id:
             return Response({"error": "history_id가 필요합니다."}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Redis 설정
-        redis_client = redis.Redis(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            db=getattr(settings, 'REDIS_DB', 0)
-        )
-        redis_key = f"chat:{history_id}:messages"
-
-        # Polling 시작 (최대 30초 대기)
-        timeout = 30
-        start_time = time.time()
-
-        while redis_client.exists(redis_key):
-            if time.time() - start_time > timeout:
-                return Response({"error": "대기 시간 초과. 나중에 다시 시도해랏"}, status=408)
-            time.sleep(1)   # 1초 간격 확인
 
         # 모델 실행, history_id에 연결된 모든 chat 데이터 가져오기
         chats = Chat.objects.filter(history_id=history_id)
