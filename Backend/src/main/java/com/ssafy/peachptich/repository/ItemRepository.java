@@ -17,6 +17,9 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Optional<Item> findByName(String name);
     // type으로 Item조회
     Optional<Item> findByType(Item.ItemType type);
+    
+    // 이름과 타입으로 아이템 조회
+    Optional<Item> findByNameAndType(String name, Item.ItemType type);
 
     boolean existsByNameAndType(String name, Item.ItemType type);
 }
