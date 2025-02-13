@@ -25,6 +25,7 @@ def google_search(query):
     else:
         return []
 
+
 # 대화 히스토리 관리 
 conversation_history = []
 conversation_turn = 0
@@ -48,9 +49,8 @@ def start_conversation(request):
             search_content = "\n".join(search_results) if search_results else ""
 
             initial_message = generate_initial_message(keyword)
-            # if search_content:
-            #     initial_message += "\n\n최근 검색 결과:\n" + search_content
             
+
             # 히스토리에 추가
             conversation_history.clear()  # 새로운 대화 시작 시 이전 기록 초기화
             conversation_turn = 1
@@ -136,8 +136,6 @@ def continue_conversation(request):
                 final_message = generate_reply(recent_conversation + [final_prompt])
                 conversation_history.append({"role": "assistant", "content": final_message})
 
-                # 언니 => final conversation은 redis에 넣지 않는다.
-                
                 return JsonResponse({'message': final_message})
             
             else:
