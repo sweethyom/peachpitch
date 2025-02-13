@@ -154,8 +154,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             }
 
             // JSON 응답 생성
-            // Map<String, Long> responseData = Map.of("userId", userId);
-            Map<String, Long> responseData = new HashMap<>();
+            Map<String, Long> responseData = Map.of("userId", userId);
+            // Map<String, Long> responseData = new HashMap<>();
             ResponseDto<Map<String, Long>> responseDto = ResponseDto.<Map<String, Long>>builder()
                     .message("User login success!")
                     .data(responseData)
@@ -180,9 +180,9 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private Cookie createCookie(String key, String value){
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60);     // 쿠키 생명 주기
-         cookie.setSecure(true);        // https 통신을 진행해야 하는 경우
-        // cookie.setPath("/");         // 쿠키가 적용될 범위
-        cookie.setHttpOnly(true);       // true: 클라이언트단에서 javascript로 해당 쿠키에 접근하지 못하게 막아줌
+        cookie.setSecure(true);        // https 통신을 진행해야 하는 경우
+        cookie.setPath("/");         // 쿠키가 적용될 범위
+        cookie.setHttpOnly(false);       // true: 클라이언트단에서 javascript로 해당 쿠키에 접근하지 못하게 막아줌
 
         return cookie;
     }
