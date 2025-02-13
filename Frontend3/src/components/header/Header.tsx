@@ -16,7 +16,7 @@ interface HeaderProps {
 }
 
 function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const headerClass = classNames(styles.header, {
         [styles.headerDark]: isDark,
         [styles.headerGreen]: isGreen,

@@ -27,7 +27,7 @@ function Footer({ isDark, isGreen, isPink, isYellow }: FooterProps) {
     setIsRemoveOpen(!isRemoveOpen);
   };
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [_isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     // ✅ localStorage에서 accessToken 확인
