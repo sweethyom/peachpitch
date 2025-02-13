@@ -2,8 +2,11 @@ package com.ssafy.peachptich.service;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.ChatRequest;
+import com.ssafy.peachptich.dto.response.TotalReportResponse;
 import com.ssafy.peachptich.entity.Chat;
 import com.ssafy.peachptich.entity.ChatHistory;
+import com.ssafy.peachptich.entity.ChatReport;
+import com.ssafy.peachptich.entity.TotalReport;
 
 import java.util.List;
 
@@ -19,11 +22,15 @@ import java.util.List;
  */
 public interface ChatService {
     void saveChatContent(ChatRequest chatRequest, CustomUserDetails userDetails);
-//    List<Chat> getAllChats();
-//    Chat getChatDetail(Long chatId);
     Chat getRandomChat();
     // 사용자대화 redis 저장
     void saveUserChat(Long historyId, String message, Long userId);
+    // 대화 리포트 조회
+    ChatReport getReport(Long userId, Long chatHistoryId);
+
+    // 전체 리포트 조회
+    TotalReportResponse getTotalReport(Long userId);
+
 //    /**
 //     * 특정 유저의 채팅 내용 조회 (필요한 경우)
 //     */

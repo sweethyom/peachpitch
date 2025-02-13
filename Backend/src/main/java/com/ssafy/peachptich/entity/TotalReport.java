@@ -3,6 +3,9 @@ package com.ssafy.peachptich.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,6 +27,9 @@ public class TotalReport {
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "totalReport")
+    private List<SpeakingHabits> speakingHabits = new ArrayList<>();
 
     /**
      * 장고에서 생성될 예정, 테스트 용으로 남겨둠
