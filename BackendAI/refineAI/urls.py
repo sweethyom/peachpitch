@@ -1,6 +1,6 @@
 from django.urls import path
-from .views import WordAnalysisView
+from .views import refine_and_trigger
 
 urlpatterns = [
-    # path('', WordAnalysisView.as_view(), name='word_analysis'),
+    path('', refine_and_trigger, name='refine_ai'),
 ]
