@@ -181,7 +181,8 @@ public class UserServiceImpl implements UserService {
             }
 
             // Redis에 Refresh Token이 저장되어 있는지 확인
-            boolean isExist = tokenListService.isContainToken("RT:RT:" + refresh);
+            boolean isExist = tokenListService.isContainToken("RT:RT:" + userEmail);
+            log.info("회원 탈퇴 요청, isExist = " + isExist);
             if(!isExist){
                 // 응답 메시지와 데이터를 포함한 ResponseDto 생성
                 Map<String, Object> responseData = new HashMap<>();
@@ -195,7 +196,7 @@ public class UserServiceImpl implements UserService {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
             }
 
-            tokenListService.removeToken("RT:RT:" + refresh);
+            tokenListService.removeToken("RT:RT:" + userEmail);
             tokenBlacklistService.addTokenToList("BL:AT:" + access);
 
             /*
