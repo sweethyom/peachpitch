@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import styles from './styles/video.module.scss';
 
 import leaveBtn from '@/assets/icons/leave.png';
@@ -8,9 +8,11 @@ import Drawer from '@/components/chat/DrawerVideo';
 import RoomLeaveModal from '@/components/modal/RoomLeave';
 import KeywordModal from '@/components/modal/KeywordVideo';
 import RedAlert from '@/components/alert/redAlert';
+import Feedback from "@components/modal/Feedback.tsx";
 
-import { Client } from "@stomp/stompjs";
-import { OpenVidu, Session, Publisher, Subscriber } from "openvidu-browser";
+import {Client} from "@stomp/stompjs";
+import {OpenVidu, Session, Publisher, Subscriber} from "openvidu-browser";
+import axios from "axios";
 
 const VideoChatPage: React.FC = () => {
     /* 대화 나가기 모달창 */
@@ -26,6 +28,7 @@ const VideoChatPage: React.FC = () => {
 
     /* alert 창 */
     const [showAlert, setShowAlert] = useState<boolean>(false);
+    const [alertMessage, setAlertMessage] = useState<string>(""); //alert 재사용을 위한 메세지
 
     const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
 
@@ -34,6 +37,7 @@ const VideoChatPage: React.FC = () => {
 
     /* openvidu session */
     const [session, setSession] = useState<Session | null>(null);
+    const [sessionId, setSessionId] = useState<string | null>(null);
 
     /* stomp publisher */
     const [publisher, setPublisher] = useState<Publisher | null>(null);
@@ -46,22 +50,102 @@ const VideoChatPage: React.FC = () => {
 
     /* matching 상태 */
     const [isMatching, setIsMatching] = useState<boolean>(false);
+    // const [isClose, setIsClose] = useState<boolean>(false);
 
     const [userJwt, setUserJwt] = useState<string>("");
     const [historyId, setHistoryId] = useState<number | null>(null);
+    const [showTimeAlert, setShowTimeAlert] = useState<boolean>(false); // 시간 측정
 
     useEffect(() => {
-        if (isCompleted) {
-            setIsKeywordOpen(false);
-        }
-    }, [isCompleted]);
+        console.log(selectedKeyword)
+    }, [selectedKeyword]);
 
+    useEffect(() => {
+        if (isCompleted && token) {
+            //console.log("선택된 키워드(전부 다 선택)" + selectedKeyword)
+            setIsKeywordOpen(false);
+            initializeOpenViduSession();
+        }
+    }, [isCompleted, token]);
+
+    const initializeOpenViduSession = () => {
+        if (token) {
+            console.log("📡 OpenVidu 세션 시작");
+            const ov = new OpenVidu();
+            const newSession: Session = ov.initSession();
+
+            // Add stream creation handler
+            newSession.on("streamCreated", (event: any) => {
+                console.log("📡 새 구독자 추가");
+                const subscriber: Subscriber = newSession.subscribe(event.stream, undefined);
+                setSubscribers((prev) => [...prev, subscriber]);
+            });
+
+            newSession.on("streamDestroyed", (event: any) => {
+                console.log("상대방 스트림 종료됨:", event);
+                if (session) session.disconnect();
+            });
+
+            newSession.on("sessionDisconnected", (event: any) => {
+                console.log("❌ 세션 연결 종료됨:", event);
+                setSession(null);
+                setPublisher(null);
+                setSubscribers([]);
+                setToken(null);
+                setIsMatching(false);
+                setIsKeywordOpen(false);
+                setSelectedKeyword(null);
+            });
+
+            newSession
+                .connect(token)
+                .then(async () => {
+                    console.log("✅ OpenVidu 연결 성공");
+                    setSessionId(newSession.sessionId);
+
+                    // Start 30-second timer
+                    setTimeout(() => {
+                        setShowTimeAlert(true);
+                    }, 30000);
+
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({
+                            video: true,
+                            audio: true,
+                        });
+
+                        const newPublisher: Publisher = ov.initPublisher(undefined, {
+                            videoSource: stream.getVideoTracks()[0],
+                            audioSource: stream.getAudioTracks()[0],
+                            publishAudio: true,
+                            publishVideo: true,
+                            resolution: "640x480",
+                            frameRate: 30,
+                            insertMode: "APPEND",
+                            mirror: false,
+                        });
+
+                        console.log("📡 로컬 비디오 퍼블리싱 시작");
+                        newSession.publish(newPublisher);
+                        setPublisher(newPublisher);
+                    } catch (error) {
+                        console.error("❌ 카메라 또는 마이크 사용 불가:", error);
+                    }
+                })
+                .catch((error) => console.error("❌ OpenVidu 연결 실패:", error));
+
+            setSession(newSession);
+            setIsMatching(false);
+        }
+    };
+
+    // STOMP client setup useEffect remains the same
     useEffect(() => {
         const userJwtFromStorage = localStorage.getItem("accessToken");
         setUserJwt(userJwtFromStorage || "");
-        console.log("stomp call " + userJwt);
+
         const stompClient = new Client({
-            brokerURL: "ws://localhost:8080/ws/room",
+            brokerURL: "ws://localhost:8080/api/ws",
             connectHeaders: {
                 access: `${userJwt}`,
             },
@@ -76,14 +160,12 @@ const VideoChatPage: React.FC = () => {
                     } else if (response.status === "matched") {
                         console.log("🎉 매칭 완료! 토큰:", response.token);
                         setToken(response.token);
-                        setHistoryId(response.historyId); // 대화 내역 id 저장
-
-                        // 🌟 매칭 완료되었으므로 웹소켓 연결 해제
+                        setHistoryId(response.historyId);
+                        setIsKeywordOpen(true);
                         console.log("🛑 웹소켓 연결 종료");
                         stompClient.deactivate();
                     }
                 });
-                // STOMP 연결이 성공하면 자동으로 매칭 요청
                 console.log("🔍 매칭 시도 중...");
                 setIsMatching(true);
                 stompClient.publish({
@@ -91,8 +173,18 @@ const VideoChatPage: React.FC = () => {
                 });
             },
             onDisconnect: () => console.log("❌ STOMP 연결 종료됨"),
-            onStompError: (frame) => console.error("STOMP 에러:", frame),
-            onWebSocketError: (event) => console.error("WebSocket 에러:", event),
+            onStompError: (frame) => {
+                console.error("STOMP 에러:", frame);
+                setAlertMessage("STOMP 에러");
+                setShowAlert(true);
+                stompClient.deactivate();
+            },
+            onWebSocketError: (event) => {
+                console.error("WebSocket 에러:", event);
+                setAlertMessage("WebSocket 에러");
+                setShowAlert(true);
+                stompClient.deactivate();
+            }
         });
 
         stompClient.activate();
@@ -103,26 +195,47 @@ const VideoChatPage: React.FC = () => {
         };
     }, [userJwt]);
 
+    /*
     useEffect(() => {
         if (token) {
-            console.log("📡 OpenVidu 세션 시작");
             // 매칭이 완료되었으므로 키워드 모달을 열기.
             setIsKeywordOpen(true);
-            if(isCompleted) setIsCompleted(false);
+            console.log("📡 OpenVidu 세션 시작");
+            if (isCompleted) setIsCompleted(false);
             const ov = new OpenVidu();
             const newSession: Session = ov.initSession();
 
+            // Add stream creation handler
             newSession.on("streamCreated", (event: any) => {
                 console.log("📡 새 구독자 추가");
                 const subscriber: Subscriber = newSession.subscribe(event.stream, undefined);
                 setSubscribers((prev) => [...prev, subscriber]);
             });
 
+            // 상대방 스트림이 끊어졌을 때
+            newSession.on("streamDestroyed", (event: any) => {
+                console.log("상대방 스트림 종료됨:", event);
+                if (session)
+                    session.disconnect();
+            });
+
+            // sessionDisconnected에서 정리 작업 수행
+            newSession.on("sessionDisconnected", (event: any) => {
+                console.log("❌ 세션 연결 종료됨:", event);
+                setSession(null);
+                setPublisher(null);
+                setSubscribers([]);
+                setToken(null);
+                setIsMatching(false);
+                setIsKeywordOpen(false);
+                setSelectedKeyword(null);
+            });
+
             newSession
                 .connect(token)
                 .then(async () => {
                     console.log("✅ OpenVidu 연결 성공");
-
+                    setSessionId(newSession.sessionId);
                     // 🎥 getUserMedia로 미디어 권한 요청
                     try {
                         const stream = await navigator.mediaDevices.getUserMedia({
@@ -153,25 +266,36 @@ const VideoChatPage: React.FC = () => {
             setSession(newSession);
             setIsMatching(false);
         }
-    }, [token]);
+    }, [token]);*/
 
     const leaveSession = (): void => {
         if (session) {
             console.log("📴 세션 종료");
+            closeSession(sessionId);
             session.disconnect();
-            setSession(null);
-            setPublisher(null);
-            setSubscribers([]);
-            setToken(null);
-            setIsMatching(false);
         }
+
     };
+
+    const closeSession = async (sessionId: string) => {
+        try {
+            const response = await axios.post('/api/chat/video/close', {
+                historyId: historyId,
+                sessionId: sessionId
+            });
+            console.log('세션이 성공적으로 종료되었습니다.');
+            return response.data;
+        } catch (error) {
+            console.error('세션 종료 중 오류 발생:', error);
+            throw error;
+        }
+    }
 
     return (
         <div className={styles.page}>
             {/* 설정 메뉴바 */}
             <div className={styles.menu}>
-                <Drawer selectedKeyword={selectedKeyword} chatHistory={chatHistory} />
+                <Drawer selectedKeyword={selectedKeyword} chatHistory={chatHistory}/>
             </div>
 
             <div className={styles.chat}>
@@ -204,19 +328,21 @@ const VideoChatPage: React.FC = () => {
                                     <UserVideoComponent streamManager={sub}/>
                                 </div>
                             ))}
+                            <div className={styles.chat__input}>
+                                <p className={styles.chat__input__content}>
+                                    최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
+                                </p>
+                                <img src={sstBtn} className={styles.chat__input__img} alt="sst button"/>
+                            </div>
                         </div>
                     </>
                 ) : (
                     <>
-                        <p>{isMatching ? "매칭 중입니다. 잠시만 기다려 주세요..." : "매칭 버튼을 눌러주세요."}</p>
+                        {isMatching ? "매칭 중입니다. 잠시만 기다려 주세요..." : "끝났어"}
+
                     </>
                 )}
-                <div className={styles.chat__input}>
-                    <p className={styles.chat__input__content}>
-                        최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                    </p>
-                    <img src={sstBtn} className={styles.chat__input__img} alt="sst button" />
-                </div>
+
             </div>
 
             {/* 키워드 모달 */}
@@ -225,20 +351,30 @@ const VideoChatPage: React.FC = () => {
                 setSelectedKeyword={setSelectedKeyword}
                 setIsCompleted={setIsCompleted}
                 historyId={historyId}
-           />
+            />
 
             {/* 키워드 선택안했을 경우 뜨는 alert창 */}
             {showAlert && (
-                <div style={{zIndex: 9999 }}>
+                <div style={{zIndex: 9999}}>
                     <RedAlert
-                        message="키워드를 선택해주세요!"
+                        message={alertMessage}
                         onClose={() => setShowAlert(false)}
                     />
                 </div>
             )}
 
+            {showTimeAlert && (
+                <div style={{zIndex: 9999}}>
+                    <RedAlert
+                        message="30초가 경과되었습니다!"
+                        onClose={() => setShowTimeAlert(false)}
+                    />
+                </div>
+            )}
+
             {/* 대화 나가기 모달 */}
-            <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} stopTTS={() => {}} />
+            <RoomLeaveModal isOpen={isLeaveOpen} onClose={() => setIsLeaveOpen(false)} stopTTS={() => {
+            }}/>
         </div>
     );
 };

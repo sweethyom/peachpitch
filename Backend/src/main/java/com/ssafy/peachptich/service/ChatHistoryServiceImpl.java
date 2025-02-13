@@ -78,4 +78,9 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
     public ChatHistory getChatHistory(Long historyId) {
         return chatHistoryRepository.findById(historyId).orElseThrow(() -> new IllegalArgumentException("유효하지 않은 채팅 내역"));
     }
+
+    @Override
+    public void updateStatus(Long historyId) {
+        chatHistoryRepository.updateStatusByHistoryId(historyId);
+    }
 }

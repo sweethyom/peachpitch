@@ -30,5 +30,9 @@ public interface ChatHistoryRepository extends JpaRepository<ChatHistory, Long> 
     @Query("UPDATE ChatHistory c SET c.user2Feedback = :feedback WHERE c.historyId = :historyId AND c.user2Id = :userId")
     int updateUser2Feedback(@Param("historyId") Long historyId, @Param("userId") Long userId, @Param("feedback") String feedback);
 
+    @Modifying
+    @Transactional
+    @Query("UPDATE ChatHistory c SET c.status = false WHERE c.historyId = :historyId")
+    void updateStatusByHistoryId(@Param("historyId") Long historyId);
 }
 

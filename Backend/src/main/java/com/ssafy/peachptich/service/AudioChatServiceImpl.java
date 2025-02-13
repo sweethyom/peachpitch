@@ -27,11 +27,13 @@ public class AudioChatServiceImpl implements AudioChatService {
         if (userDetails == null) {
             //비로그인 유저는 finger print 확인
             return trialService.checkTrialAccess(trialRequest.getFingerprint()).isCanAccess();
+//            return true;
         } else {
             //로그인 유저는 쿠폰 확인
             Long userId = userDetails.getUserId();
             System.out.println("쿠폰 갯수= " + couponService.getAvailableCoupons(userId));
             return couponService.getAvailableCoupons(userId) > 0;
+//            return true;
         }
     }
 

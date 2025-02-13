@@ -61,7 +61,7 @@ public class ReissueController {
         String role = tokenProvider.getRole(refresh);
 
         // Redis에 저장되어 있는지 확인
-        boolean isExist = tokenListService.isContainToken("RT:" + userEmail);
+        boolean isExist = tokenListService.isContainToken("RT:RT:" + userEmail);
         if(!isExist){
             // response body
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
@@ -82,8 +82,11 @@ public class ReissueController {
 
         // Refresh Token 저장
         // DB에 기존의 Refresh Token 삭제 후 새 Refresh Token 저장
-        refreshRepository.deleteByRefresh(refresh);
-        addToken(userEmail, newRefresh, 86400000L);
+        // refreshRepository.deleteByRefresh(refresh);
+        // addToken(userEmail, newRefresh, 86400000L);
+
+        addToken("RT:AT:" + userEmail, newAccess, 600000L);
+        addToken("RT:RT:" + userEmail, newRefresh, 86400000L);
 
         // response
         response.setHeader("access", newAccess);
@@ -95,16 +98,16 @@ public class ReissueController {
     private Cookie createCookie(String key, String value){
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60);
-         cookie.setSecure(true);
-        // cookie.setPath("/");
-        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setHttpOnly(false);
 
         return cookie;
     }
 
-    private void addToken(String userEmail, String value, Long expiredMs) {
+    private void addToken(String key, String value, Long expiredMs) {
         redisTemplate.opsForValue().set(
-                "RT:" + userEmail,       // key 값
+                key,       // key 값
                 value,                // value
                 System.currentTimeMillis() + expiredMs,     // 만료 시간
                 TimeUnit.MICROSECONDS
