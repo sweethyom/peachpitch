@@ -64,6 +64,7 @@ function loginPage() {
       // 대소문자 상관없이 access 헤더 찾기
       const accessToken = headers["access"] || headers["Access"] || headers["ACCESS"];
 
+      console.log("accessToken = " , accessToken);
       const data = await response.json(); // ✅ JSON 데이터 파싱
 
       if (response.ok) {
@@ -89,51 +90,39 @@ function loginPage() {
     }
   };
 
-  // 소셜 로그인
+  // 소셜 로그인 핸들러
   const handleSocialLogin = (provider: string) => {
-    localStorage.setItem('socialLoginAttempt', 'true'); // ✅ 로그인 시도 기록 저장
+    localStorage.setItem('socialLoginAttempt', 'true');
+    console.log("provider: ", provider);
 
-    // ✅ 팝업 창 열기
+    const popupUrl = `http://localhost:8080/api/users/login/social/${provider}`;
     const popup = window.open(
-      `http://localhost:8080/api/users/login/social/${provider}`,
+      popupUrl,
       "Social Login",
-      "width=500,height=600"
+      "width=500,height=600,scrollbars=yes,resizable=no"
     );
 
-    // ✅ 메시지 리스너 추가
-    const receiveMessage = (event: MessageEvent) => {
-      if (event.origin !== "http://localhost:8080") return; // ✅ 보안상 올바른 origin만 허용
+    if (!popup || popup.closed || typeof popup.closed === "undefined") {
+      alert("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
+      return;
+    }
 
-      console.log("📩 팝업에서 메시지 수신:", event.data);
-
-      if (typeof event.data === "object" && event.data.status === "success") {
-        console.log("✅ 소셜 로그인 성공!");
-
-        localStorage.setItem("accessToken", event.data.access);
-        localStorage.setItem("userEmail", event.data.email);
-        localStorage.setItem("userId", event.data.userId);
-
-        window.removeEventListener("message", receiveMessage);
-
-        // ✅ storage 이벤트 트리거하여 Header.tsx 업데이트
-        window.dispatchEvent(new Event("storage"));
-
-        // ✅ localStorage 업데이트 후 `/main`으로 이동
-        setTimeout(() => {
-          navigate("/main");
-        }, 500);
+    const timer = setInterval(() => {
+      if (popup.closed) {
+        clearInterval(timer);
+        console.log("팝업이 닫혔습니다.");
+        handlePopupClose();
       }
-    };
-    window.addEventListener("message", receiveMessage);
+    }, 500);
   };
 
-  useEffect(() => {
-    if (localStorage.getItem("socialLoginAttempt")) {
-      checkSocialLogin();
-    }
-  }, []);
+  // 팝업 닫힘 핸들러
+  const handlePopupClose = () => {
+    console.log("소셜 로그인 완료 후 처리 로직 실행");
+    checkSocialLogin();
+  };
 
-  // ✅ 로그인 상태 확인 (팝업 종료 후 실행)
+  // 로그인 상태 확인
   const checkSocialLogin = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/users/check-login", {
@@ -141,7 +130,6 @@ function loginPage() {
         credentials: "include",
       });
 
-      // ✅ JSON 응답이 아닐 경우 예외 처리
       const contentType = response.headers.get("content-type");
       if (!contentType || !contentType.includes("application/json")) {
         throw new Error("서버 응답이 JSON 형식이 아닙니다.");
@@ -164,10 +152,8 @@ function loginPage() {
         localStorage.setItem("userEmail", email || "");
         localStorage.setItem("userId", userId || "");
 
-        // ✅ storage 이벤트 트리거하여 Header.tsx 업데이트
         window.dispatchEvent(new Event("storage"));
 
-        // ✅ localStorage 업데이트 후 500ms 뒤에 메인 페이지로 이동
         setTimeout(() => {
           navigate("/main");
         }, 500);
@@ -178,8 +164,7 @@ function loginPage() {
       console.error("🚨 로그인 상태 확인 실패:", error);
     }
   };
-
-
+  
 
   return (
     <>

@@ -4,6 +4,7 @@ import com.ssafy.peachptich.global.config.jwt.*;
 import com.ssafy.peachptich.repository.RefreshRepository;
 import com.ssafy.peachptich.repository.UserRepository;
 import com.ssafy.peachptich.service.CustomOAuth2UserService;
+import com.ssafy.peachptich.service.CustomOidcUserService;
 import com.ssafy.peachptich.service.TokenBlacklistService;
 import com.ssafy.peachptich.service.TokenListService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,11 +17,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -37,6 +40,7 @@ public class SecurityConfig {
     private final RedisTemplate<String, String> redisTemplate;
     private final TokenListService tokenListService;
     private final TokenBlacklistService tokenBlacklistService;
+    private final CustomOidcUserService customOidcUserService;
 
 
 //    @Bean
@@ -68,7 +72,7 @@ public class SecurityConfig {
                                 .requestMatchers("/pub/**", "/sub/**").permitAll() // STOMP 메시징 경로
                                 .requestMatchers("/api/main/**", "/api/index", "/api/users/login", "/api/users/signup", "/api/pay/ready", "/api/pay/completed",
                                         "/api/chat/ai/keywords/**", "/api/chat/ai/check", "/api/users/coupon/**", "/error", "/api/chat/report/**", "/api/users/check",
-                                        "/api/chat/video/close").permitAll()
+                                        "/api/chat/video/close", "/api/users/login/social/**", "/api/login/oauth2/code/*", "/login/oauth2/code/*").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
@@ -76,6 +80,12 @@ public class SecurityConfig {
                             System.out.println("Requested URL: " + request.getRequestURI());
                             response.sendError(HttpServletResponse.SC_FORBIDDEN);
                         })
+                );
+
+        http
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
+                        .addHeaderWriter(new StaticHeadersWriter("Cross-Origin-Opener-Policy", "same-origin-allow-popups"))
                 );
 
         http
@@ -111,18 +121,42 @@ public class SecurityConfig {
         AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
 
         // JWTFilter 등록
+        /*
         http
-                .addFilterBefore(new JwtFilter(tokenProvider, userRepository, tokenBlacklistService), CustomLoginFilter.class);
-
-        //oauth2
-        http
-                .oauth2Login((oauth2) -> oauth2
+                .addFilterBefore(new JwtFilter(tokenProvider, userRepository, tokenBlacklistService), CustomLoginFilter.class)
+                // OAuth2 설정
+                .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint
                                 .baseUri("/api/users/login/social"))
-                        .userInfoEndpoint((userInfoEndpointConfig) -> userInfoEndpointConfig
+                        .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService))
                         .successHandler(customOauthSuccessHandler)
                 );
+
+
+         */
+        // OAuth2 설정을 JWT 필터보다 먼저 배치
+        http
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .baseUri("/api/users/login/social"))
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .oidcUserService(customOidcUserService)
+                                .userService(customOAuth2UserService))
+                        .successHandler(customOauthSuccessHandler)
+                )
+                /*
+                    .oauth2Login(oauth2 -> oauth2
+                    .userInfoEndpoint(userInfo -> userInfo
+                        .oidcUserService(customOidcUserService)    // OIDC 서비스 추가
+                        .userService(customOAuth2UserService))     // 기존 OAuth2 서비스
+                    .successHandler(customOauthSuccessHandler)
+                )
+                 */
+
+                // JWT 필터를 OAuth2LoginAuthenticationFilter 뒤에 명시적으로 배치
+                .addFilterAfter(new JwtFilter(tokenProvider, userRepository, tokenBlacklistService),
+                        CustomLoginFilter.class);
 
 
         // CustomLogoutFilter 등록
