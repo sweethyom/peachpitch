@@ -1,5 +1,6 @@
 package com.ssafy.peachptich.service;
 
+import com.ssafy.peachptich.dto.request.ReadyRequest;
 import com.ssafy.peachptich.global.config.KakaoPayProperties;
 import com.ssafy.peachptich.dto.response.ApproveResponse;
 import com.ssafy.peachptich.dto.response.ReadyResponse;
@@ -15,9 +16,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -34,21 +38,24 @@ public class PurchaseServiceImpl implements PurchaseService{
 
     private final RestTemplate template = new RestTemplate();
     private ReadyResponse readyResponse;
+    private ReadyRequest readyRequest;
     private String orderNum;
 
+
     @Override
-    public ReadyResponse payReady(String name, Integer totalPrice, Integer ea) {
+    public ReadyResponse payReady(@RequestBody ReadyRequest readyRequest) {
 
         try {
+            this.readyRequest = readyRequest;
             this.orderNum = UUID.randomUUID().toString();  // 메소드 내부로 이동
             log.info("주문번호 생성: {}", this.orderNum);
             Map<String, String> parameters = new HashMap<>();
             parameters.put("cid", "TC0ONETIME");
             parameters.put("partner_order_id", this.orderNum);
-            parameters.put("partner_user_id", "peachpitch"); // 후에 사용자ID로 변경
-            parameters.put("item_name", name);
-            parameters.put("quantity", String.valueOf(ea));
-            parameters.put("total_amount", String.valueOf(totalPrice));
+            parameters.put("partner_user_id", readyRequest.getPartner_user_id()); // 후에 사용자ID로 변경
+            parameters.put("item_name", readyRequest.getItem_name());
+            parameters.put("quantity", String.valueOf(readyRequest.getQuantity()));
+            parameters.put("total_amount", String.valueOf(readyRequest.getTotal_amount()));
             parameters.put("tax_free_amount", "0");
             parameters.put("approval_url", "http://localhost:8080/api/pay/completed");
             parameters.put("cancel_url", "http://localhost:8080/api/pay/cancel");
@@ -73,6 +80,7 @@ public class PurchaseServiceImpl implements PurchaseService{
     // 최종적으로 결제 완료 처리를 하는 단계
     @Override
     public ApproveResponse payApprove(String pgToken) {
+        try {
         log.info("결제 승인 시작 - readyResponse: {}", this.readyResponse);
 
         if (this.readyResponse == null || this.readyResponse.getTid() == null) {
@@ -93,8 +101,8 @@ public class PurchaseServiceImpl implements PurchaseService{
         log.info("여기까진 왔니 : tid통과");
         parameters.put("partner_order_id", this.orderNum); // 주문번호
         log.info("여기까진 왔니 : orderNum");
-        parameters.put("partner_user_id", "peachpitch");    // 회원 아이디
-        log.info("여기까진 왔니 : peachpitch");
+        parameters.put("partner_user_id", String.valueOf(readyRequest.getPartner_user_id()));    // 회원 아이디
+        log.info("여기까진 왔니 :" + readyRequest.getPartner_user_id());
         parameters.put("pg_token", pgToken);              // 결제승인 요청을 인증하는 토큰
         log.info("여기까진 왔니 : pgToken통과");
 
@@ -107,36 +115,77 @@ public class PurchaseServiceImpl implements PurchaseService{
         System.out.println();
 
         String url = "https://open-api.kakaopay.com/online/v1/payment/approve";
-        ApproveResponse approveResponse = template.postForObject(url, requestEntity, ApproveResponse.class);
-        log.info("결제승인 응답객체: " + approveResponse);
+            try {
+                ApproveResponse approveResponse = template.postForObject(url, requestEntity, ApproveResponse.class);
+                log.info("결제승인 응답객체: {}", approveResponse);
+                return approveResponse;
+            } catch (RestClientException e) {
+                log.error("카카오페이 API 호출 실패: {}", e.getMessage());
+                log.error("에러 상세: ", e);
+                throw new RuntimeException("카카오페이 결제 승인 실패", e);
+            }
 
-        return approveResponse;
+        } catch (Exception e) {
+            log.error("결제 승인 처리 중 오류 발생: {}", e.getMessage());
+            throw new RuntimeException("결제 승인 처리 실패", e);
+        }
 
     }
-
     @Override
     @Transactional
     public void savePaymentInfo(ApproveResponse response) {
+        log.info("구매정보 담기 시작");
+
+        // response 객체 검증
+        log.info("Response 객체: {}", response);
+        if (response == null) {
+            log.error("Response 객체가 null입니다.");
+            throw new RuntimeException("결제 응답 정보가 없습니다.");
+        }
+
         Integer totalPrice = response.getAmount().getTotal();
+        log.info("Total Price 확인: {}", totalPrice);
 
-        // User와 Item 정보 조회
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        try {
+            // User와 Item 정보 조회
+            User user = userRepository.findById(Long.valueOf(response.getPartner_user_id()))
+                    .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        Item item = itemRepository.findByName("이용권")
-                .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
-        Purchase purchase = Purchase.builder()
-                .orderId(response.getPartner_order_id())
-                .paymentTime(LocalDateTime.parse(response.getApproved_at()))
-                .ea(response.getQuantity())
-                .method(response.getPayment_method_type())
-                .totalPrice(totalPrice)
-                .user(user)  // user브랜치랑 머지 후 user수정필요
-                .item(item)
-                .build();
-        purchaseRepository.save(purchase);
-        log.info("결제 정보 저장 완료 - orderId: {}", purchase.getOrderId());
+            Item item = itemRepository.findByNameAndType(response.getItem_name(), Item.ItemType.PAID)
+                    .orElseThrow(() -> new RuntimeException("상품을 찾을 수 없습니다."));
+
+            log.info("구매정보 확인");
+            log.info("partner_order_id: {}", response.getPartner_order_id());
+            log.info("approved_at: {}", response.getApproved_at());
+            log.info("quantity: {}", response.getQuantity());
+            log.info("payment_method_type: {}", response.getPayment_method_type());
+            log.info("totalPrice: {}", totalPrice);
+            log.info("user: {}", user);
+            log.info("item: {}", item);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            LocalDateTime paymentTime = LocalDateTime.parse(response.getApproved_at(), formatter);
+
+            Purchase purchase = Purchase.builder()
+                    .orderId(response.getPartner_order_id())
+                    .paymentTime(paymentTime)
+                    .ea(response.getQuantity())
+                    .method(response.getPayment_method_type())
+                    .totalPrice(totalPrice)
+                    .user(user)
+                    .item(item)
+                    .build();
+
+            log.info("생성된 purchase 객체: {}", purchase);
+            purchaseRepository.save(purchase);
+            log.info("결제 정보 저장 완료 - orderId: {}", purchase.getOrderId());
+        } catch (Exception e) {
+            log.error("구매정보 처리 중 오류 발생: {}", e.getMessage());
+            e.printStackTrace(); // 스택 트레이스 출력
+            throw new RuntimeException("구매정보 저장 실패", e);
+        }
     }
+
 
     @Override
     @Transactional(readOnly = true)
