@@ -72,10 +72,10 @@ function VoiceChatPage() {
     try {
       const userJwtFromStorage = localStorage.getItem("accessToken");
 
-      if (!userJwtFromStorage) {
-        console.error("No access token found, please log in.");
-        return;
-      }
+      // if (!userJwtFromStorage) {
+      //   console.error("No access token found, please log in.");
+      //   return;
+      // }
 
       console.log(userJwtFromStorage);
       const config = userJwtFromStorage ? { headers: { access: `${userJwtFromStorage}` } }
@@ -93,15 +93,15 @@ function VoiceChatPage() {
       }
 
       const hintResponse = responseFromSpring.data;
-      const historyIdFromResponse = hintResponse.data.historyId;
+      const historyIdFromResponse = hintResponse.data.historyId || null;
 
       console.log("Extracted historyId:", historyIdFromResponse);
       setHistoryId(historyIdFromResponse); // 대화 내역 id 저장
 
-      if (!historyIdFromResponse) {
-        console.error("historyId is null or undefined, check backend response.");
-        return;
-      }
+      // if (!historyIdFromResponse) {
+      //   console.error("historyId is null or undefined, check backend response.");
+      //   return;
+      // }
 
       const response = await axios.post('http://127.0.0.1:8000/ai/start/', {
         keyword: selectedKeyword,
