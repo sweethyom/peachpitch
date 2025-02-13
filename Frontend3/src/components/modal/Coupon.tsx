@@ -34,7 +34,7 @@ function Coupon({ isOpen, onClose }: ModalProps) {
         const handlePaymentMessage = (event: MessageEvent) => {
             console.log("📩 쿠폰 모달에서 결제 완료 메시지 수신:", event.data, "from:", event.origin);
 
-            if (event.origin !== "http://localhost:8080") return;
+            if (event.origin !== "https://peachpitch.site") return;
 
             if (event.data === "paymentSuccess") {
                 onClose(); // ✅ 쿠폰 모달 닫기
@@ -59,7 +59,7 @@ function Coupon({ isOpen, onClose }: ModalProps) {
         }
 
         try {
-            const response = await fetch("http://localhost:8080/api/pay/ready", {
+            const response = await fetch("https://peachpitch.site/api/pay/ready", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -102,7 +102,7 @@ function Coupon({ isOpen, onClose }: ModalProps) {
     // 무료 쿠폰 받기
     // const handleFreeCoupon = async () => {
     //     try {
-    //         const response = await fetch("http://localhost:8080/api/users/coupon/login/2", {
+    //         const response = await fetch("https://peachpitch.site/api/users/coupon/login/2", {
     //             method: "POST",
     //             headers: { "Content-Type": "application/json" },
     //         });

@@ -46,7 +46,7 @@ function chatReportPage() {
 
         // Fetch total report data using only userId
         const response = await axios.post(
-          "http://localhost:8080/api/users/reports/totalreport",
+          "https://peachpitch.site/api/users/reports/totalreport",
           { userId },
           {
             headers: {

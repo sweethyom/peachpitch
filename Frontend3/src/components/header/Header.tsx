@@ -85,7 +85,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
             // ✅ 로그아웃 요청 (refreshToken을 헤더에 포함)
             await axios.post(
-                "http://localhost:8080/api/users/logout",
+                "https://peachpitch.site/api/users/logout",
                 {},
                 {
                     withCredentials: true, // ✅ 쿠키 자동 포함
@@ -126,7 +126,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                     return;
                 }
 
-                const response = await axios.get(`http://localhost:8080/api/users/coupon/${storedUserId}`);
+                const response = await axios.get(`https://peachpitch.site/api/users/coupon/${storedUserId}`);
                 setCouponCount(response.data);
             } catch (error) {
                 console.error("쿠폰 수 조회 실패:", error);
