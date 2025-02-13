@@ -41,7 +41,18 @@ public class JwtFilter extends OncePerRequestFilter {
     private final TokenBlacklistService tokenBlacklistService;
 
     // 토큰 검증 결과를 건너뛸 API URL들
-    private final List<String> excludedPaths = Arrays.asList("/login", "/join");
+    // private final List<String> excludedPaths = Arrays.asList("/login", "/join");
+    private final List<String> excludedPaths = Arrays.asList(
+            "/login",
+            "/join",
+            "/api/users/login/social",
+            "/login/oauth2/code",
+            "/oauth2/authorization",
+            "/oauth2/token",
+            "/oauth2/userinfo",
+            "/api/main/randomscript"
+    );
+
 
     @Override
     // 로그인, 회원가입 API URL이 포함되는지 확인하는 함수
@@ -55,6 +66,16 @@ public class JwtFilter extends OncePerRequestFilter {
         // 헤더에서 access 키에 담긴 토큰을 꺼냄
         String accessToken = request.getHeader("access");
         log.info("JWTFilter에서 accessToken = " + accessToken);
+
+        // OAuth2 관련 경로는 JWT 검증 건너뛰기
+        String requestURI = request.getRequestURI();
+        log.info("JWTFilter에서 requestURI = " + requestURI);
+        if (requestURI.startsWith("/api/users/login/social") ||
+                requestURI.startsWith("/login/oauth2/code/") ||
+                requestURI.startsWith("/api/users/coupon/*")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // 토큰이 없다면 다음 필터로 넘김
         if (accessToken == null){

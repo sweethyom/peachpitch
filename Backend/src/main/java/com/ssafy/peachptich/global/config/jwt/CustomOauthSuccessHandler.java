@@ -12,6 +12,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -25,6 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final TokenProvider tokenProvider;
     private final TokenListService tokenListService;
@@ -34,7 +36,6 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException{
-
         // OAuth2User
         CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 
@@ -71,27 +72,50 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             throw new CustomLoginFilter.TokenStorageException("Faied to store refresh token: " + e.getMessage());
         }
 
+        System.out.println("oauth handler");
+
         // JSON 응답 생성
-        Map<String, Long> responseData = new HashMap<>();
-        ResponseDto<Map<String, Long>> responseDto = ResponseDto.<Map<String, Long>>builder()
+        log.info("in CustomOauthSuccessHandler, Json 응답 생성");
+        Map<String, String> responseData = new HashMap<>();
+        responseData.put("accessToken", access);  // access 토큰 값 추가
+        ResponseDto<Map<String, String>> responseDto = ResponseDto.<Map<String, String>>builder()
                 .message("User login success!")
                 .data(responseData)
                 .build();
 
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.setHeader("access", access);
+        response.addCookie(createCookie("refresh", refresh));
+        //response.sendRedirect("http://localhost:5173/main");        // redirect 주소
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.writeValue(response.getWriter(), responseDto);
+
+
+        /*
         // 팝업 창에서 부모 창으로 메시지 전송 후 닫기
         response.setContentType("text/html;charset=UTF-8");
         response.setHeader("access", access);
         response.addCookie(createCookie("refresh", refresh));
+        response.getWriter().println("<!DOCTYPE html>");
+        response.getWriter().println("<html>");
+        response.getWriter().println("<body>");
         response.getWriter().println("<script>");
         response.getWriter().println("window.opener.postMessage({");
         response.getWriter().println("  status: 'success',");
         response.getWriter().println("  access: '" + access + "',");
         response.getWriter().println("  email: '" + userEmail + "',");
         response.getWriter().println("  userId: '" + userId + "'");
-        response.getWriter().println("}, 'http://localhost:5173');");
+        response.getWriter().println("}, '" + request.getHeader("Origin") + "');");
 
-        response.getWriter().println("setTimeout(() => { window.close(); }, 500);"); // 메시지 전송 후 500ms 대기 후 닫기
+        response.getWriter().println("setTimeout(() => { window.close(); }, 300);"); // 메시지 전송 후 500ms 대기 후 닫기
         response.getWriter().println("</script>");
+        response.getWriter().println("</body>");
+        response.getWriter().println("</html>");
+
+        response.sendRedirect("http://localhost:5173/main");
+         */
     }
 
     private Cookie createCookie(String key, String value){
