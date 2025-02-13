@@ -1,5 +1,7 @@
 package com.ssafy.peachptich.controller.purchase;
 
+import com.ssafy.peachptich.dto.request.PurchaseRequest;
+import com.ssafy.peachptich.dto.request.ReadyRequest;
 import com.ssafy.peachptich.dto.response.ApproveResponse;
 import com.ssafy.peachptich.dto.response.ReadyResponse;
 import com.ssafy.peachptich.entity.Item;
@@ -12,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
 
 /**
  * 카카오페이 단건결제 API이용
@@ -31,19 +35,33 @@ public class PurchaseController {
     private final CouponService couponService;
 
     @PostMapping("/ready")
-    public @ResponseBody ReadyResponse payReady(@RequestBody Purchase purchase){
-        String name = purchase.getItem().getName();
-        Integer totalPrice = purchase.getTotalPrice();
-        Integer ea = purchase.getEa();
+    public @ResponseBody ReadyResponse payReady(@RequestBody PurchaseRequest purchaseRequest) {
+        log.info("Received purchase request: {}", purchaseRequest);  // 요청 데이터 로깅
+        log.info("userId: {}, itemName: {}, totalPrice: {}, ea: {}",
+                purchaseRequest.getUserId(),
+                purchaseRequest.getItemName(),
+                purchaseRequest.getTotalPrice(),
+                purchaseRequest.getEa());
 
-        log.info("주문 상품 이름: " + name);
-        log.info("주문 금액: " + totalPrice);
+                ReadyRequest readyRequest = ReadyRequest.builder()
+                .cid("TC0ONETIME")
+                .partner_order_id(UUID.randomUUID().toString())
+                .partner_user_id(String.valueOf(purchaseRequest.getUserId()))
+                .item_name(purchaseRequest.getItemName())
+                .quantity(purchaseRequest.getEa())
+                .total_amount(purchaseRequest.getTotalPrice())
+                .tax_free_amount(0)
+                .approval_url("http://localhost:8080/api/pay/completed")
+                .cancel_url("http://localhost:8080/api/pay/cancel")
+                .fail_url("http://localhost:8080/api/pay/fail")
+                .build();
 
-        // 카카오 결제 준비하기
-        ReadyResponse readyResponse = purchaseService.payReady(name, totalPrice, ea);
+        log.info("주문 상품 이름: {}", readyRequest.getItem_name());
+        log.info("주문 금액: {}", readyRequest.getTotal_amount());
 
-        return readyResponse;
+        return purchaseService.payReady(readyRequest);
     }
+
 
     @GetMapping("/completed")
     public ResponseEntity<String> payCompleted(@RequestParam("pg_token") String pgToken) {
