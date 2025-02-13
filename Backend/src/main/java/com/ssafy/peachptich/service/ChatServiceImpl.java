@@ -17,12 +17,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -102,19 +102,78 @@ public class ChatServiceImpl implements ChatService {
     }
 
     // 사용자 대화 redis 저장
+    @Transactional
     @Override
-    public void saveUserChat(Long historyId, String message, Long userId) {
+    public void saveUserChatTemp(UserChatRequest userChatRequest) {
         try {
-            String key = CHAT_KEY_PREFIX + historyId + ":messages";
-            UserChatRequest userChatRequest = new UserChatRequest(historyId, message, userId);
+            String key = CHAT_KEY_PREFIX + userChatRequest.getHistoryId() + ":messages";
 
-            // 저장 전 로그 추가
             log.info("Saving chat - Key: {}, Request: {}", key, userChatRequest);
 
             objectRedisTemplate.opsForList().leftPush(key, userChatRequest);
         } catch (Exception e) {
             log.error("Error saving chat: ", e);
             throw new RuntimeException("Failed to save chat to Redis", e);
+        }
+    }
+
+    @Override
+    public void saveUserChat(UserChatRequest userChatRequest) {
+        try {
+            List<Chat> chatsToSave = new ArrayList<>();
+            String redisKey = "chat:" + userChatRequest.getHistoryId() + ":messages";
+            Long userId = userChatRequest.getUserId();
+
+            ChatHistory chatHistory = chatHistoryRepository.findById(userChatRequest.getHistoryId())
+                    .orElseThrow(() -> new RuntimeException("ChatHistory not found"));
+
+
+            List<String> messages = redisTemplate.opsForList().range(redisKey, 0, -1);
+
+            if (messages == null || messages.isEmpty()) {
+                log.warn("대화내역 {}의 저장할 채팅 메시지가 없습니다.", userChatRequest.getHistoryId());
+                return;
+            }
+
+//            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS");
+            messages.forEach(message -> {
+                try {
+                    JsonNode jsonNode = objectMapper.readTree(message);
+                    log.info("파싱된 메시지: {}", jsonNode.toString());
+
+                    String content = jsonNode.has("message") ? jsonNode.get("message").asText() : "";
+                    LocalDateTime createdAt = LocalDateTime.now(); // 기본값 설정
+
+                    if (jsonNode.has("createdAt") && !jsonNode.get("createdAt").isNull()) {
+                        try {
+                            createdAt = LocalDateTime.parse(jsonNode.get("createdAt").asText(),
+                                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+                        } catch (Exception e) {
+                            log.error("날짜 파싱 실패: {}", e.getMessage());
+                        }
+                    }
+
+                    Chat chat = Chat.builder()
+                            .content(content)
+                            .createdAt(createdAt)
+                            .userId(userId)
+                            .chatHistory(chatHistory)
+                            .build();
+                    chatsToSave.add(chat);
+                } catch (JsonProcessingException e) {
+                    log.error("메시지 변환 중 오류: {}", e.getMessage());
+                }
+            });
+
+            if (!chatsToSave.isEmpty()) {
+                chatRepository.saveAll(chatsToSave);
+                redisTemplate.delete(redisKey);
+                log.info("세션 {}의 Redis 데이터가 성공적으로 삭제되었습니다.", userChatRequest.getHistoryId());
+            }
+
+        } catch (Exception e) {
+            log.error("세션 {}의 채팅 저장 중 오류 발생: {}", userChatRequest.getHistoryId(), e.getMessage());
+            throw new RuntimeException("채팅 저장 실패", e);
         }
     }
 
