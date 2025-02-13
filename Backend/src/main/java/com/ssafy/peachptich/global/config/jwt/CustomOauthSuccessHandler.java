@@ -78,23 +78,28 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 .data(responseData)
                 .build();
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        // 팝업 창에서 부모 창으로 메시지 전송 후 닫기
+        response.setContentType("text/html;charset=UTF-8");
         response.setHeader("access", access);
         response.addCookie(createCookie("refresh", refresh));
-        // response.sendRedirect("http://localhost:5173/main");        // redirect 주소
-        response.sendRedirect("http://localhost:8080/");        // redirect 주소
+        response.getWriter().println("<script>");
+        response.getWriter().println("window.opener.postMessage({");
+        response.getWriter().println("  status: 'success',");
+        response.getWriter().println("  access: '" + access + "',");
+        response.getWriter().println("  email: '" + userEmail + "',");
+        response.getWriter().println("  userId: '" + userId + "'");
+        response.getWriter().println("}, 'http://localhost:5173');");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(response.getWriter(), responseDto);
+        response.getWriter().println("setTimeout(() => { window.close(); }, 500);"); // 메시지 전송 후 500ms 대기 후 닫기
+        response.getWriter().println("</script>");
     }
 
     private Cookie createCookie(String key, String value){
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(60*60*60);
-        //cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
-        cookie.setHttpOnly(true);
+        cookie.setHttpOnly(false);
 
         return cookie;
     }
