@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
@@ -60,6 +61,13 @@ public class CustomLogoutFilter extends GenericFilterBean {
             if(cookie.getName().equals("refresh")) {
                 refresh = cookie.getValue();
                 log.info("in CustomLogoutFilter, refresh token = " + refresh);
+                log.info("Received cookie - name: " + cookie.getName()
+                        + ", value: " + cookie.getValue()
+                        + ", domain: " + cookie.getDomain()
+                        + ", path: " + cookie.getPath()
+                        + ", maxAge: " + cookie.getMaxAge()
+                        + ", secure: " + cookie.getSecure()
+                        + ", httpOnly: " + cookie.isHttpOnly());
             }
         }
 
@@ -164,9 +172,14 @@ public class CustomLogoutFilter extends GenericFilterBean {
          */
 
         // Refresh Token Cookie 값 0 설정
-        Cookie cookie = new Cookie("refresh", null);
+        Cookie cookie = new Cookie("refresh", "");
         cookie.setMaxAge(0);
-        cookie.setPath("/");
+        cookie.setPath("/");             // 로그인 시와 동일하게 설정
+        cookie.setHttpOnly(false);
+        cookie.setSecure(true);
+
+        // SecurityContext 클리어
+        SecurityContextHolder.clearContext();
 
         // JSON 응답 생성
         ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
@@ -177,6 +190,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // 응답 설정 및 전송
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
+        response.setHeader("Access-Control-Allow-Credentials", "true");
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
 
