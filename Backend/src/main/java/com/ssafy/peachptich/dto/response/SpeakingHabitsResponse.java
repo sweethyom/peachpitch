@@ -7,9 +7,8 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class ChatReportListResponse {
-    private Long reportId;
-    private String partnerName;
-    private String keyword1;
-    private String keyword2;
+public class SpeakingHabitsResponse {
+    private Long wordId;
+    private String word;
+    private Integer count;
 }
