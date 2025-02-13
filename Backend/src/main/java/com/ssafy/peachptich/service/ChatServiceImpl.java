@@ -6,10 +6,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.ChatRequest;
 import com.ssafy.peachptich.dto.request.UserChatRequest;
+import com.ssafy.peachptich.dto.response.ChatReportListResponse;
 import com.ssafy.peachptich.entity.Chat;
 import com.ssafy.peachptich.entity.ChatHistory;
+import com.ssafy.peachptich.entity.ChatReport;
+import com.ssafy.peachptich.entity.TotalReport;
 import com.ssafy.peachptich.repository.ChatHistoryRepository;
 import com.ssafy.peachptich.repository.ChatRepository;
+import com.ssafy.peachptich.repository.ReportRepository;
+import com.ssafy.peachptich.repository.TotalReportRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -20,14 +25,17 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class ChatServiceImpl implements ChatService{
+public class ChatServiceImpl implements ChatService {
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisTemplate<String, Object> objectRedisTemplate;
     private final ChatRepository chatRepository;
+    private final ReportRepository reportRepository;
+    private final TotalReportRepository totalReportRepository;
     private final ObjectMapper objectMapper;
     private final ChatHistoryRepository chatHistoryRepository;
     private static  final String CHAT_KEY_PREFIX = "chat:";
@@ -112,6 +120,25 @@ public class ChatServiceImpl implements ChatService{
         }
     }
 
+    @Override
+    public ChatReport getReport() {
+        return reportRepository.findReport();
+    }
+
+    @Override
+    public TotalReport getTotalReport() {
+        TotalReport totalReport = getTotalReport();
+
+        List<ChatReport> chatReports = reportRepository.findAllByOrderByChatHistory_CreatedAtDesc();
+
+        List<ChatReportListResponse> chatReportListResponses = chatReports.stream()
+                .map(report -> ChatReportListResponse.builder()
+                .reportId(report.getReportId())
+                .summary(report.getSummary())
+                        .chatTime(report.getChatTime())
+                        .build())
+                .collect(Collectors.toList());
+        return totalReportRepository.findTotalReport(); }
 //
 //    @Override
 //    public List<Chat> getChatsByUserId(Long userId) {
