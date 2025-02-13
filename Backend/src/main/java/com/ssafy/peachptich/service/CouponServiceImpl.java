@@ -73,24 +73,17 @@ public class CouponServiceImpl implements CouponService {
         Item freeCouponItem = itemRepository.findByType(Item.ItemType.FREE)
                 .orElseThrow(() -> new IllegalStateException("무료 쿠폰 아이템이 설정되지 않았습니다."));
         System.out.println("Free coupon item found: " + freeCouponItem.getItemId());
-        // 기존 무료 쿠폰 확인
-        Optional<HaveCoupon> existingCoupon = haveCouponRepository
-                .findByUserIdAndItemTypeAndExpirationDateAfter(
-                        userId,
-                        Item.ItemType.FREE,
-                        LocalDateTime.now()
-                );
+        HaveCoupon haveCoupon = haveCouponRepository
+                .findByUser_IdAndItem(user.getUserId(), freeCouponItem)
+                .orElseGet(() -> HaveCoupon.builder()
+                        .user(user)
+                        .item(freeCouponItem)
+                        .ea(0)
+                        .build());
 
-        if (existingCoupon.isEmpty()) {
-            HaveCoupon newCoupon = HaveCoupon.builder()
-                    .user(user)
-                    .item(freeCouponItem)
-                    .ea(1)
-                    .expirationDate(LocalDateTime.now().plusDays(30))
-                    .build();
-
-            haveCouponRepository.save(newCoupon);
-        }
+        haveCoupon.setEa(haveCoupon.getEa() + 1);
+        haveCoupon.setExpirationDate(LocalDateTime.now().withHour(23).withMinute(59).withSecond(59));
+        haveCouponRepository.save(haveCoupon);
     }
 
     @Transactional(readOnly = true)
