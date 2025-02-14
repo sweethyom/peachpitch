@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import classNames from "classnames";
 import { useState, useEffect, useRef } from "react";
 import styles from "./Header.module.scss";

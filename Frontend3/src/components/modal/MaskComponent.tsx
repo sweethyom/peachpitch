@@ -11,12 +11,12 @@ interface MaskProps {
   // selectedMask: string | null;
 }
 
-const maskImages: { [key: string]: string } = {
-  mask1: Mask1,
-  mask2: Mask2,
-  mask3: Mask3,
-  mask4: Mask4,
-};
+// const maskImages: { [key: string]: string } = {
+//   mask1: Mask1,
+//   mask2: Mask2,
+//   mask3: Mask3,
+//   mask4: Mask4,
+// };
 
 function MaskComponent({ x, y, width, height }: MaskProps) {
   // const maskSrc = selectedMask ? maskImages[selectedMask] : Mask1; // 기본값 Mask1
