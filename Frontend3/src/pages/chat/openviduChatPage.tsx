@@ -20,10 +20,7 @@ enum SessionEndType {
     AUTO = 'AUTO',
     ERROR = 'ERROR'
 }
-// 힌트 타입 정의
-interface Hint {
-    hint: string;
-}
+
 const VideoChatPage: React.FC = () => {
     const navigate = useNavigate();
     /* 대화 나가기 모달창 */
@@ -45,7 +42,7 @@ const VideoChatPage: React.FC = () => {
     const [chatHistory] = useState<{ role: string; message: string }[]>([]);
     const [selectedKeywords, setSelectedKeywords] = useState<string[] | null>(null); // 사용자들이 고른 키워드
     //const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
-    const [hints, setHints] = useState<Array<Array<{hint: string}>> | null>(null);
+    const [hints, setHints] = useState<{ hint: string }[][]>([]);
 
     /* stomp client */
     //const [client, setClient] = useState<Client | null>(null);
