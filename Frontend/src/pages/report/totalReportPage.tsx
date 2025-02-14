@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import Header from '@/components/header/Header'
 import Footer from '@/components/footer/Footer'
 
@@ -19,14 +21,14 @@ interface SpeakingHabit {
 }
 
 // ✅ 대화 리스트 더미 데이터 (20개)
-// const conversationList = Array.from({ length: 20 }, (_, i) => ({
-//   id: i + 1,
-//   name: `대화 ${i + 1}`,
-//   keywords: i % 2 === 0 ? ["보드 게임", "겨울 스포츠"] : ["AI", "블록체인"],
-//   date: new Date(2024, 1, i + 1).toISOString().split("T")[0], // 2024-02-01 형식 날짜
-// }));
+const conversationList = Array.from({ length: 20 }, (_, i) => ({
+  id: i + 1,
+  name: `대화 ${i + 1}`,
+  keywords: i % 2 === 0 ? ["보드 게임", "겨울 스포츠"] : ["AI", "블록체인"],
+  date: new Date(2024, 1, i + 1).toISOString().split("T")[0], // 2024-02-01 형식 날짜
+}));
 
-// const ITEMS_PER_PAGE = 6; // ✅ 한 페이지당 6개 표시
+const ITEMS_PER_PAGE = 6; // ✅ 한 페이지당 6개 표시
 
 
 function totalReportPage() {
@@ -35,15 +37,15 @@ function totalReportPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   // ✅ 필터링된 대화 리스트 계산
-  // const filteredConversations = conversationList
-  //   .filter(conv => keywordFilter === "전체" || conv.keywords.includes(keywordFilter))
-  //   .sort((a, b) => {
-  //     if (sortOrder === "최신순") {
-  //       return new Date(b.date).getTime() - new Date(a.date).getTime();
-  //     } else {
-  //       return new Date(a.date).getTime() - new Date(b.date).getTime();
-  //     }
-  //   });
+  const filteredConversations = conversationList
+    .filter(conv => keywordFilter === "전체" || conv.keywords.includes(keywordFilter))
+    .sort((a, b) => {
+      if (sortOrder === "최신순") {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      } else {
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      }
+    });
 
   // ✅ 특정 섹션으로 스크롤 이동 함수
   const handleScrollToSection = (sectionId: string) => {
