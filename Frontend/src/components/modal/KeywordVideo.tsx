@@ -63,7 +63,7 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
         const userJwtFromStorage = localStorage.getItem("accessToken");
         if (isOpen && historyId) {
             const client = new Client({
-                brokerURL: "wss://localhost:8080/api/ws",
+                brokerURL: "ws://localhost:8080/api/ws",
                 connectHeaders: {
                     access: `${userJwtFromStorage}`,
                 },

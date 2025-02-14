@@ -73,10 +73,10 @@ public class VideoChatWebSocketController {
     }
 
     @EventListener
-    public void handleSessionDisconnect(SessionDisconnectEvent event) {
-        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-        String sessionId = headerAccessor.getSessionId();
-        System.out.println("STOMP 세션 종료: " + sessionId);
-        // 여기서 추가적인 후처리 작업 수행 (예: 사용자 목록 업데이트 등)
+    public void handleSessionDisconnectListener(SessionDisconnectEvent event) {
+        System.out.println("나감 이벤트 발생");
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        Principal principal = accessor.getUser();
+        videoChatService.handleVideoChatWebSocketDisconnect(principal.getName());
     }
 }
