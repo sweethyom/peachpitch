@@ -9,7 +9,7 @@ export default defineConfig({
     server: {
         proxy: {
             '/api': {
-                target: 'https://peachpitch.site',  // ✅ 백엔드 서버로 프록시
+                target: 'https://localhost:8080',  // ✅ 백엔드 서버로 프록시
                 changeOrigin: true,
                 secure: false,
             }
