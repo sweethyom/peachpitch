@@ -20,6 +20,10 @@ enum SessionEndType {
     AUTO = 'AUTO',
     ERROR = 'ERROR'
 }
+// 힌트 타입 정의
+interface Hint {
+    hint: string;
+}
 const VideoChatPage: React.FC = () => {
     const navigate = useNavigate();
     /* 대화 나가기 모달창 */
@@ -37,12 +41,15 @@ const VideoChatPage: React.FC = () => {
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [alertMessage, setAlertMessage] = useState<string>(""); //alert 재사용을 위한 메세지
 
-    const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+    //const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+    const [chatHistory] = useState<{ role: string; message: string }[]>([]);
     const [selectedKeywords, setSelectedKeywords] = useState<string[] | null>(null); // 사용자들이 고른 키워드
-    const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
+    //const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
+    const [hints, setHints] = useState<Hint[][]>([]);
 
     /* stomp client */
-    const [client, setClient] = useState<Client | null>(null);
+    //const [client, setClient] = useState<Client | null>(null);
+    const [stompClient, setClient] = useState<Client | null>(null);
 
     /* openvidu session */
     const [session, setSession] = useState<Session | null>(null);
@@ -290,14 +297,13 @@ const VideoChatPage: React.FC = () => {
 
                 try {
                     await closeSession(currentSessionId);
-                    // 자동 종료 시에만 피드백 모달 표시
                     setIsFeedbackOpen(true);
-                } catch (err) {
-                    if (err.response?.status === 404) {
+                } catch (error: unknown) {
+                    if (axios.isAxiosError(error) && error.response?.status === 404) {
                         console.log('세션이 이미 종료됨');
                         return;
                     }
-                    console.error("자동 종료 중 오류:", err);
+                    console.error("자동 종료 중 오류:", error);
                 }
             }
         }, 20000);
