@@ -41,7 +41,7 @@ function joinPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch('/api/users/signup', {  // ✅ 변경: 절대 경로(X) → /api 사용
+      const response = await fetch('http://localhost:8080/api/users/signup', {  // ✅ 변경: 절대 경로(X) → /api 사용
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
