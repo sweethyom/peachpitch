@@ -165,21 +165,21 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
 
     @Override
     public synchronized void closeSession(CloseRequest closeRequest) throws OpenViduJavaClientException, OpenViduHttpException {
-        System.out.println("closeRequest.getHistoryId() 종료 요청= " + closeRequest.getHistoryId());
+        System.out.println("closeRequest.getHistoryId() close= " + closeRequest.getHistoryId());
 
         Session session = openvidu.getActiveSession(closeRequest.getSessionId());
 
         try {
             if (session == null) {
-                System.out.println("세션이 이미 종료되었습니다: " + closeRequest.getSessionId());
+                System.out.println("session already close " + closeRequest.getSessionId());
             } else {
                 session.close();
-                System.out.println("세션이 성공적으로 종료되었습니다: " + closeRequest.getSessionId());
+                System.out.println("session close successfully: " + closeRequest.getSessionId());
             }
         }
         catch (Exception e) {
             String msg = e.getMessage();
-            System.err.println("예외 발생: " + msg);
+            System.err.println("exception: " + msg);
             //e.printStackTrace();
         }
         finally {
@@ -192,7 +192,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         Long userId = userService.getUserByEmail(userEmail).orElseThrow().getUserId();
         System.out.println("handleVideoChatDisconnect: " + userEmail + " (userId=" + userId + ")");
         if (waitingUsers.remove(userId)) {
-            System.out.println("대기열에서 사용자 제거: " + userEmail);
+            System.out.println("remove from queue: " + userEmail);
         }
     }
 
