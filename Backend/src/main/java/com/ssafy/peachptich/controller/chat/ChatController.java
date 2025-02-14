@@ -73,7 +73,7 @@ public class ChatController {
     }
     
     // 대화 상세 리포트
-    @GetMapping("users/reports/report")
+    @PostMapping("users/reports/report")
     public ResponseEntity<ResponseDto<ReportResponse>> showReport(@RequestBody ReportRequest reportRequest) {
         // 리포트 내용 가져오기
         ChatReport chatReport = chatService.getReport(reportRequest.getUserId(), reportRequest.getHistoryId());
@@ -95,7 +95,7 @@ public class ChatController {
     }
 
     // 전체 리포트
-    @GetMapping("users/reports/totalreport")
+    @PostMapping("users/reports/totalreport")
     public ResponseEntity<ResponseDto<TotalReportResponse>> showOverview(@RequestBody TotalReportRequest totalReportRequest) {
         // TotalReportResponse를 반환받음
         TotalReportResponse response = chatService.getTotalReport(totalReportRequest.getUserId());
