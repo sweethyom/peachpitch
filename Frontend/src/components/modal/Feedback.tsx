@@ -74,7 +74,7 @@ function Feedback({ isOpen, historyId }: ModalProps) {
 
             // 피드백 제출 후 리포트 페이지로 이동
             console.log('피드백 제출 성공:', response.data);
-            navigate('/report');
+            navigate('/main');
         } catch (error) {
             console.error('피드백 제출 실패:', error);
             // 에러 처리 로직 추가 가능
