@@ -134,7 +134,9 @@ public class CustomLogoutFilter extends GenericFilterBean {
         tokenListService.removeToken("RT:RT:" + userEmail);
         
         // access token을 blackList에 추가
-        tokenBlacklistService.addTokenToList("BL:AT:" + access);
+        if (access != null) {
+            tokenBlacklistService.addTokenToList("BL:AT:" + access);
+        }
         tokenListService.removeToken("RT:AT:" + userEmail);
 
         // Refresh Token Cookie 값 0 설정
