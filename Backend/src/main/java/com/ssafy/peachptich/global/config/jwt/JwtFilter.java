@@ -1,6 +1,8 @@
 package com.ssafy.peachptich.global.config.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.CustomUserDetails;
+import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.repository.UserRepository;
 import com.ssafy.peachptich.service.CustomUserDetailsService;
@@ -27,10 +29,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -45,6 +44,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final List<String> excludedPaths = Arrays.asList(
             "/login",
             "/join",
+            "/api/users/signup",
             "/api/users/login/social",
             "/login/oauth2/code",
             "/oauth2/authorization",
@@ -63,6 +63,10 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
+        ObjectMapper objectMapper = new ObjectMapper();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
         // 헤더에서 access 키에 담긴 토큰을 꺼냄
         String accessToken = request.getHeader("access");
         log.info("JWTFilter에서 accessToken = " + accessToken);
@@ -71,24 +75,21 @@ public class JwtFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         log.info("JWTFilter에서 requestURI = " + requestURI);
         if (requestURI.startsWith("/api/users/login/social") ||
-                requestURI.startsWith("/login/oauth2/code/") ||
-                requestURI.startsWith("/api/users/coupon/*")) {
+                requestURI.startsWith("/login/oauth2/code/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // 토큰이 없다면 다음 필터로 넘김
-        if (accessToken == null){
-            filterChain.doFilter(request, response);
+        // 토큰이 없다면 다음 필터로 넘기지 않음
+        if (accessToken == null || accessToken.isEmpty()){
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: Access token is missing");
             return;
         }
 
         // 토큰이 blackList에 존재하는지 확인
         boolean isBlacked = tokenBlacklistService.isContainToken("BL:AT:" + accessToken);
         if(isBlacked) {
-            PrintWriter writer = response.getWriter();
-            writer.print("aleady logged out. Please sign in.");
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "aleady logged out. Please sign in.");
             return;
         }
 
@@ -96,13 +97,7 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             tokenProvider.isExpired(accessToken);
         } catch (ExpiredJwtException e) {
-            // responseBody
-            PrintWriter writer = response.getWriter();
-            writer.print("access token expired");
-
-            // response status code (상태 코드 응답)
-            // HTTP 응답 코드 설정
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "access token is expired.");
             return;
         }
 
@@ -110,12 +105,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String category = tokenProvider.getCategory(accessToken);
 
         if (!category.equals("access")){
-            // responseBody
-            PrintWriter writer = response.getWriter();
-            writer.print("invalid access token");
-
-            // response status code
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "invalid access token");
             return;
         }
 
@@ -137,5 +127,22 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 검증 종료 후 다음 필터로 넘김
         filterChain.doFilter(request, response);
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, int status, String message) {
+        try {
+            response.setStatus(status);
+            Map<String, String> errorData = new HashMap<>();
+            errorData.put("errorMessage", message);
+
+            ResponseDto<Map<String, String>> responseDto = ResponseDto.<Map<String, String>>builder()
+                    .message("Authentication failed")
+                    .data(errorData)
+                    .build();
+
+            new ObjectMapper().writeValue(response.getWriter(), responseDto);
+        } catch (IOException e) {
+            log.error("Error writing response", e);
+        }
     }
 }

@@ -27,7 +27,7 @@ function Footer({ isDark, isGreen, isPink, isYellow }: FooterProps) {
     setIsRemoveOpen(!isRemoveOpen);
   };
 
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [_isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
     // ✅ localStorage에서 accessToken 확인
@@ -56,11 +56,11 @@ function Footer({ isDark, isGreen, isPink, isYellow }: FooterProps) {
                 스몰톡을 연습하고 싶지만, 사람과의 직접적인 대화는 아직 부담스러운 사용자들을 위한 스피킹 티칭 서비스를 제공합니다.
               </p>
             </div>
-            {isLoggedIn && (
+            {/* {isLoggedIn && (
               <p onClick={toggleRemove} className={styles.footer__leave}>
                 회원탈퇴
               </p>
-            )}
+            )} */}
           </div>
           <hr className={styles.footer__divider} />
           <div className={styles.footer__copyright}>

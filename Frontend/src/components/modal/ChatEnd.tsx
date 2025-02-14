@@ -21,27 +21,43 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
     /* ✅ 종료 버튼 클릭 시 데이터 저장 후 /report 페이지로 이동 */
     const endChat = async () => {
         if (!historyId) {
-            console.error("No historyId available to save chat history.");
+            console.error("history id 없음");
+            navigate('/main');
             return;
         }
 
         const accessToken = localStorage.getItem("accessToken");
         if (!accessToken) {
-            console.error("No access token found, please log in.");
+            console.error("accessToken 없음");
             return;
         }
 
         try {
-            await axios.post("http://localhost:8080/api/chat/save", 
-                { historyId }, 
+            // ✅ Step 1: Save chat history in the database
+            await axios.post("http://localhost:8080/api/chat/save",
+                { historyId },
                 { headers: { access: accessToken } }
             );
+            console.log("채팅 기록 저장 완료");
 
             navigate("/report");
+
+            setTimeout(async () => {
+                try {
+                    await axios.post("http://localhost:8080/ai/users/reports/refine/",
+                        { history_id: historyId }
+                    );
+                    console.log("리포트 생성 완료");
+                } catch (error) {
+                    console.error("리포트 생성 실패", error);
+                }
+            }, 3000);
+
         } catch (error) {
-            console.error("채팅이 저장이 안 됐습니다.");
+            console.error("❌ Failed to save chat history:", error);
         }
     };
+
 
     return (
         <div className={styles.overlay}>
@@ -55,7 +71,7 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
                 <div className={styles.modal__contents}>
                     <p className={styles.modal__sub}>AI와의 대화가 종료되었습니다.</p>
                     <p className={styles.modal__description}>
-                        [다른 대화 진행하기] 버튼을 클릭하면 새로운 키워드로 <br/> AI와 대화를 시작할 수 있습니다.
+                        [다른 대화 진행하기] 버튼을 클릭하면 새로운 키워드로 <br /> AI와 대화를 시작할 수 있습니다.
                     </p>
                 </div>
 
