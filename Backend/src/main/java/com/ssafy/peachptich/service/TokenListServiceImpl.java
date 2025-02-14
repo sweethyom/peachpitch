@@ -7,6 +7,8 @@ import org.springframework.data.redis.connection.DataType;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -16,6 +18,8 @@ import java.util.List;
 public class TokenListServiceImpl implements TokenListService {
     private final RedisTemplate<String, String> redisTemplate;
 
+    //TODO
+    // 만료 시간 입력받고 redis에 저장되는 토큰 만료시간 설정해야 함
     @Override
     public void addTokenToList(String key, String value){
 

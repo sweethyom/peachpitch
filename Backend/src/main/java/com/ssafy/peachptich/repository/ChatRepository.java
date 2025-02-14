@@ -28,11 +28,16 @@ public interface ChatRepository extends JpaRepository<Chat, Long> {
     /**
      * 랜덤 채팅 조회
      */
-    @Query(value = "SELECT * FROM chat ORDER BY RAND() LIMIT 1", nativeQuery = true)
-    Chat findRandomChat();
+    @Query(value = "SELECT * FROM chat WHERE user_id IS NOT NULL ORDER BY RAND() LIMIT 1", nativeQuery = true)
+    Chat findRandomChatWithUserId();
 
     /**
      * 특정 기간 내의 채팅 조회
      */
     List<Chat> findByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
+    /**
+     * 특정 대화 내역 조회
+     */
+    List<Chat> findByChatHistory_HistoryIdOrderByCreatedAtAsc(Long historyId);
+
 }
