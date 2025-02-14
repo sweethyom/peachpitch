@@ -87,7 +87,7 @@ public class ReissueController {
         // refreshRepository.deleteByRefresh(refresh);
         // addToken(userEmail, newRefresh, 86400000L);
 
-        addToken("RT:AT:" + userEmail, newAccess, 18000000L);
+        addToken("RT:AT:" + userEmail, newAccess, 600000L);
         addToken("RT:RT:" + userEmail, newRefresh, 86400000L);
 
         // response
@@ -115,8 +115,7 @@ public class ReissueController {
         redisTemplate.opsForValue().set(
                 key,       // key 값
                 value,                // value
-//                System.currentTimeMillis() + expiredMs,     // 만료 시간
-                expiredMs,
+                System.currentTimeMillis() + expiredMs,     // 만료 시간
                 TimeUnit.MICROSECONDS
         );
     }
