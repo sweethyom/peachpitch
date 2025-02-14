@@ -158,7 +158,7 @@ function MainPage() {
     // }
 
     // try {
-    // const response = await axios.post('/api/trial/check', {
+    // const response = await axios.post('http://localhost:8080/api/trial/check', {
     //   fingerprint: fingerprint,
     // });
 
@@ -257,11 +257,12 @@ function MainPage() {
     navigate('/chat/ai');
   };
 
+  const userId = localStorage.getItem("userId")
   // 쿠폰 관련
   const checkCouponAvailability = async () => {
     try {
-      // const response = await axios.get(`https://peachpitch.site/api/users/coupon/${userId}`);
-      const response = await axios.get(`http://localhost:8080/api/users/coupon/1`);
+      const response = await axios.get(`https://peachpitch.site/api/users/coupon/${userId}`);
+      // const response = await axios.get(`http://localhost:8080/api/users/coupon/1`);
       
       console.log("쿠폰수: " + response.data);
       
