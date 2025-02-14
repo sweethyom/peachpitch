@@ -30,7 +30,7 @@ interface ReportDetail {
   // historyId: number;
 }
 
-function chatReportPage() {
+function chatReportPage(_id : any) {
   const params = useParams(); // ✅ URL에서 reportId 가져오기
   const reportId = params.reportId ? Number(params.reportId) : null;
 

@@ -160,7 +160,7 @@ function totalReportPage() {
   const handleReportClick = (reportId: number) => {
     console.log(reportId);
     setSelectReportId(Number(reportId));
-    navigate(`/report/detail/${reportId}`, { replace: true })
+    navigate(`/report/detail/${reportId}`,)
   };
 
   // 필터링된 대화 리스트 계산
@@ -326,56 +326,58 @@ function totalReportPage() {
                   <>
                     <p className={styles.report__title}>전체 리포트</p>
                     <div className={styles.report__list}>
-                      {chatReports.map((report) => (
-                        <div key={report.reportId} className={styles.item}>
-                          <div onClick={() => handleReportClick(report.reportId)} className={styles.item__link}>
-                            <p className={styles.item__name}>{`${report.partnerName}와의 대화`}</p>
-                            <div className={styles.item__keyword}>
-                              <p className={styles.item__keyword__title}>대화 키워드</p>
-                              <div className={styles.item__tag}>
-                                <p className={styles.item__tag__1}>{report.keyword1}</p>
-                                {report.keyword2 && <p className={styles.item__tag__2}>{report.keyword2}</p>}
+                      <div className={styles.report__grid}>
+                        {chatReports.map((report) => (
+                          <div key={report.reportId} className={styles.item}>
+                            <div onClick={() => handleReportClick(report.reportId)} className={styles.item__link}>
+                              <p className={styles.item__name}>{`${report.partnerName}와의 대화`}</p>
+                              <div className={styles.item__keyword}>
+                                <p className={styles.item__keyword__title}>대화 키워드</p>
+                                <div className={styles.item__tag}>
+                                  <p className={styles.item__tag__1}>{report.keyword1}</p>
+                                  {report.keyword2 && <p className={styles.item__tag__2}>{report.keyword2}</p>}
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </>
                 )}
 
-              {/* ✅ 페이징 */}
-              <div className={styles.report__paging}>
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={styles.report__paging__button}
-                >
-                  ◁
-                </button>
-                {[...Array(totalPages)].map((_, i) => (
+                {/* ✅ 페이징 */}
+                <div className={styles.report__paging}>
                   <button
-                    key={i}
-                    className={`${styles.report__paging__number} ${currentPage === i + 1 ? styles.active : ""}`}
-                    onClick={() => handlePageChange(i + 1)}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={styles.report__paging__button}
                   >
-                    {i + 1}
+                    ◁
                   </button>
-                ))}
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={styles.report__paging__button}
-                >
-                  ▷
-                </button>
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button
+                      key={i}
+                      className={`${styles.report__paging__number} ${currentPage === i + 1 ? styles.active : ""}`}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className={styles.report__paging__button}
+                  >
+                    ▷
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <Footer />
-    </div >
+        <Footer />
+      </div >
     </>
   )
 }
