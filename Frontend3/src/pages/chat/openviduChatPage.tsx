@@ -45,11 +45,11 @@ const VideoChatPage: React.FC = () => {
     const [chatHistory] = useState<{ role: string; message: string }[]>([]);
     const [selectedKeywords, setSelectedKeywords] = useState<string[] | null>(null); // 사용자들이 고른 키워드
     //const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
-    const [hints, setHints] = useState<Hint[][]>([]);
+    const [hints, setHints] = useState<Array<Array<{hint: string}>> | null>(null);
 
     /* stomp client */
     //const [client, setClient] = useState<Client | null>(null);
-    const [stompClient, setClient] = useState<Client | null>(null);
+    const [, setClient] = useState<Client | null>(null);
 
     /* openvidu session */
     const [session, setSession] = useState<Session | null>(null);
@@ -335,6 +335,7 @@ const VideoChatPage: React.FC = () => {
                     chatHistory={chatHistory}
                     selectedKeywords={selectedKeywords}
                     hints={hints}
+                    historyId={historyId ?? 0}
                 />
             </div>
 
