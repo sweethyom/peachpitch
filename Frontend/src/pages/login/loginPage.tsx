@@ -6,12 +6,13 @@ import Footer from '@/components/footer/Footer';
 
 import styles from './styles/login.module.scss';
 
-import { FaGoogle } from "react-icons/fa";
+// import { FaGoogle } from "react-icons/fa";
 import { RiKakaoTalkFill } from "react-icons/ri";
-import { SiNaver } from "react-icons/si";
+// import { SiNaver } from "react-icons/si";
 
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
+import { color } from 'echarts';
 
 function loginPage() {
   const navigate = useNavigate();
@@ -66,14 +67,14 @@ function loginPage() {
       // const userId = headers["user_id"] || headers["userId"];
       const refreshToken = headers["refresh"] || headers["Refresh"] || headers["REFRESH"];
 
-      console.log("accessToken = " , accessToken);
+      console.log("accessToken = ", accessToken);
       const data = await response.json(); // ✅ JSON 데이터 파싱
 
       if (response.ok) {
         if (accessToken) {
           console.log("✅ Access Token:", accessToken);
           localStorage.setItem('accessToken', accessToken); // ✅ localStorage에 저장
-          localStorage.setItem("refreshToken", refreshToken); 
+          localStorage.setItem("refreshToken", refreshToken);
         } else {
           console.warn("🚨 Access 토큰이 undefined (서버 헤더 확인 필요)");
         }
@@ -168,7 +169,7 @@ function loginPage() {
       console.error("🚨 로그인 상태 확인 실패:", error);
     }
   };
-  
+
 
   return (
     <>
@@ -181,15 +182,18 @@ function loginPage() {
 
             <p className={styles.login__sns}>다른 서비스로 로그인</p>
             <div className={styles.login__sns__item}>
-              <a onClick={() => handleSocialLogin('google')}>
+              {/* <a onClick={() => handleSocialLogin('google')}>
                 <FaGoogle style={{ fontSize: '40px' }} />
-              </a>
+              </a> */}
 
               <a onClick={() => handleSocialLogin('kakao')}>
-                <RiKakaoTalkFill style={{ fontSize: '50px' }} />
+                <div className={styles.kakao}>
+                  <RiKakaoTalkFill style={{ fontSize: '40px', color:"#ffffff" }} />
+                  <p>카카오 로그인</p>
+                </div>
               </a>
 
-              <SiNaver style={{ fontSize: '36px' }} />
+              {/* <SiNaver style={{ fontSize: '36px' }} /> */}
             </div>
 
             <div className={styles.login__divider}>
