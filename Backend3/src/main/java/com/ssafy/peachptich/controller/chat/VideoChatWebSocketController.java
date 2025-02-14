@@ -53,7 +53,7 @@ public class VideoChatWebSocketController {
             String email = principal.getName();
             videoChatService.handleVideoChatWebSocket(email);
         } else {
-            log.error("Principal이 null입니다. WebSocket 연결에 실패했습니다.");
+            log.error("Principal null");
         }
     }
 
@@ -68,13 +68,13 @@ public class VideoChatWebSocketController {
             String email = principal.getName();
             videoChatService.handleVideoChatKeyword(videoChatRequest, historyId, email);
         } else {
-            log.error("Principal이 null입니다. WebSocket 연결에 실패했습니다.");
+            log.error("Principal null");
         }
     }
 
     @EventListener
     public void handleSessionDisconnectListener(SessionDisconnectEvent event) {
-        System.out.println("나감 이벤트 발생");
+        System.out.println("disconnect event");
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         Principal principal = accessor.getUser();
         videoChatService.handleVideoChatWebSocketDisconnect(principal.getName());
