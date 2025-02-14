@@ -28,7 +28,7 @@ function App() {
                     <Route path="/chat/ai" element={<VoiceChatPage />} />
                     <Route path="/chat/video" element={<VideoChatPage />} />
                     <Route path="/report" element={<TotalReportPage />} />
-                    <Route path="/report/detail/*" element={<ChatReportPage />} />
+                    <Route path="/report/detail/:reportId" element={<ChatReportPage />} />
                 </Routes>
             </BrowserRouter>
         </RecoilRoot>
