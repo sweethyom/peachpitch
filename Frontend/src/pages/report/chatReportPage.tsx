@@ -11,7 +11,6 @@ import icon_mouth from '../../assets/icons/feedback_mouth.png'
 import icon_score from '../../assets/icons/feedback_score.png'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
-import { useParams } from 'react-router-dom'
 
 interface ChatReport {
   reportId: number;
@@ -20,9 +19,14 @@ interface ChatReport {
   keyword2?: string;
 }
 
-function chatReportPage() {
+interface Report {
+  historyId:number;
+}
 
-  const { historyId } = useParams();
+function chatReportPage({ historyId }: Report) {
+
+  // const { historyId } = useParams();
+  console.log("historyId : " + historyId)
   // const navigate = useNavigate();
   const [reportData, setReportData] = useState<ChatReport | null>(null);
 
@@ -36,10 +40,10 @@ function chatReportPage() {
       console.log("📢 Received historyId from params:", historyId);
       console.log("📢 Parsed historyId:", parsedHistoryId);
 
-      if (!accessToken || !userId || parsedHistoryId === null || isNaN(parsedHistoryId)) {
-        console.error("❌ Invalid parameters: Missing access token, user ID, or history ID");
-        return;
-      }
+      // if (!accessToken || !userId || parsedHistoryId === null || isNaN(parsedHistoryId)) {
+      //   console.error("❌ Invalid parameters: Missing access token, user ID, or history ID");
+      //   return;
+      // }
 
       try {
         console.log("📢 Fetching total report for userId:", userId);
@@ -47,29 +51,31 @@ function chatReportPage() {
         // Fetch total report data using only userId
         const response = await axios.post(
           "http://localhost:8080/api/users/reports/totalreport",
-          { userId },
+          { userId: userId },
           {
             headers: {
-              access: accessToken,
               "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken}`,
             },
-            withCredentials: true,
+            withCredentials: true, // ✅ 쿠키 포함
           }
         );
 
         console.log("✅ Report Data:", response.data);
 
-        // Find the matching report by historyId
-        const chatReport = response.data.data?.chatReports?.find(
-          (report: ChatReport) => report.reportId === parsedHistoryId
-        ) || null;
+        const historyId = response.data.data.chatReports
 
-        if (chatReport) {
-          console.log("✅ Found Matching Report:", chatReport);
-          setReportData(chatReport);
-        } else {
-          console.warn("⚠ No matching report found for historyId:", parsedHistoryId);
-        }
+        // Find the matching report by historyId
+        // const chatReport = response.data.data?.chatReports?.find(
+        //   (report: ChatReport) => report.reportId === parsedHistoryId
+        // ) || null;
+
+        // if (chatReport) {
+        //   console.log("✅ Found Matching Report:", chatReport);
+        //   setReportData(chatReport);
+        // } else {
+        //   console.warn("⚠ No matching report found for historyId:", parsedHistoryId);
+        // }
       } catch (error) {
         console.error("❌ Failed to fetch chat report:", error);
       }

@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom'
+
 import Header from '@/components/header/Header'
 import Footer from '@/components/footer/Footer'
 
@@ -19,14 +21,14 @@ interface SpeakingHabit {
 }
 
 // ✅ 대화 리스트 더미 데이터 (20개)
-// const conversationList = Array.from({ length: 20 }, (_, i) => ({
-//   id: i + 1,
-//   name: `대화 ${i + 1}`,
-//   keywords: i % 2 === 0 ? ["보드 게임", "겨울 스포츠"] : ["AI", "블록체인"],
-//   date: new Date(2024, 1, i + 1).toISOString().split("T")[0], // 2024-02-01 형식 날짜
-// }));
+const conversationList = Array.from({ length: 20 }, (_, i) => ({
+  id: i + 1,
+  name: `대화 ${i + 1}`,
+  keywords: i % 2 === 0 ? ["보드 게임", "겨울 스포츠"] : ["AI", "블록체인"],
+  date: new Date(2024, 1, i + 1).toISOString().split("T")[0], // 2024-02-01 형식 날짜
+}));
 
-// const ITEMS_PER_PAGE = 6; // ✅ 한 페이지당 6개 표시
+const ITEMS_PER_PAGE = 6; // ✅ 한 페이지당 6개 표시
 
 
 function totalReportPage() {
@@ -35,15 +37,15 @@ function totalReportPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   // ✅ 필터링된 대화 리스트 계산
-  // const filteredConversations = conversationList
-  //   .filter(conv => keywordFilter === "전체" || conv.keywords.includes(keywordFilter))
-  //   .sort((a, b) => {
-  //     if (sortOrder === "최신순") {
-  //       return new Date(b.date).getTime() - new Date(a.date).getTime();
-  //     } else {
-  //       return new Date(a.date).getTime() - new Date(b.date).getTime();
-  //     }
-  //   });
+  const filteredConversations = conversationList
+    .filter(conv => keywordFilter === "전체" || conv.keywords.includes(keywordFilter))
+    .sort((a, b) => {
+      if (sortOrder === "최신순") {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      } else {
+        return new Date(a.date).getTime() - new Date(b.date).getTime();
+      }
+    });
 
   // ✅ 특정 섹션으로 스크롤 이동 함수
   const handleScrollToSection = (sectionId: string) => {
@@ -63,49 +65,44 @@ function totalReportPage() {
       const accessToken = localStorage.getItem("accessToken");
       const userId = Number(localStorage.getItem("userId"));
 
-      if (!accessToken || !userId) {
-        console.error("❌ Missing access token or user ID");
-        window.location.href = "/login";
-        return;
-      }
+      // console.log("userId: " + userId);
+      // console.log("userId: " + accessToken);
+
+      // if (!accessToken || !userId) {
+      //   console.error("❌ Missing access token or user ID");
+      //   window.location.href = "/login";
+      //   return;
+      // }
 
       try {
         const response = await axios.post(
           "http://localhost:8080/api/users/reports/totalreport",
-          { userId },
+          { userId: userId },
           {
             headers: {
-              "access": accessToken,
               "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken}`,
             },
-            withCredentials: true,
+            withCredentials: true, // ✅ 쿠키 포함
           }
         );
 
         console.log("✅ Report Data:", response.data);
 
-        // 대화 습관 데이터 받아오기
         if (response.data?.data?.speakingHabits) {
-          console.log("📊 Received speakingHabits:", response.data.data.speakingHabits);
           setSpeakingHabits(response.data.data.speakingHabits);
-        } else {
-          console.warn("⚠ No speakingHabits found in API response");
         }
 
-        // 대화 주도권 데이터 받아오기기
         if (response.data?.data) {
           setReportData({
             ansCount: response.data.data.ansCount || 0,
             questCount: response.data.data.questCount || 0,
           });
-        } else {
-          console.warn("⚠ No ansCount or questCount found in API response");
         }
-        // 워드 클라우드 데이터 받아오기기
+
         if (response.data.data.chatReports) {
           setChatReports(response.data.data.chatReports);
         }
-
       } catch (error) {
         console.error("❌ Failed to fetch report data:", error);
       }
@@ -166,9 +163,11 @@ function totalReportPage() {
   // 리포트 선택
   const navigate = useNavigate();
 
-  const handleReportClick = async (historyId: number) => {
+  const handleReportClick = async (reportId: number) => {
     const accessToken = localStorage.getItem("accessToken");
     const userId = Number(localStorage.getItem("userId"));
+
+    // console.log("historyId: " + historyId)
 
     if (!accessToken || !userId) {
       console.error("❌ Missing access token or user ID");
@@ -177,13 +176,13 @@ function totalReportPage() {
 
     try {
       // Send GET request with headers and body
-      const response = await axios.post("http://localhost:8080/api/users/reports/report", {
-        headers: {
-          "access": accessToken,
-        },
-        params: { userId },
-        data: { userId, historyId },
-      });
+      const response = await axios.post("http://localhost:8080/api/users/reports/report",
+        {userId},
+        {
+          headers: {
+            "access": accessToken,
+          }
+        });
 
       console.log("✅ Report Details:", response.data);
 
