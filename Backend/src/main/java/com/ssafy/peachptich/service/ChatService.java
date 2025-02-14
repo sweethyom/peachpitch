@@ -2,6 +2,7 @@ package com.ssafy.peachptich.service;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.ChatRequest;
+import com.ssafy.peachptich.dto.request.ReportRequest;
 import com.ssafy.peachptich.dto.request.UserChatRequest;
 import com.ssafy.peachptich.dto.response.TotalReportResponse;
 import com.ssafy.peachptich.entity.Chat;
@@ -28,9 +29,10 @@ public interface ChatService {
     void saveUserChatTemp(UserChatRequest userChatRequest);
     // 사용자대화 db 저장
     void saveUserChat(UserChatRequest userChatRequest);
-
+    // 특정 대화 조회
+    List<Chat> getChatsByHistoryId(Long historyId);
     // 대화 리포트 조회
-    ChatReport getReport(Long userId, Long chatHistoryId);
+    ChatReport getReport(ReportRequest reportRequest);
 
     // 전체 리포트 조회
     TotalReportResponse getTotalReport(Long userId);
