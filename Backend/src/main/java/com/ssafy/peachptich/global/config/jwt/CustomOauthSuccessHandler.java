@@ -120,7 +120,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private Cookie createCookie(String key, String value){
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(60*60*60);
+        cookie.setMaxAge(60*60*24);
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setHttpOnly(false);
@@ -132,8 +132,8 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         redisTemplate.opsForValue().set(
             key,                    // key 값
             value,                // value
-            System.currentTimeMillis() + expiredMs,     // 만료 시간
-            TimeUnit.MICROSECONDS
+            expiredMs,     // 만료 시간
+            TimeUnit.MILLISECONDS
         );
     }
 }

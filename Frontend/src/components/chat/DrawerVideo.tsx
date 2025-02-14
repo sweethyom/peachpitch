@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import styles from "./styles/Drawer.module.scss";
 
 import openBtn from "@/assets/icons/drawer_open.png";
@@ -17,9 +16,10 @@ type DrawerProps = {
     chatHistory: { role: string; message: string }[];
     selectedKeywords: string[] | null;
     hints: Array<Array<{hint: string}>> | null;  // 2차원 배열 타입으로 수정
+    historyId: number | null;
 };
 
-const Drawer = ({ selectedKeywords, hints, chatHistory }: DrawerProps) => {
+const Drawer = ({ selectedKeywords, hints, chatHistory, historyId }: DrawerProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [keyword1, setKeyword1] = useState<string | null>(null);
     const [keyword2, setKeyword2] = useState<string | null>(null);
@@ -107,9 +107,9 @@ const Drawer = ({ selectedKeywords, hints, chatHistory }: DrawerProps) => {
     };
 
     // 피드백 토글
-    const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+    const [isFeedbackOpen, _setIsFeedbackOpen] = useState(false);
 
-    const toggleFeedback = () => { setIsFeedbackOpen(!isFeedbackOpen) };
+    // const toggleFeedback = () => { setIsFeedbackOpen(!isFeedbackOpen) };
 
     return (
         <div>
@@ -232,7 +232,7 @@ const Drawer = ({ selectedKeywords, hints, chatHistory }: DrawerProps) => {
             )}
 
             {/* 피드백 모달 */}
-            <FeedbackModal isOpen={isFeedbackOpen} onClose={toggleFeedback} />
+            <FeedbackModal isOpen={isFeedbackOpen} historyId={historyId} />
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import classNames from "classnames";
 import { useState, useEffect, useRef } from "react";
 import styles from "./Header.module.scss";
@@ -16,7 +16,7 @@ interface HeaderProps {
 }
 
 function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const headerClass = classNames(styles.header, {
         [styles.headerDark]: isDark,
         [styles.headerGreen]: isGreen,
@@ -68,27 +68,65 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
     // ✅ 로그아웃 처리
     const handleLogout = async () => {
-        await fetch("http://localhost:8080/api/users/logout", {
-            method: "POST",
-            credentials: "include",
-        });
+        try {
+            // ✅ 브라우저에서 refreshToken 가져오기
+            const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+                const [name, value] = cookie.split("=");
+                acc[name] = value;
+                return acc;
+            }, {} as Record<string, string>);
 
-        document.cookie = "refresh=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("userEmail");
-        localStorage.removeItem("userId");
-        setIsLoggedIn(false);
-        setUserId(null);
-        navigate("/login");
-        window.dispatchEvent(new Event("storage"));
+            const refreshToken = cookies["refresh"];
+
+            if (!refreshToken) {
+                console.error("🚨 Refresh token이 없습니다. 로그아웃 불가능.");
+                return;
+            }
+
+            // ✅ 로그아웃 요청 (refreshToken을 헤더에 포함)
+            await axios.post(
+                "http://localhost:8080/api/users/logout",
+                {},
+                {
+                    withCredentials: true, // ✅ 쿠키 자동 포함
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                        "refresh": refreshToken, // ✅ refreshToken을 명시적으로 추가
+                    },
+                }
+            );
+
+            console.log("✅ 로그아웃 성공");
+
+            // ✅ 로컬 스토리지 삭제
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userId");
+
+            // ✅ 쿠키 삭제 (refresh 토큰 제거)
+            document.cookie = "refresh=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure;";
+
+            // ✅ 로그인 페이지로 이동
+            window.location.href = "/login";
+        } catch (error) {
+            console.error("❌ 로그아웃 실패:", error);
+        }
     };
+
 
     // 쿠폰 확인
     const [couponCount, setCouponCount] = useState<number>(0);
     useEffect(() => {
         const fetchCouponCount = async () => {
             try {
-                const response = await axios.get("http://localhost:8080/api/users/coupon/1");
+                const storedUserId = localStorage.getItem("userId");
+
+                if (!storedUserId) {
+                    // console.error("User ID가 없습니다.");
+                    return;
+                }
+
+                const response = await axios.get(`http://localhost:8080/api/users/coupon/${storedUserId}`);
                 setCouponCount(response.data);
             } catch (error) {
                 console.error("쿠폰 수 조회 실패:", error);
