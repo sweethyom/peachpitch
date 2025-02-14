@@ -40,16 +40,22 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
             );
             console.log("채팅 기록 저장 완료");
 
-            navigate("/report");
+            navigate("/main");
 
             setTimeout(async () => {
                 try {
-                    await axios.post("http://localhost:8080/ai/users/reports/refine/",
+                    const response = await axios.post("http://127.0.0.1:8000/ai/users/reports/refine/",
                         { history_id: historyId }
                     );
-                    console.log("리포트 생성 완료");
+
+                    if (response.status === 200) {
+                        console.log("✅ 리포트 생성 완료 - 응답 코드 200");
+                    } else {
+                        console.warn("⚠️ 리포트 생성 완료했으나 예상과 다른 응답 코드:", response.status);
+                    }
+
                 } catch (error) {
-                    console.error("리포트 생성 실패", error);
+                    console.error("❌ 리포트 생성 실패", error);
                 }
             }, 3000);
 
