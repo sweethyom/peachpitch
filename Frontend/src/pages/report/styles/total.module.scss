@@ -58,8 +58,6 @@
         display: flex;
         flex-direction: row;
         gap: 67px;
-        // align-items: center;
-        justify-content: center;
     }
 
     &__sub {
@@ -205,6 +203,8 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    // align-items: flex-end;
+    // min-height: 30px;
 
     &__wordcloud {
         width: 400px;

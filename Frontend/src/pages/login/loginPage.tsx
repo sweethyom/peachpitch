@@ -16,7 +16,7 @@ import RedAlert from '@/components/alert/redAlert';
 function loginPage() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState<string | null>(null);
+  const [_error, setError] = useState<string | null>(null);
 
   // alert창
   const [showErrorAlert, setShowErrorAlert] = useState(false);
@@ -45,7 +45,7 @@ function loginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8080/api/users/login', {
+      const response = await fetch('https://peachpitch.site/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -63,6 +63,8 @@ function loginPage() {
 
       // 대소문자 상관없이 access 헤더 찾기
       const accessToken = headers["access"] || headers["Access"] || headers["ACCESS"];
+      // const userId = headers["user_id"] || headers["userId"];
+      const refreshToken = headers["refresh"] || headers["Refresh"] || headers["REFRESH"];
 
       console.log("accessToken = " , accessToken);
       const data = await response.json(); // ✅ JSON 데이터 파싱
@@ -71,10 +73,12 @@ function loginPage() {
         if (accessToken) {
           console.log("✅ Access Token:", accessToken);
           localStorage.setItem('accessToken', accessToken); // ✅ localStorage에 저장
+          localStorage.setItem("refreshToken", refreshToken); 
         } else {
           console.warn("🚨 Access 토큰이 undefined (서버 헤더 확인 필요)");
         }
-
+        const userId = data.data?.userId;
+        localStorage.setItem('userId', userId);
         localStorage.setItem('loginSuccess', 'true');
         localStorage.setItem('userEmail', formData.email);
 
@@ -95,7 +99,7 @@ function loginPage() {
     localStorage.setItem('socialLoginAttempt', 'true');
     console.log("provider: ", provider);
 
-    const popupUrl = `http://localhost:8080/api/users/login/social/${provider}`;
+    const popupUrl = `https://peachpitch.site/api/users/login/social/${provider}`;
     const popup = window.open(
       popupUrl,
       "Social Login",
@@ -125,7 +129,7 @@ function loginPage() {
   // 로그인 상태 확인
   const checkSocialLogin = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/users/check-login", {
+      const response = await fetch("https://peachpitch.site/api/users/check-login", {
         method: "GET",
         credentials: "include",
       });

@@ -2,6 +2,8 @@ import styles from "./styles/Remove.module.scss";
 
 import closeBtn from "@/assets/icons/modal__close.png";
 import warnIcon from "@/assets/icons/modal_warn.png"
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 type ModalProps = {
     isOpen: boolean; // 모달 열림 상태
@@ -10,7 +12,39 @@ type ModalProps = {
 
 function AccountRemove({ isOpen, onClose }: ModalProps) {
 
+    const navigate = useNavigate();
+
     if (!isOpen) return null;
+
+    const handleAccountRemove = async () => {
+        try {
+            const response = await axios.post("https://peachpitch.site/api/users/delete", {}, {
+                withCredentials: true,
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,
+                    "Content-Type": "application/json",
+                },
+            });
+    
+            console.log("회원 탈퇴 성공:", response.data);
+    
+            // ✅ 탈퇴 후 로컬 스토리지 삭제
+            localStorage.removeItem("accessToken");
+            localStorage.removeItem("userEmail");
+            localStorage.removeItem("userId");
+    
+            // ✅ 로그아웃과 동일하게 쿠키 삭제
+            document.cookie = "refresh=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure;";
+    
+            // ✅ 로그인 페이지로 이동
+            navigate("/login");
+            window.dispatchEvent(new Event("storage"));
+        } catch (error) {
+            console.error("회원 탈퇴 실패:", error);
+        }
+    };
+    
+
 
     return (
         <div className={styles.overlay}>
@@ -32,7 +66,9 @@ function AccountRemove({ isOpen, onClose }: ModalProps) {
                         className={styles.modal__btn__cancle}>
                         취소하기
                     </div>
-                    <div className={styles.modal__btn__remove}>탈퇴하기</div>
+                    <div
+                        onClick={handleAccountRemove}
+                        className={styles.modal__btn__remove}>탈퇴하기</div>
                 </div>
             </div>
         </div>

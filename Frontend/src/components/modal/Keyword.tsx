@@ -17,7 +17,7 @@ type KeywordItem = {
     name: string;
 };
 
-function Keyword({ children, setSelectedKeyword, setSelectedKeywordId, onClose }: ModalProps) {
+function Keyword({ children, setSelectedKeyword, setSelectedKeywordId }: ModalProps) {
     // 키워드 배열의 타입을 KeywordItem[]으로 수정
     const [keywords, setKeywords] = useState<KeywordItem[]>([]);
     const [visibleCount, setVisibleCount] = useState(5); // 처음 5개만 표시
@@ -26,7 +26,7 @@ function Keyword({ children, setSelectedKeyword, setSelectedKeywordId, onClose }
     useEffect(() => {
         const fetchKeywords = async () => {
             try {
-                const response = await fetch("http://localhost:8080/api/chat/ai/keywords/add");
+                const response = await fetch("https://peachpitch.site/api/chat/ai/keywords/add");
                 const responseJson = await response.json();
                 const data = responseJson.data;
                 console.log(data);

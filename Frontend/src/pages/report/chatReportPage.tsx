@@ -9,8 +9,77 @@ import icon_heart from '../../assets/icons/feedback_heart.png'
 import icon_laugh from '../../assets/icons/feedback_laugh.png'
 import icon_mouth from '../../assets/icons/feedback_mouth.png'
 import icon_score from '../../assets/icons/feedback_score.png'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { useParams } from 'react-router-dom'
+
+interface ChatReport {
+  reportId: number;
+  partnerName: string;
+  keyword1: string;
+  keyword2?: string;
+}
 
 function chatReportPage() {
+
+  const { historyId } = useParams();
+  // const navigate = useNavigate();
+  const [reportData, setReportData] = useState<ChatReport | null>(null);
+
+
+  useEffect(() => {
+    const fetchChatReport = async () => {
+      const accessToken = localStorage.getItem("accessToken");
+      const userId = Number(localStorage.getItem("userId"));
+      const parsedHistoryId = historyId ? Number(historyId) : null;
+
+      console.log("📢 Received historyId from params:", historyId);
+      console.log("📢 Parsed historyId:", parsedHistoryId);
+
+      if (!accessToken || !userId || parsedHistoryId === null || isNaN(parsedHistoryId)) {
+        console.error("❌ Invalid parameters: Missing access token, user ID, or history ID");
+        return;
+      }
+
+      try {
+        console.log("📢 Fetching total report for userId:", userId);
+
+        // Fetch total report data using only userId
+        const response = await axios.post(
+          "https://peachpitch.site/api/users/reports/totalreport",
+          { userId },
+          {
+            headers: {
+              access: accessToken,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+
+        console.log("✅ Report Data:", response.data);
+
+        // Find the matching report by historyId
+        const chatReport = response.data.data?.chatReports?.find(
+          (report: ChatReport) => report.reportId === parsedHistoryId
+        ) || null;
+
+        if (chatReport) {
+          console.log("✅ Found Matching Report:", chatReport);
+          setReportData(chatReport);
+        } else {
+          console.warn("⚠ No matching report found for historyId:", parsedHistoryId);
+        }
+      } catch (error) {
+        console.error("❌ Failed to fetch chat report:", error);
+      }
+    };
+
+    fetchChatReport();
+  }, [historyId]);
+
+
+
 
   // ✅ 특정 섹션으로 스크롤 이동하는 함수
   const handleScrollToSection = (sectionId: string) => {
@@ -37,10 +106,10 @@ function chatReportPage() {
           </div>
 
           <div className={styles.report}>
-            <p className={styles.report__title}>달고나 좋아하는 강아지와의 대화 리포트</p>
+            <h1 className={styles.report__title}>{reportData?.partnerName || "알 수 없는 사용자"}와의 대화 리포트</h1>
             <div className={styles.report__tag}>
-              <p className={styles.report__tag__1}>보드 게임</p>
-              <p className={styles.report__tag__2}>보드 게임</p>
+              <p className={styles.report__tag__1}>{reportData?.keyword1 || "키워드 없음"}</p>
+              {reportData?.keyword2 && <p className={styles.report__tag__2}>{reportData?.keyword2}</p>}
             </div>
 
 
@@ -94,6 +163,12 @@ function chatReportPage() {
                   3. 구체적 경험 공유: 모래사장에서 뛰어논 경험 등 구체적인 이야기를 통해 대화에 생동감을 더했습니다.
                 </div>
                 <p className={styles.report__commentary__title}>개선점</p>
+                <div className={styles.report__commentary__contents}>
+                  1. 대화 속도: 대부분의 발화 사이에 5-6초의 간격이 있었습니다. 더 빠른 응답으로 대화의 흐름을 더욱 자연스럽게 만들 수 있습니다.<br />
+                  2. 질문의 다양성: 더 다양한 유형의 질문을 통해 대화를 더욱 풍부하게 만들 수 있습니다.<br />
+                  3. 정보의 깊이: 스위스에 대한 대화에서 더 구체적인 정보나 개인적인 의견을 추가하면 대화가 더욱 흥미로워질 수 있습니다.
+                </div>
+                <p className={styles.report__commentary__title}>AI 요약</p>
                 <div className={styles.report__commentary__contents}>
                   1. 대화 속도: 대부분의 발화 사이에 5-6초의 간격이 있었습니다. 더 빠른 응답으로 대화의 흐름을 더욱 자연스럽게 만들 수 있습니다.<br />
                   2. 질문의 다양성: 더 다양한 유형의 질문을 통해 대화를 더욱 풍부하게 만들 수 있습니다.<br />
