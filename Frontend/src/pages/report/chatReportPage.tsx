@@ -1,16 +1,17 @@
-import Header from '../../components/header/Header'
-import Footer from '../../components/footer/Footer'
+import Header from '@/components/header/Header'
+import Footer from '@/components/footer/Footer'
 
 import styles from './styles/chat.module.scss'
 
-import icon_clock from '../../assets/icons/feedback_clock.png'
-import icon_hands from '../../assets/icons/feedback_hands.png'
-import icon_heart from '../../assets/icons/feedback_heart.png'
-import icon_laugh from '../../assets/icons/feedback_laugh.png'
-import icon_mouth from '../../assets/icons/feedback_mouth.png'
-import icon_score from '../../assets/icons/feedback_score.png'
+import icon_clock from '@/assets/icons/feedback_clock.png'
+import icon_hands from '@/assets/icons/feedback_hands.png'
+import icon_heart from '@/assets/icons/feedback_heart.png'
+import icon_laugh from '@/assets/icons/feedback_laugh.png'
+import icon_mouth from '@/assets/icons/feedback_mouth.png'
+import icon_score from '@/assets/icons/feedback_score.png'
 import { useEffect, useState } from 'react'
 import axios from 'axios'
+import { useParams } from 'react-router-dom'
 
 interface ChatReport {
   reportId: number;
@@ -19,36 +20,42 @@ interface ChatReport {
   keyword2?: string;
 }
 
-interface Report {
-  historyId:number;
+interface ReportDetail {
+  // reportId: number;
+  // chatTime: number;
+  pros: string;
+  cons: string;
+  summary: string;
+  // userId: number;
+  // historyId: number;
 }
 
-function chatReportPage({ historyId }: Report) {
+function chatReportPage() {
+  const params = useParams(); // ✅ URL에서 reportId 가져오기
+  const reportId = params.reportId ? Number(params.reportId) : null;
 
-  // const { historyId } = useParams();
-  console.log("historyId : " + historyId)
+  // console.log("reportId : " + reportId)
+
   // const navigate = useNavigate();
-  const [reportData, setReportData] = useState<ChatReport | null>(null);
+  // const [reportData, setReportData] = useState<any>(null);
+  const userId = localStorage.getItem("userId");
+  const accessToken = localStorage.getItem("accessToken")
+  // useEffect(() => {
+  //   console.log("📢 현재 reportId:", reportId);
+  // }, [reportId]);
 
+  const [chatReport, setChatReport] = useState<ChatReport | null>(null);
+  const [reportDetail, setReportDetail] = useState<ReportDetail | null>(null);
 
   useEffect(() => {
+    if (!reportId || !userId || !accessToken) {
+      console.warn("⚠ reportId 또는 userId가 없습니다. API 요청을 중단합니다.");
+      return;
+    }
+
+    // ✅ 첫 번째 API 요청: /totalreport 에서 chatReports 가져오기
     const fetchChatReport = async () => {
-      const accessToken = localStorage.getItem("accessToken");
-      const userId = Number(localStorage.getItem("userId"));
-      const parsedHistoryId = historyId ? Number(historyId) : null;
-
-      console.log("📢 Received historyId from params:", historyId);
-      console.log("📢 Parsed historyId:", parsedHistoryId);
-
-      // if (!accessToken || !userId || parsedHistoryId === null || isNaN(parsedHistoryId)) {
-      //   console.error("❌ Invalid parameters: Missing access token, user ID, or history ID");
-      //   return;
-      // }
-
       try {
-        console.log("📢 Fetching total report for userId:", userId);
-
-        // Fetch total report data using only userId
         const response = await axios.post(
           "http://localhost:8080/api/users/reports/totalreport",
           { userId: userId },
@@ -57,33 +64,53 @@ function chatReportPage({ historyId }: Report) {
               "Content-Type": "application/json",
               "Authorization": `Bearer ${accessToken}`,
             },
-            withCredentials: true, // ✅ 쿠키 포함
+            withCredentials: true,
           }
         );
 
-        console.log("✅ Report Data:", response.data);
+        // ✅ chatReports에서 reportId와 일치하는 데이터 찾기
+        const chatReports = response.data?.data?.chatReports || [];
+        const foundReport = chatReports.find((report: ChatReport) => report.reportId === Number(reportId));
 
-        const historyId = response.data.data.chatReports
-
-        // Find the matching report by historyId
-        // const chatReport = response.data.data?.chatReports?.find(
-        //   (report: ChatReport) => report.reportId === parsedHistoryId
-        // ) || null;
-
-        // if (chatReport) {
-        //   console.log("✅ Found Matching Report:", chatReport);
-        //   setReportData(chatReport);
-        // } else {
-        //   console.warn("⚠ No matching report found for historyId:", parsedHistoryId);
-        // }
+        if (foundReport) {
+          console.log("✅ chatReports에서 reportId 찾음:", foundReport);
+          setChatReport(foundReport);
+        } else {
+          console.warn("⚠ chatReports에서 해당 reportId를 찾을 수 없음.");
+        }
       } catch (error) {
-        console.error("❌ Failed to fetch chat report:", error);
+        console.error("❌ Failed to fetch chatReports:", error);
+      }
+    };
+
+    // ✅ 두 번째 API 요청: /report에서 reportId의 상세 정보 가져오기
+    const fetchReportDetail = async () => {
+      try {
+        const response = await axios.post(
+          "http://localhost:8080/api/users/reports/report",
+          {
+            userId: userId,
+            reportId: Number(reportId),
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${accessToken}`,
+            },
+            withCredentials: true,
+          }
+        );
+
+        console.log("✅ report 상세 데이터 가져옴:", response.data);
+        setReportDetail(response.data.data);
+      } catch (error) {
+        console.error("❌ Failed to fetch report detail:", error);
       }
     };
 
     fetchChatReport();
-  }, [historyId]);
-
+    fetchReportDetail();
+  }, [reportId, userId, accessToken]);
 
 
 
@@ -102,20 +129,25 @@ function chatReportPage({ historyId }: Report) {
         <div className={styles.page}>
           {/* 목차 */}
           <div className={styles.index}>
-            <p className={styles.index__item}
-              onClick={() => handleScrollToSection('history')}>대화 기록</p>
-            <p className={styles.index__item}
-              onClick={() => handleScrollToSection('commentary')}>총평</p>
-            <p className={styles.index__item} onClick={() => handleScrollToSection('feedback')}>
-              상대방의 평가
-            </p>
+            <div className={styles.index__container}>
+              <p className={styles.index__item}
+                onClick={() => handleScrollToSection('history')}>대화 기록</p>
+              <p className={styles.index__item}
+                onClick={() => handleScrollToSection('commentary')}>총평</p>
+
+              {chatReport?.keyword2 !== null && (
+                <p className={styles.index__item} onClick={() => handleScrollToSection('feedback')}>
+                  상대방의 평가
+                </p>
+              )}
+            </div>
           </div>
 
           <div className={styles.report}>
-            <h1 className={styles.report__title}>{reportData?.partnerName || "알 수 없는 사용자"}와의 대화 리포트</h1>
+            <h1 className={styles.report__title}>{chatReport?.partnerName || "알 수 없는 사용자"}와의 대화 리포트</h1>
             <div className={styles.report__tag}>
-              <p className={styles.report__tag__1}>{reportData?.keyword1 || "키워드 없음"}</p>
-              {reportData?.keyword2 && <p className={styles.report__tag__2}>{reportData?.keyword2}</p>}
+              <p className={styles.report__tag__1}>{chatReport?.keyword1 || "키워드 없음"}</p>
+              {chatReport?.keyword2 && <p className={styles.report__tag__2}>{chatReport?.keyword2}</p>}
             </div>
 
 
@@ -164,62 +196,60 @@ function chatReportPage({ historyId }: Report) {
               <div className={styles.report__commentary__wrapper}>
                 <p className={styles.report__commentary__title}>강점</p>
                 <div className={styles.report__commentary__contents}>
-                  1. 주제 전개: 강릉 여행에서 시작하여 해외여행, 특히 스위스로 자연스럽게 주제를 확장했습니다.<br />
-                  2. 상호작용: 서로의 말에 적절히 반응하고 추가 질문을 하며 대화를 이어갔습니다.<br />
-                  3. 구체적 경험 공유: 모래사장에서 뛰어논 경험 등 구체적인 이야기를 통해 대화에 생동감을 더했습니다.
+                  {reportDetail?.pros || "총평 데이터 없음"}
                 </div>
                 <p className={styles.report__commentary__title}>개선점</p>
                 <div className={styles.report__commentary__contents}>
-                  1. 대화 속도: 대부분의 발화 사이에 5-6초의 간격이 있었습니다. 더 빠른 응답으로 대화의 흐름을 더욱 자연스럽게 만들 수 있습니다.<br />
-                  2. 질문의 다양성: 더 다양한 유형의 질문을 통해 대화를 더욱 풍부하게 만들 수 있습니다.<br />
-                  3. 정보의 깊이: 스위스에 대한 대화에서 더 구체적인 정보나 개인적인 의견을 추가하면 대화가 더욱 흥미로워질 수 있습니다.
+                  {reportDetail?.cons || "개선점 데이터 없음"}
                 </div>
                 <p className={styles.report__commentary__title}>AI 요약</p>
                 <div className={styles.report__commentary__contents}>
-                  1. 대화 속도: 대부분의 발화 사이에 5-6초의 간격이 있었습니다. 더 빠른 응답으로 대화의 흐름을 더욱 자연스럽게 만들 수 있습니다.<br />
-                  2. 질문의 다양성: 더 다양한 유형의 질문을 통해 대화를 더욱 풍부하게 만들 수 있습니다.<br />
-                  3. 정보의 깊이: 스위스에 대한 대화에서 더 구체적인 정보나 개인적인 의견을 추가하면 대화가 더욱 흥미로워질 수 있습니다.
+                  {reportDetail?.summary || "요약 데이터 없음"}
                 </div>
               </div>
             </div>
 
-            <hr className={styles.report__divider} />
+            {chatReport?.keyword2 !== null && (
+              <>
+                <hr className={styles.report__divider} />
 
-            <div className={styles.report__feedback}>
-              <p id="feedback" className={styles.report__sub}>상대방의 평가</p>
-              <p className={styles.report__feedback__comment}>
-                전반적으로, 이 대화는 자연스러운 흐름과 상호 관심사를 잘 반영하고 있어 성공적인 스몰톡의 사례라고 볼 수 있습니다.<br />
-                참여자들이 서로의 경험과 관심사에 대해 더 깊이 있게 탐구하고, 대화 속도를 조금 더 높인다면 더욱 활기찬 대화가 될 것입니다.
-              </p>
+                <div className={styles.report__feedback}>
+                  <p id="feedback" className={styles.report__sub}>상대방의 평가</p>
+                  <p className={styles.report__feedback__comment}>
+                    전반적으로, 이 대화는 자연스러운 흐름과 상호 관심사를 잘 반영하고 있어 성공적인 스몰톡의 사례라고 볼 수 있습니다.<br />
+                    참여자들이 서로의 경험과 관심사에 대해 더 깊이 있게 탐구하고, 대화 속도를 조금 더 높인다면 더욱 활기찬 대화가 될 것입니다.
+                  </p>
 
-              {/* 상대방이 체크한 평가 */}
-              <div className={styles.report__feedback__check}>
-                <div className={styles.check}>
-                  <img src={icon_hands} height="26px" />
-                  <p className={styles.check__label}>편안했어요</p>
+                  {/* 상대방이 체크한 평가 */}
+                  <div className={styles.report__feedback__check}>
+                    <div className={styles.check}>
+                      <img src={icon_hands} height="26px" />
+                      <p className={styles.check__label}>편안했어요</p>
+                    </div>
+                    <div className={styles.check}>
+                      <img src={icon_heart} height="26px" />
+                      <p className={styles.check__label}>따뜻해요</p>
+                    </div>
+                    <div className={styles.check} style={{ display: 'none' }}>
+                      <img src={icon_mouth} height="26px" />
+                      <p className={styles.check__label}>말이 잘 통해요</p>
+                    </div>
+                    <div className={styles.check}>
+                      <img src={icon_clock} height="26px" />
+                      <p className={styles.check__label}>시간 가는 줄 몰랐어요</p>
+                    </div>
+                    <div className={styles.check} style={{ display: 'none' }}>
+                      <img src={icon_laugh} height="26px" />
+                      <p className={styles.check__label}>배꼽이 빠졌어요</p>
+                    </div>
+                    <div className={styles.check} style={{ display: 'none' }}>
+                      <img src={icon_score} height="26px" />
+                      <p className={styles.check__label}>속도가 잘 맞아요</p>
+                    </div>
+                  </div>
                 </div>
-                <div className={styles.check}>
-                  <img src={icon_heart} height="26px" />
-                  <p className={styles.check__label}>따뜻해요</p>
-                </div>
-                <div className={styles.check} style={{ display: 'none' }}>
-                  <img src={icon_mouth} height="26px" />
-                  <p className={styles.check__label}>말이 잘 통해요</p>
-                </div>
-                <div className={styles.check}>
-                  <img src={icon_clock} height="26px" />
-                  <p className={styles.check__label}>시간 가는 줄 몰랐어요</p>
-                </div>
-                <div className={styles.check} style={{ display: 'none' }}>
-                  <img src={icon_laugh} height="26px" />
-                  <p className={styles.check__label}>배꼽이 빠졌어요</p>
-                </div>
-                <div className={styles.check} style={{ display: 'none' }}>
-                  <img src={icon_score} height="26px" />
-                  <p className={styles.check__label}>속도가 잘 맞아요</p>
-                </div>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
 

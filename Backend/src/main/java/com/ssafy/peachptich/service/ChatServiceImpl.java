@@ -120,8 +120,8 @@ public class ChatServiceImpl implements ChatService {
 
     // 대화 리포트 데이터 띄우기
     @Override
-    public ChatReport getReport(Long userId, Long chatHistoryId) {
-        return reportRepository.findByUserIdAndChatHistoryId(userId, chatHistoryId)
+    public ChatReport getReport(Long userId, Long reportId) {
+        return reportRepository.findByUserIdAndChatHistoryId(userId, reportId)
                 .orElseThrow(() -> new EntityNotFoundException("Chat Report not found"));
     }
 

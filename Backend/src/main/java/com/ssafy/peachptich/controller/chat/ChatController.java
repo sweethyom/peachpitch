@@ -76,7 +76,10 @@ public class ChatController {
     @PostMapping("users/reports/report")
     public ResponseEntity<ResponseDto<ReportResponse>> showReport(@RequestBody ReportRequest reportRequest) {
         // 리포트 내용 가져오기
-        ChatReport chatReport = chatService.getReport(reportRequest.getUserId(), reportRequest.getHistoryId());
+        log.info("report request : {}",reportRequest.getReportId());
+        ChatReport chatReport = chatService.getReport(reportRequest.getUserId(),
+                reportRequest.getReportId()
+        );
 
         // Response DTO로 변환
         ReportResponse response = ReportResponse.builder()
