@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Builder
@@ -18,6 +19,20 @@ public class ReportResponse {
     private String cons;
     private String summary;
     private Long userId;
-    private Long historyId;
+    private List<ChatMessageResponse> chatMessages;
     private LocalDateTime createdAt;
+    private Long historyId;
+    private String feedback;  // 상대방이 남긴 피드백
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class ChatMessageResponse {
+        private Long chatId;
+        private String content;
+        private Long userId;
+        private LocalDateTime createdAt;
+    }
+
+
 }

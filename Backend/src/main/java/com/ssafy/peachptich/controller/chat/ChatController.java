@@ -10,6 +10,7 @@ import com.ssafy.peachptich.dto.response.ReportResponse;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.dto.response.TotalReportResponse;
 import com.ssafy.peachptich.entity.Chat;
+import com.ssafy.peachptich.entity.ChatHistory;
 import com.ssafy.peachptich.entity.ChatReport;
 import com.ssafy.peachptich.entity.TotalReport;
 import com.ssafy.peachptich.service.ChatService;
@@ -30,7 +31,7 @@ public class ChatController {
     private final ChatService chatService;
 
     // Django에서 redis에 저장한 AI 대화내용 db에 저장하기
-    @PostMapping("chat/save")
+    @PostMapping("/chat/save")
     public ResponseEntity<Void> saveChatContent(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody ChatRequest chatrequest) {
@@ -68,14 +69,14 @@ public class ChatController {
     }
 
     // 사용자와의 대화 redis 저장
-    @PostMapping("chat/video/save/temp")
+    @PostMapping("/chat/video/save/temp")
     public ResponseEntity<Void> saveChatTemp(@RequestBody UserChatRequest userChatRequest) {
         chatService.saveUserChatTemp(userChatRequest);
         return ResponseEntity.ok().build();
     }
 
     // redis에 저장한 사용자와의 대화 db저장
-    @PostMapping("chat/video/save")
+    @PostMapping("/chat/video/save")
     public ResponseEntity<Void> saveChat(@RequestBody UserChatRequest userChatRequest){
         log.debug("Request received: {}", userChatRequest);
 
@@ -96,11 +97,36 @@ public class ChatController {
 
 
     // 대화 상세 리포트
-    @GetMapping("users/reports/report")
+    @PostMapping("/users/reports/report")
     public ResponseEntity<ResponseDto<ReportResponse>> showReport(@RequestBody ReportRequest reportRequest) {
+        log.info("대화리포트 조회시작");
         // 리포트 내용 가져오기
-        ChatReport chatReport = chatService.getReport(reportRequest.getUserId(), reportRequest.getHistoryId());
+        ChatReport chatReport = chatService.getReport(reportRequest);
+        ChatHistory chatHistory = chatReport.getChatHistory();
 
+        log.info("채팅 내역 조회 시작");
+        // historyId로 채팅 내역 조회
+        List<Chat> chatList = chatService.getChatsByHistoryId(chatReport.getChatHistory().getHistoryId());
+
+        // 채팅 내역을 ChatMessageResponse로 변환
+        List<ReportResponse.ChatMessageResponse> chatMessages = chatList.stream()
+                .map(chat -> ReportResponse.ChatMessageResponse.builder()
+                        .chatId(chat.getChatId())
+                        .content(chat.getContent())
+                        .userId(chat.getUserId())
+                        .createdAt(chat.getCreatedAt())
+                        .build())
+                .toList();
+
+        // 피드백 가져오기 (상대방이 남긴 피드백)
+        String feedback = null;
+        if (chatReport.getUser().getUserId().equals(chatHistory.getUser1Id())) {
+            feedback = chatHistory.getUser2Feedback();  // user1의 리포트에는 user2의 피드백
+        } else {
+            feedback = chatHistory.getUser1Feedback();  // user2의 리포트에는 user1의 피드백
+        }
+
+        log.info("Response DTO로 변환시작");
         // Response DTO로 변환
         ReportResponse response = ReportResponse.builder()
                 .reportId(chatReport.getReportId())
@@ -111,14 +137,18 @@ public class ChatController {
                 .createdAt(chatReport.getChatHistory().getCreatedAt())
                 .historyId(chatReport.getChatHistory().getHistoryId())
                 .userId(chatReport.getUser().getUserId())
+                .chatMessages(chatMessages)  // 채팅 메시지 리스트 추가
+                .feedback(feedback)
                 .build();
 
+        log.info("Response DTO로 변환완료");
         return ResponseEntity.ok()
                 .body(new ResponseDto<>("Report showed successfully", response));
     }
 
+
     // 전체 리포트
-    @GetMapping("users/reports/totalreport")
+    @PostMapping("/users/reports/totalreport")
     public ResponseEntity<ResponseDto<TotalReportResponse>> showOverview(@RequestBody TotalReportRequest totalReportRequest) {
         // TotalReportResponse를 반환받음
         TotalReportResponse response = chatService.getTotalReport(totalReportRequest.getUserId());

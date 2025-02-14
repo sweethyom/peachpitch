@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.ChatRequest;
+import com.ssafy.peachptich.dto.request.ReportRequest;
 import com.ssafy.peachptich.dto.request.UserChatRequest;
 import com.ssafy.peachptich.dto.response.ChatReportListResponse;
 import com.ssafy.peachptich.dto.response.SpeakingHabitsResponse;
@@ -53,7 +54,6 @@ public class ChatServiceImpl implements ChatService {
             ChatHistory chatHistory = chatHistoryRepository.findById(chatRequest.getHistoryId())
                     .orElseThrow(() -> new RuntimeException("ChatHistory not found"));
 
-
             List<String> messages = redisTemplate.opsForList().range(redisKey, 0, -1);
 
             if (messages == null || messages.isEmpty()) {
@@ -66,10 +66,12 @@ public class ChatServiceImpl implements ChatService {
             messages.forEach(message -> {
                 try {
                     JsonNode jsonNode = objectMapper.readTree(message);
+                    String role = jsonNode.get("role").asText();
+
                     Chat chat = Chat.builder()
                             .content(jsonNode.get("content").asText())
                             .createdAt(LocalDateTime.parse(jsonNode.get("timestamp").asText(), formatter))
-                            .userId(userId)
+                            .userId("assistant".equals(role) ? null : userId)  // assistant면 null, 아니면 userId
                             .chatHistory(chatHistory)
                             .build();
                     chatsToSave.add(chat);
@@ -89,7 +91,8 @@ public class ChatServiceImpl implements ChatService {
             throw new RuntimeException("채팅 저장 실패", e);
         }
     }
-//
+
+    //
 //    @Override
 //    public Chat getChatDetail(Long chatId) {
 //        return null;
@@ -98,7 +101,7 @@ public class ChatServiceImpl implements ChatService {
     // 랜덤 스크립트
     @Override
     public Chat getRandomChat() {
-        return chatRepository.findRandomChat();
+        return chatRepository.findRandomChatWithUserId();
     }
 
     // 사용자 대화 redis 저장
@@ -177,10 +180,15 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
+    @Override
+    public List<Chat> getChatsByHistoryId(Long historyId) {
+        return chatRepository.findByChatHistory_HistoryIdOrderByCreatedAtAsc(historyId);
+    }
+
     // 대화 리포트 데이터 띄우기
     @Override
-    public ChatReport getReport(Long userId, Long chatHistoryId) {
-        return reportRepository.findByUserIdAndChatHistoryId(userId, chatHistoryId)
+    public ChatReport getReport(@RequestBody ReportRequest reportRequest) {
+        return reportRepository.findByUserIdAndChatHistoryId(reportRequest.getUserId(), reportRequest.getHistoryId())
                 .orElseThrow(() -> new EntityNotFoundException("Chat Report not found"));
     }
 
