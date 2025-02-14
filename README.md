@@ -1,58 +1,85 @@
 # PeachPitch
-React Project - Frontend
+### SSAFY 12기 공통 프로젝트 - D201 Team 노 피카 킵고잉
+스몰톡이 어려운 사람들을 위한 AI 스피킹 연습
 
 <br>
 
+
 <center>
 
-<img src="https://shields.io/badge/React-18.3.1-61DAFB">
-<img src="https://shields.io/badge/Vite-6.0.5-646CFF">
-<img src="https://shields.io/badge/Typescript-5.6.2-3178C6">
+### 백엔드
+![Spring Boot Badge](https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&logoColor=fff&style=flat-square)
+![MySQL Badge](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=fff&style=flat-square)
+
+
+### 프론트엔드
+![React Badge](https://img.shields.io/badge/React-61DAFB?logo=react&logoColor=000&style=flat-square)
+![TypeScript Badge](https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=fff&style=flat-square)
+
+### 인프라
+![Ubuntu Badge](https://img.shields.io/badge/Ubuntu-E95420?logo=ubuntu&logoColor=fff&style=flat-square)
+![Docker Badge](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff&style=flat-square)
+
+### 디자인
+![Figma Badge](https://img.shields.io/badge/Figma-F24E1E?logo=figma&logoColor=fff&style=flat-square)
+
+
+### 상태 관리
+![Git Badge](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=fff&style=flat-square)
+![Jira Badge](https://img.shields.io/badge/Jira-0052CC?logo=jira&logoColor=fff&style=flat-square)
+![Mattermost Badge](https://img.shields.io/badge/Mattermost-0058CC?logo=mattermost&logoColor=fff&style=flat-square)
 
 </center>
 
 <br>
 <br>
 
-## Installation
 
-1. 레포지토리 클론
+# 📌팀원 소개
 
-```console
-git clone https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201.git
-cd Frontend
-```
+| 이름   |  출신 | 별자리 | MBTI(호소) | 역할         | 특징 |
+| :--: |  :--: |:--: |:--: | :-- | :--: |
+| 김미경 |  제주 | 👭 | INFP | 팀장, 프론트엔드, 디자인 |   사장님   |
+| 김민주 |  대구 | 🍶 | ISTP | 팀원, 백엔드 |      |
+| 이한나 |  서울 | 🐂 | ENFJ | 팀원, AI, 백엔드 |      |
+| 이효미 |  대구 | 👩 | INFJ | 팀원, 백엔드 |   래퍼   |
+| 정유선 |  상주 | 👭 | ENTJ | 팀원, DevOps, 영상편집 |   휴먼리소스   |
+| 최지원 |  창원 | 🐂 | ENTJ | 팀원, 백엔드 |   칼단발   |
+<br>
 
-2. 패키지 설치
+## 1. 프로젝트 소개 및 기획 배경
 
-```console
-npm install --legacy-peer-deps
-```
-
-3. 개발 서버 실행
-
-```console
-npm run dev
-```
+- 
 
 <br>
 
-## Getting Started
+## 2. 주요 기능
 
-1. 환경 변수 설정: .env 파일을 생성하여 필요한 환경 변수를 설정하세요.
-2. AI 서비스 활성화: AI 기능을 사용하려면 API 키를 발급받아 .env에 추가하세요.
-3. WebRTC 설정: 화상 채팅 기능을 위해 WebRTC 서버 설정이 필요합니다.
-4. 빌드 및 배포:
-```console
-npm run build
-npm run preview
-```
+### 1. 
+- 
+
+### 2. 
+- 
 
 <br>
 <br>
 
-## Checklist
 
+## 3. 시연 영상
+
+
+
+## 4. 설계
+
+### 서비스 아키텍처
+
+### 와이어프레임
+
+### ERD 다이어그램
+
+### API 명세서
+
+### 코드 컨벤션
 
 
 <br>
