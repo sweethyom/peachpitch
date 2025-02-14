@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Getter
 @NoArgsConstructor
@@ -15,14 +16,23 @@ public class UserChatRequest {
     private String message;
     private Long userId;
 
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS") // LocalDateTime 형식 지정
-    private LocalDateTime createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS")
+    private String createdAt;
 
     public UserChatRequest(Long historyId, String message, Long userId) {
         this.historyId = historyId;
         this.message = message;
         this.userId = userId;
-        this.createdAt = LocalDateTime.now();  // createdAt을 서버에서 자동 설정
+        this.createdAt = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+    }
+
+    @Override
+    public String toString() {
+        return "UserChatRequest{" +
+                "historyId=" + historyId +
+                ", message='" + message + '\'' +
+                ", userId=" + userId +
+                ", createdAt='" + createdAt + '\'' +
+                '}';
     }
 }
-

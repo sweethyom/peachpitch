@@ -152,29 +152,29 @@ function MainPage() {
   const handleAIChatClick = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    // if (!fingerprint) {
-    //   console.error('Fingerprint not generated');
-    //   return;
-    // }
+    if (!fingerprint) {
+      console.error('Fingerprint not generated');
+      return;
+    }
 
-    // try {
-    // const response = await axios.post('/api/trial/check', {
-    //   fingerprint: fingerprint,
-    // });
+    try {
+    const response = await axios.post('/api/trial/check', {
+      fingerprint: fingerprint,
+    });
 
-    // if (response.data.canAccess) {
+    if (response.data.canAccess) {
     const hasCoupon = await checkCouponAvailability();
     if (hasCoupon) {
       setIsChatModalOpen(true);
     }
-    // } else {
-    // setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
-    // navigate('/login');
-    // }
-    // } catch (error) {
-    // console.error('Trial check failed:', error);
-    // setAlertMessage("서비스 이용에 문제가 발생했습니다.");
-    // }
+    } else {
+    setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
+    navigate('/login');
+    }
+    } catch (error) {
+    console.error('Trial check failed:', error);
+    setAlertMessage("서비스 이용에 문제가 발생했습니다.");
+    }
 
     const hasPermission = await checkPermissions();
     if (!hasPermission) {
