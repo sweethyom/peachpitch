@@ -4,6 +4,12 @@
     align-items: center;
 }
 
+.loading {
+    margin: 220px 0;
+    width: 335px;
+    height: 192px;
+}
+
 .page {
     display: flex;
     justify-content: center;
@@ -298,7 +304,7 @@
     padding: 10px 0;
 }
 
-.report__paging__button, 
+.report__paging__button,
 .report__paging__number {
     background: none;
     border: none;
@@ -311,7 +317,7 @@
     transition: color 0.2s ease-in-out;
 }
 
-.report__paging__button:hover, 
+.report__paging__button:hover,
 .report__paging__number:hover {
     color: var(--color-red-200);
 }

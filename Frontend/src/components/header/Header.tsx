@@ -85,14 +85,15 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 },
                 withCredentials: true,
             });
+            // console.log("서버응답"+ response.headers)
 
-            if (response.data?.accessToken) {
-                localStorage.setItem("accessToken", response.data.accessToken);
-                console.log("✅ Access Token 재발급 성공: ", response.data.accessToken);
+            if (response.headers?.access) {
+                localStorage.setItem("accessToken", response.headers.access);
+                console.log("✅ Access Token 재발급 성공: ");
 
-                setTimeout(() => {
-                    console.log("📌 localStorage 최신 accessToken:", localStorage.getItem("accessToken"));
-                }, 500);
+                // setTimeout(() => {
+                //     console.log("📌 localStorage 최신 accessToken:", localStorage.getItem("accessToken"));
+                // }, 500);
             } else {
                 console.warn("⚠️ 응답에 accessToken 없음", response.data);
             }
@@ -102,11 +103,11 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
         }
     };
 
-    // refresh 요청
+    // 1시간마다 refresh 요청
     useEffect(() => {
         const interval = setInterval(() => {
             refreshAccessToken();
-        }, 9 * 60 * 1000);
+        }, 60 * 60 * 1000);
         return () => clearInterval(interval);
     }, []);
 
