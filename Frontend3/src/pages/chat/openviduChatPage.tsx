@@ -312,7 +312,7 @@ const VideoChatPage: React.FC = () => {
         console.log(sId+" "+sessionEndType);
         if(!sId) return;
         try {
-            const response = await axios.post('http://localhost:8080/api/chat/video/close', {
+            const response = await axios.post('https://peachpitch.site/api/chat/video/close', {
                 historyId: historyId,
                 sessionId: sId,
                 sessionEndType: sessionEndType
