@@ -18,7 +18,7 @@ function AccountRemove({ isOpen, onClose }: ModalProps) {
 
     const handleAccountRemove = async () => {
         try {
-            const response = await axios.post("https://peachpitch.site/api/users/delete", {}, {
+            const response = await axios.post("http://localhost:8080/api/users/delete", {}, {
                 withCredentials: true,
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("accessToken")}`,

@@ -71,7 +71,7 @@ function totalReportPage() {
 
       try {
         const response = await axios.post(
-          "https://peachpitch.site/api/users/reports/totalreport",
+          "http://localhost:8080/api/users/reports/totalreport",
           { userId },
           {
             headers: {
@@ -177,7 +177,7 @@ function totalReportPage() {
 
     try {
       // Send GET request with headers and body
-      const response = await axios.post("https://peachpitch.site/api/users/reports/report", {
+      const response = await axios.post("http://localhost:8080/api/users/reports/report", {
         headers: {
           "access": accessToken,
         },

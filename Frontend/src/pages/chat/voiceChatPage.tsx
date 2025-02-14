@@ -38,6 +38,8 @@ function VoiceChatPage() {
   /* 키워드 상태 */
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
   const [selectedKeywordId, setSelectedKeywordId] = useState<number | null>(null);
+  const [hints, setHints] = useState<string[] |null>(null);
+
   /* 음성 인식 관련 상태 */
   const [isListening, setIsListening] = useState(false);
   const { transcript, resetTranscript, listening } = useSpeechRecognition();
@@ -47,10 +49,6 @@ function VoiceChatPage() {
   const [currentMessage, setCurrentMessage] = useState<string>('');
 
   const [historyId, setHistoryId] = useState<number | null>(null);
-
-  // const [hints, _setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
-  const [hints, _setHints] = useState<{ hint: string }[] | null>([]);
-
 
   useEffect(() => {
     if (listening && transcript !== currentMessage) {
@@ -86,7 +84,7 @@ function VoiceChatPage() {
         : {}; // 토큰이 없으면 headers 설정 안 함
 
       const responseFromSpring = await axios.post(
-        'https://peachpitch.site/api/chat/ai/keywords',
+        'http://localhost:8080/api/chat/ai/keywords',
         { keywordId: selectedKeywordId }, // Body 데이터
         config // 헤더 설정
       );
@@ -98,6 +96,8 @@ function VoiceChatPage() {
 
       const hintResponse = responseFromSpring.data;
       const historyIdFromResponse = hintResponse.data.historyId || null;
+      const hints = hintResponse.data.hints; // 힌트 배열
+      setHints(hints)
 
       console.log("Extracted historyId:", historyIdFromResponse);
       setHistoryId(historyIdFromResponse); // 대화 내역 id 저장
@@ -107,7 +107,7 @@ function VoiceChatPage() {
       //   return;
       // }
 
-      const response = await axios.post('https://peachpitch.site/ai/start/', {
+      const response = await axios.post('http://127.0.0.1:8000/ai/start/', {
         keyword: selectedKeyword,
         history_id: historyIdFromResponse,
       });
@@ -180,7 +180,7 @@ function VoiceChatPage() {
   };
 
   /* AI 응답이 발생할 때 새로운 영상으로 전환 */
-  const handleNewAIResponse = (_aiResponse: string) => {
+  const handleNewAIResponse = (aiResponse: string) => {
     console.log("🚀 handleNewAIResponse 실행됨!");
 
     let randomVideo;
@@ -209,7 +209,7 @@ function VoiceChatPage() {
     if (turnCount > 0) {
       try {
         console.log("📡 AI 서버에 요청 중...");
-        const response = await axios.post("https://peachpitch.site/ai/chat/", {
+        const response = await axios.post("http://127.0.0.1:8000/ai/chat/", {
           message: modifiedMessage,
           history_id: historyId
         });
@@ -280,14 +280,14 @@ function VoiceChatPage() {
   const navigate = useNavigate();
 
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
-  const [turnCount, setTurnCount] = useState(10);
+  const [turnCount, setTurnCount] = useState(2);
   const [isChatEnd, setIsChatEnd] = useState(false);
-  const [isOverlay, _setIsOverlay] = useState(false);
+  const [isOverlay, setIsOverlay] = useState(false);
 
   /* 대화 재시작 */
-  // const restartChat = () => {
-  //   window.location.href = "/chat/ai";
-  // };
+  const restartChat = () => {
+    window.location.href = "/chat/ai";
+  };
 
   /* 대화 종료 후 /report 페이지 이동 */
   const endChat = () => {
@@ -297,7 +297,7 @@ function VoiceChatPage() {
   const videos = [Video_AI_1, Video_AI_2, Video_AI_4, Video_AI_3];
 
   // 기본 영상
-  // const [videoState, setVideoState] = useState<string>(videos[1]);
+  const [videoState, setVideoState] = useState<string>(videos[1]);
 
   // ai 영상 상태 변화
   const [currentVideo, setCurrentVideo] = useState<string>(videos[1]);
@@ -307,7 +307,7 @@ function VoiceChatPage() {
   const [aiMessage, setAiMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
-  const [_aiResponseBuffer, setAiResponseBuffer] = useState('');
+  const [aiResponseBuffer, setAiResponseBuffer] = useState('');
   const [lastAiMessage, setLastAiMessage] = useState(''); // 마지막 AI 응답 저장
   const [lastUserMessage, setLastUserMessage] = useState<string>(''); // 마지막 사용자 메시지 저장
 
@@ -354,19 +354,7 @@ function VoiceChatPage() {
       <ChatEnd isOpen={isChatEnd} onClose={endChat} historyId={historyId} />
 
       <div className={styles.menu}>
-        {/* <Drawer
-          selectedKeyword={selectedKeyword}
-          hints={hints}
-          chatHistory={messageHistory}
-          turnCount={turnCount} /> */}
-
-        <Drawer
-          selectedKeyword={selectedKeyword}
-          hints={hints?.map(hint => (typeof hint === "string" ? { hint } : hint)) ?? null}
-          chatHistory={messageHistory}
-          turnCount={turnCount}
-        />
-
+        <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} turnCount={turnCount} hints={hints}/>
       </div>
 
       <div className={styles.chat}>
@@ -433,8 +421,6 @@ function VoiceChatPage() {
           <div className={styles.btn} onClick={handleStartClick}>시작하기</div>
         </KeywordModal>
       )}
-
-
 
       {/* 키워드 미선택 시 alert */}
       {showAlert && (
