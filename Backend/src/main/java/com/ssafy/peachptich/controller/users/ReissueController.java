@@ -85,7 +85,7 @@ public class ReissueController {
         // refreshRepository.deleteByRefresh(refresh);
         // addToken(userEmail, newRefresh, 86400000L);
 
-        addToken("RT:AT:" + userEmail, newAccess, 600000L);
+        addToken("RT:AT:" + userEmail, newAccess, 18000000L);
         addToken("RT:RT:" + userEmail, newRefresh, 86400000L);
 
         // response
