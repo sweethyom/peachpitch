@@ -3,6 +3,7 @@ package com.ssafy.peachptich.controller.users;
 import com.ssafy.peachptich.dto.request.JoinRequest;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.User;
+import com.ssafy.peachptich.global.exception.DuplicateEmailException;
 import com.ssafy.peachptich.service.UserServiceImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -42,7 +43,7 @@ public class UserController {
                     return ResponseEntity.ok(new ResponseDto<Map<String, Long>>(
                             "User register Success!", responseData));
                 })
-                .orElseThrow(() -> new ResponseDto.DuplicateEmailException("Email already exists"));
+                .orElseThrow(() -> new DuplicateEmailException("Email already exists"));  // 409 에러 반환
     }
 
     @GetMapping("/api/users/check")
@@ -51,9 +52,6 @@ public class UserController {
         return userServiceimpl.checkEmail(email);
     }
 
-
-    //TODO
-    // 회원 탈퇴 기능 구현
     @GetMapping("/api/users/delete")
     public ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
                                                                                 Authentication authentication){

@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
         if(exist){
             responseData.put("result", false);
             message = "The email is already subscribed to.";
-        } else{
+        } else{         // 중복 이메일이 없는 경우
             responseData.put("result", true);
             message = "The email is available.";
         }
@@ -151,6 +151,7 @@ public class UserServiceImpl implements UserService {
 
             // 토큰이 refresh인지 확인
             String category = tokenProvider.getCategory(refresh);
+            log.info("in UserServiceImpl, category = " + category);
             if (!category.equals("refresh")) {
                 // 응답 메시지와 데이터를 포함한 ResponseDto 생성
                 Map<String, Object> responseData = new HashMap<>();
@@ -199,26 +200,6 @@ public class UserServiceImpl implements UserService {
             tokenListService.removeToken("RT:RT:" + userEmail);
             tokenBlacklistService.addTokenToList("BL:AT:" + access);
 
-            /*
-            // 기존 코드
-            // DB에 저장되어 있는지 확인
-            Boolean isExist = refreshRepository.existsByRefresh(refresh);
-            if (!isExist) {
-                // 응답 메시지와 데이터를 포함한 ResponseDto 생성
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("error", "refresh token is not available.");
-
-                ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
-                        "Bad Request: The token does not exist in database",
-                        responseData
-                );
-
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
-            }
-
-            // refresh Token을 DB에서 제거
-            refreshRepository.deleteByRefresh(refresh);
-             */
             // 회원 상태(status) false 전환
             User userEntity = userRepository.findByEmail(userEmail).get();
             userEntity.setStatus(false);
