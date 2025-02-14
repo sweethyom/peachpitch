@@ -171,16 +171,21 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
 
         try {
             if (session == null) {
-                System.out.println("session already close " + closeRequest.getSessionId());
+                System.out.println("session closed already: " + closeRequest.getSessionId());
             } else {
                 session.close();
-                System.out.println("session close successfully: " + closeRequest.getSessionId());
+                System.out.println("session closed successfully: " + closeRequest.getSessionId());
             }
         }
         catch (Exception e) {
             String msg = e.getMessage();
             System.err.println("exception: " + msg);
-            //e.printStackTrace();
+            if (msg.contains("404")){
+                System.out.println("session closed already: " + closeRequest.getSessionId());
+            }
+            else {
+                e.printStackTrace();
+            }
         }
         finally {
             chatHistoryService.updateStatusFalse(closeRequest.getHistoryId());
