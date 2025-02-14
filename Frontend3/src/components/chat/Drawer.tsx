@@ -12,7 +12,7 @@ import Setting from "@/components/modal/Setting";
 
 type DrawerProps = {
     selectedKeyword: string | null;
-    hints: { hint: string }[] | null;
+    hints: { hint: string }[] | string[] | null;
     chatHistory: { role: string; message: string }[];
     turnCount: number;
 };
@@ -29,6 +29,7 @@ const Drawer = ({ selectedKeyword, hints, chatHistory, turnCount }: DrawerProps)
     const [limitOn, setLimitOn] = useState(false);
     const [hintOn, setHintOn] = useState(false);
 
+
     const limitSwitch = () => {
         setLimitOn(!limitOn);
     };
@@ -43,6 +44,8 @@ const Drawer = ({ selectedKeyword, hints, chatHistory, turnCount }: DrawerProps)
     const hintSwitch = () => {
         setHintOn(!hintOn);
     };
+
+
 
     const [isSettingOpen, setIsSettingOpen] = useState(false);
     const toggleSetting = () => {
@@ -118,7 +121,7 @@ const Drawer = ({ selectedKeyword, hints, chatHistory, turnCount }: DrawerProps)
                             {hints!.length > 0 ? (
                                 hints!.map((item, index) => (
                                     <li key={index} className={styles.drawer__hint__list__item}>
-                                        {item.hint}
+                                        {typeof item === "string" ? item : item.hint}
                                     </li>
                                 ))
                             ) : (

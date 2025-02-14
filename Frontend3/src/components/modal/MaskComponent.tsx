@@ -1,7 +1,7 @@
 import Mask1 from '@/assets/images/catMask_1.png';
-import Mask2 from '@/assets/images/catMask_2.png';
-import Mask3 from '@/assets/images/catMask_3.png';
-import Mask4 from '@/assets/images/catMask_4.png';
+// import Mask2 from '@/assets/images/catMask_2.png';
+// import Mask3 from '@/assets/images/catMask_3.png';
+// import Mask4 from '@/assets/images/catMask_4.png';
 
 interface MaskProps {
   x: number;
