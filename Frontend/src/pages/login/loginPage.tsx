@@ -45,7 +45,7 @@ function loginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch('https://peachpitch.site/api/users/login', {
+      const response = await fetch('http://localhost:8080/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -99,7 +99,7 @@ function loginPage() {
     localStorage.setItem('socialLoginAttempt', 'true');
     console.log("provider: ", provider);
 
-    const popupUrl = `https://peachpitch.site/api/users/login/social/${provider}`;
+    const popupUrl = `http://localhost:8080/api/users/login/social/${provider}`;
     const popup = window.open(
       popupUrl,
       "Social Login",
@@ -129,7 +129,7 @@ function loginPage() {
   // 로그인 상태 확인
   const checkSocialLogin = async () => {
     try {
-      const response = await fetch("https://peachpitch.site/api/users/check-login", {
+      const response = await fetch("http://localhost:8080/api/users/check-login", {
         method: "GET",
         credentials: "include",
       });
