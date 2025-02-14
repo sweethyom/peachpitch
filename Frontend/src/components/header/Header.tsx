@@ -60,11 +60,55 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
     // ✅ 아이디 크기를 가져와서 모달창 너비 설정 (최소 130px)
     useEffect(() => {
-        if (userRef.current) {
-            const calculatedWidth = userRef.current.offsetWidth;
-            setDropdownWidth(calculatedWidth < 100 ? 100 : calculatedWidth); // ✅ 최소 너비 130px 적용
+        checkLoginStatus();
+        window.addEventListener("storage", checkLoginStatus);
+        return () => {
+            window.removeEventListener("storage", checkLoginStatus);
+        };
+    }, [isLoggedIn]);
+
+    // ✅ Refresh Token 재발급 함수
+    const refreshAccessToken = async () => {
+        try {
+            console.log("🔄 refreshAccessToken 함수 실행됨");
+            let accessToken = localStorage.getItem("accessToken");
+            if (!accessToken) {
+                console.warn("⚠️ accessToken이 존재하지 않음, 로그인 상태 확인 필요");
+                checkLoginStatus(); // 다시 한 번 localStorage 확인
+                return;
+            }
+
+            console.log("📡 Access Token 재발급 요청 중...");
+            const response = await axios.post("http://localhost:8080/api/users/reissue", {}, {
+                headers: {
+                    access: accessToken,
+                },
+                withCredentials: true,
+            });
+
+            if (response.data?.accessToken) {
+                localStorage.setItem("accessToken", response.data.accessToken);
+                console.log("✅ Access Token 재발급 성공: ", response.data.accessToken);
+
+                setTimeout(() => {
+                    console.log("📌 localStorage 최신 accessToken:", localStorage.getItem("accessToken"));
+                }, 500);
+            } else {
+                console.warn("⚠️ 응답에 accessToken 없음", response.data);
+            }
+        } catch (error) {
+            console.error("❌ Access Token 재발급 실패: ");
+            handleLogout();
         }
-    }, [userId, isDropdownOpen]);
+    };
+
+    // refresh 요청
+    useEffect(() => {
+        const interval = setInterval(() => {
+            refreshAccessToken();
+        }, 9 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     // ✅ 로그아웃 처리
     const handleLogout = async () => {
@@ -90,7 +134,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 {
                     withCredentials: true, // ✅ 쿠키 자동 포함
                     headers: {
-                        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+                        access: `${localStorage.getItem("accessToken")}`,
                         "refresh": refreshToken, // ✅ refreshToken을 명시적으로 추가
                     },
                 }
