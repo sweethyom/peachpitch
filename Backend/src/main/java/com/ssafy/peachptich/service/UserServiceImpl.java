@@ -190,7 +190,7 @@ public class UserServiceImpl implements UserService {
                 responseData.put("error", "refresh token is not available.");
 
                 ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
-                        "Bad Request: The token does not exist in database",
+                        "Bad Request: Refresh token is not available.",
                         responseData
                 );
 
@@ -198,7 +198,11 @@ public class UserServiceImpl implements UserService {
             }
 
             tokenListService.removeToken("RT:RT:" + userEmail);
-            tokenBlacklistService.addTokenToList("BL:AT:" + access);
+            // access token을 blackList에 추가
+            if (access != null) {
+                tokenBlacklistService.addTokenToList("BL:AT:" + access);
+            }
+            tokenListService.removeToken("RT:AT:" + userEmail);
 
             // 회원 상태(status) false 전환
             User userEntity = userRepository.findByEmail(userEmail).get();
