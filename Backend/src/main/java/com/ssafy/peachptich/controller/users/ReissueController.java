@@ -65,29 +65,15 @@ public class ReissueController {
         // Redis에 저장되어 있는지 확인
         boolean isExist = tokenListService.isContainToken("RT:RT:" + userEmail);
         if(!isExist){
-            // response body
+            // response
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
         }
-
-        /* 기존 코드
-        // DB에 저장되어 있는지 확인
-        Boolean isExist = refreshRepository.existsByRefresh(refresh);
-        if (!isExist) {
-            // response body
-            return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
-        }
-         */
 
         // make new JWT
         String newAccess = tokenProvider.createJwt("access", userEmail, role, 600000L);
         String newRefresh = tokenProvider.createJwt("refresh", userEmail, role, 86400000L);
 
-        // Refresh Token 저장
-        // DB에 기존의 Refresh Token 삭제 후 새 Refresh Token 저장
-        // refreshRepository.deleteByRefresh(refresh);
-        // addToken(userEmail, newRefresh, 86400000L);
-
-        addToken("RT:AT:" + userEmail, newAccess, 600000L);
+        addToken("RT:AT:" + userEmail, newAccess, 18000000L);
         addToken("RT:RT:" + userEmail, newRefresh, 86400000L);
 
         // response
@@ -115,8 +101,8 @@ public class ReissueController {
         redisTemplate.opsForValue().set(
                 key,       // key 값
                 value,                // value
-                System.currentTimeMillis() + expiredMs,     // 만료 시간
-                TimeUnit.MICROSECONDS
+                expiredMs,     // 만료 시간
+                TimeUnit.MILLISECONDS
         );
     }
 

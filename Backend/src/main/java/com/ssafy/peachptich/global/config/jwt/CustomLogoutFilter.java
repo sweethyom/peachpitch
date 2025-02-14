@@ -41,6 +41,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         // path and method verify
         String requestUri = request.getRequestURI();
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
         // 로그아웃 관련 URI와 Http Method 설정
         if (!requestUri.matches("^\\/api/users/logout$")) {
@@ -94,30 +96,13 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
-        // Redis의 BlackList 내에 토큰이 존재하지 않는 경우
-        /*
-            if (!tokenBlacklistService.isContainToken(refresh)){
-                // BlackList를 추가함
-                tokenBlacklistService.addTokenToList(refresh);
-                List<Object> blackList = tokenBlacklistService.getTokenBlackList();
-                log.debug("blackList에 refresh 토큰 추가 -> blackList: " + blackList);
-
-                // response status code
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
-        */
-
         // blackList 확인
         String access = request.getHeader("access");
 
         boolean isBlacked = tokenBlacklistService.isContainToken("BL:AT:" + access);
         if(isBlacked) {
             // response status code
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
             ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
                     .message("Already logged out. Need to logged in.")
                     .data(null)
@@ -133,10 +118,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         boolean isExist = tokenListService.isContainToken("RT:AT:" + userEmail);
         if(!isExist){           // 재로그인 필요
             // response status code
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
             ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
                     .message("invalid access token.")
                     .data(null)
@@ -152,24 +134,10 @@ public class CustomLogoutFilter extends GenericFilterBean {
         tokenListService.removeToken("RT:RT:" + userEmail);
         
         // access token을 blackList에 추가
-        tokenBlacklistService.addTokenToList("BL:AT:" + access);
-        tokenListService.removeToken("RT:AT:" + userEmail);
-        
-        /*
-        // 여기부터 기존 코드
-        // DB에 저장되어 있는지 확인
-        Boolean isExist = refreshRepository.existsByRefresh(refresh);
-        if (!isExist) {
-            // response status code
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+        if (access != null) {
+            tokenBlacklistService.addTokenToList("BL:AT:" + access);
         }
-
-        // 로그아웃 진행
-        // Refresh Token을 DB에서 제거
-        refreshRepository.deleteByRefresh(refresh);
-        
-         */
+        tokenListService.removeToken("RT:AT:" + userEmail);
 
         // Refresh Token Cookie 값 0 설정
         Cookie cookie = new Cookie("refresh", "");
@@ -188,8 +156,6 @@ public class CustomLogoutFilter extends GenericFilterBean {
                         .build();
 
         // 응답 설정 및 전송
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         response.addCookie(cookie);
         response.setStatus(HttpServletResponse.SC_OK);
