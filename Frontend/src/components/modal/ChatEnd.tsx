@@ -40,7 +40,7 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
             );
             console.log("채팅 기록 저장 완료");
 
-            navigate("/report");
+            navigate("/main");
 
             setTimeout(async () => {
                 try {
