@@ -1,5 +1,3 @@
-import { Link } from 'react-router-dom'
-
 import Header from '@/components/header/Header'
 import Footer from '@/components/footer/Footer'
 
@@ -9,17 +7,27 @@ import HabitsChart from '@/components/chart/Habits'
 import LeadChart from '@/components/chart/Lead'
 import WordCloud from '@/components/chart/WordCloud'
 import WordChart from '@/components/chart/Word'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+
+import { useNavigate } from "react-router-dom";
+
+interface SpeakingHabit {
+  wordId: number;
+  word: string;
+  count: number;
+}
 
 // ✅ 대화 리스트 더미 데이터 (20개)
-const conversationList = Array.from({ length: 20 }, (_, i) => ({
-  id: i + 1,
-  name: `대화 ${i + 1}`,
-  keywords: i % 2 === 0 ? ["보드 게임", "겨울 스포츠"] : ["AI", "블록체인"],
-  date: new Date(2024, 1, i + 1).toISOString().split("T")[0], // 2024-02-01 형식 날짜
-}));
+// const conversationList = Array.from({ length: 20 }, (_, i) => ({
+//   id: i + 1,
+//   name: `대화 ${i + 1}`,
+//   keywords: i % 2 === 0 ? ["보드 게임", "겨울 스포츠"] : ["AI", "블록체인"],
+//   date: new Date(2024, 1, i + 1).toISOString().split("T")[0], // 2024-02-01 형식 날짜
+// }));
 
-const ITEMS_PER_PAGE = 6; // ✅ 한 페이지당 6개 표시
+// const ITEMS_PER_PAGE = 6; // ✅ 한 페이지당 6개 표시
+
 
 function totalReportPage() {
   const [keywordFilter, setKeywordFilter] = useState<string>("전체");
@@ -27,27 +35,15 @@ function totalReportPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
 
   // ✅ 필터링된 대화 리스트 계산
-  const filteredConversations = conversationList
-    .filter(conv => keywordFilter === "전체" || conv.keywords.includes(keywordFilter))
-    .sort((a, b) => {
-      if (sortOrder === "최신순") {
-        return new Date(b.date).getTime() - new Date(a.date).getTime();
-      } else {
-        return new Date(a.date).getTime() - new Date(b.date).getTime();
-      }
-    });
-
-  // ✅ 페이지별 데이터 분할
-  const totalPages = Math.ceil(filteredConversations.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedConversations = filteredConversations.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-
-  // ✅ 페이지 변경 핸들러
-  const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setCurrentPage(newPage);
-    }
-  };
+  // const filteredConversations = conversationList
+  //   .filter(conv => keywordFilter === "전체" || conv.keywords.includes(keywordFilter))
+  //   .sort((a, b) => {
+  //     if (sortOrder === "최신순") {
+  //       return new Date(b.date).getTime() - new Date(a.date).getTime();
+  //     } else {
+  //       return new Date(a.date).getTime() - new Date(b.date).getTime();
+  //     }
+  //   });
 
   // ✅ 특정 섹션으로 스크롤 이동 함수
   const handleScrollToSection = (sectionId: string) => {
@@ -57,6 +53,149 @@ function totalReportPage() {
     }
   };
 
+  const [reportData, setReportData] = useState<{ ansCount: number; questCount: number } | null>(null);
+  const [speakingHabits, setSpeakingHabits] = useState<SpeakingHabit[]>([]);
+  const [chatReports, setChatReports] = useState<any[]>([]);
+  const [paginatedConversations, setPaginatedConversations] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchReportData = async () => {
+      const accessToken = localStorage.getItem("accessToken");
+      const userId = Number(localStorage.getItem("userId"));
+
+      if (!accessToken || !userId) {
+        console.error("❌ Missing access token or user ID");
+        window.location.href = "/login";
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          "https://peachpitch.site/api/users/reports/totalreport",
+          { userId },
+          {
+            headers: {
+              "access": accessToken,
+              "Content-Type": "application/json",
+            },
+            withCredentials: true,
+          }
+        );
+
+        console.log("✅ Report Data:", response.data);
+
+        // 대화 습관 데이터 받아오기
+        if (response.data?.data?.speakingHabits) {
+          console.log("📊 Received speakingHabits:", response.data.data.speakingHabits);
+          setSpeakingHabits(response.data.data.speakingHabits);
+        } else {
+          console.warn("⚠ No speakingHabits found in API response");
+        }
+
+        // 대화 주도권 데이터 받아오기기
+        if (response.data?.data) {
+          setReportData({
+            ansCount: response.data.data.ansCount || 0,
+            questCount: response.data.data.questCount || 0,
+          });
+        } else {
+          console.warn("⚠ No ansCount or questCount found in API response");
+        }
+        // 워드 클라우드 데이터 받아오기기
+        if (response.data.data.chatReports) {
+          setChatReports(response.data.data.chatReports);
+        }
+
+      } catch (error) {
+        console.error("❌ Failed to fetch report data:", error);
+      }
+    };
+
+    fetchReportData();
+  }, []);
+
+  // 워드 클라우드 키워드 가지고 오기
+  const keywords = chatReports.reduce((acc: string[], report: any) => {
+    if (report.keyword1) acc.push(report.keyword1);
+    if (report.keyword2) acc.push(report.keyword2);
+    return acc;
+  }, []);
+
+  const wordCloudData = keywords.map((keyword: string) => ({
+    text: keyword,
+    value: Math.floor(Math.random() * 100) + 1, // Random value for word size
+  }));
+
+  // 페이징
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  // Filter chatReports based on selected keyword filter
+  const filteredReports = chatReports.filter((report) => {
+    if (keywordFilter === "전체") return true;
+    return (
+      (report.keyword1 && report.keyword1.includes(keywordFilter)) ||
+      (report.keyword2 && report.keyword2.includes(keywordFilter))
+    );
+  });
+
+  // Sort chatReports based on the selected sort order
+  const sortedReports = filteredReports.sort((a, b) => {
+    if (sortOrder === "최신순") {
+      return b.reportId - a.reportId;
+    } else {
+      return a.reportId - b.reportId;
+    }
+  });
+
+  // Calculate total pages for pagination (inside useEffect or computation)
+  const totalPages = Math.ceil(sortedReports.length / 6); // Assuming 6 items per page
+
+  // Paginate the reports based on currentPage
+  useEffect(() => {
+    if (sortedReports.length > 0) {
+      const startIndex = (currentPage - 1) * 6;
+      const endIndex = startIndex + 6;
+      setPaginatedConversations(sortedReports.slice(startIndex, endIndex));
+    }
+  }, [currentPage, sortedReports.length]); // Only depend on `sortedReports.length`
+
+
+  // 리포트 선택
+  const navigate = useNavigate();
+
+  const handleReportClick = async (historyId: number) => {
+    const accessToken = localStorage.getItem("accessToken");
+    const userId = Number(localStorage.getItem("userId"));
+
+    if (!accessToken || !userId) {
+      console.error("❌ Missing access token or user ID");
+      return;
+    }
+
+    try {
+      // Send GET request with headers and body
+      const response = await axios.post("https://peachpitch.site/api/users/reports/report", {
+        headers: {
+          "access": accessToken,
+        },
+        params: { userId },
+        data: { userId, historyId },
+      });
+
+      console.log("✅ Report Details:", response.data);
+
+      // ✅ Navigate to report detail page
+      navigate(`/report/detail/${historyId}`);
+
+    } catch (error) {
+      console.error("❌ Failed to fetch report data:", error);
+    }
+  };
+
+
   return (
     <>
       <Header />
@@ -65,13 +204,13 @@ function totalReportPage() {
           {/* 목차 */}
           <div className={styles.index}>
             <p className={styles.index__item}
-            onClick={() => handleScrollToSection('habits')}>반복되는 단어 습관</p>
+              onClick={() => handleScrollToSection('habits')}>반복되는 단어 습관</p>
             <p className={styles.index__item}
-            onClick={() => handleScrollToSection('lead')}>대화 주도권</p>
+              onClick={() => handleScrollToSection('lead')}>대화 주도권</p>
             <p className={styles.index__item}
-            onClick={() => handleScrollToSection('keyword')}>대화 키워드</p>
+              onClick={() => handleScrollToSection('keyword')}>대화 키워드</p>
             <p className={styles.index__item}
-            onClick={() => handleScrollToSection('list')}>대화 리스트</p>
+              onClick={() => handleScrollToSection('list')}>대화 리스트</p>
           </div>
 
           <div className={styles.report}>
@@ -83,21 +222,17 @@ function totalReportPage() {
                 <p className={styles.total__title}>총 대화 시간</p>
                 <p className={styles.total__time}><span className={styles.total__time__strong}>50</span>시간 <span className={styles.total__time__strong}>20</span>분</p>
               </div>
-              <div className={styles.total}>
-                <p className={styles.total__title}>평균 공백 시간</p>
-                <p className={styles.total__time}>평균 <span className={styles.total__time__strong}>16</span>초</p>
-              </div>
             </div>
 
             {/* 반복되는 단어 습관 */}
             <div id="habits"
-            className={styles.report__habits}>
+              className={styles.report__habits}>
               <p className={styles.report__sub}>반복되는 단어 습관</p>
 
               {/* Pie 차트 */}
               <div className={styles.pie}>
                 <div className={styles.pie__graph}>
-                  <HabitsChart />
+                  <HabitsChart speakingHabits={speakingHabits} />
                 </div>
               </div>
             </div>
@@ -105,12 +240,17 @@ function totalReportPage() {
 
             {/* 대화 주도권 */}
             <div id="lead"
-            className={styles.report__lead}>
+              className={styles.report__lead}>
               <p className={styles.report__sub}>대화 주도권</p>
               <div className={styles.meter}>
                 <p className={styles.meter__label}>질문</p>
                 <div className={styles.meter__graph}>
-                  <LeadChart />
+                  {/* <LeadChart  /> */}
+                  {reportData ? (
+                    <LeadChart ansCount={reportData.ansCount} questCount={reportData.questCount} />
+                  ) : (
+                    <p>📊 데이터 로딩 중...</p>
+                  )}
                 </div>
                 <p className={styles.meter__label}>답변</p>
               </div>
@@ -119,14 +259,14 @@ function totalReportPage() {
 
             {/* 대화 키워드(워드 클라우드) */}
             <div id="keyword"
-            className={styles.report__keyword}>
+              className={styles.report__keyword}>
               <p className={styles.report__sub}>대화 키워드(워드 클라우드)</p>
               <div className={styles.keyword}>
                 <div className={styles.keyword__wordcloud}>
-                  <WordCloud />
+                  <WordCloud words={wordCloudData} />
                 </div>
                 <div className={styles.keyword__bar}>
-                  <WordChart />
+                  <WordChart keywords={keywords} />
                 </div>
               </div>
             </div>
@@ -134,7 +274,7 @@ function totalReportPage() {
 
             {/* 대화 리스트 */}
             <div id="list"
-            className={styles.report__list}>
+              className={styles.report__list}>
               <p className={styles.report__sub}>대화 리스트</p>
 
               <div className={styles.report__list__items}>
@@ -174,19 +314,17 @@ function totalReportPage() {
                 {/* ✅ 필터링된 대화 리스트 (2x3 레이아웃 적용) */}
                 <div className={styles.report__grid}>
                   {paginatedConversations.map((conv) => (
-                    <div key={conv.id} className={styles.item}>
-                      {/* <Link to={`/report/detail/${conv.id}`} className={styles.item__link}> */}
-                      <Link to={`/report/detail`} className={styles.item__link}>
-                        <p className={styles.item__name}>{conv.name}</p>
+                    <div key={conv.reportId} className={styles.item}>
+                      <div onClick={() => handleReportClick(conv.reportId)} className={styles.item__link}>
+                        <p className={styles.item__name}>{`${conv.partnerName}와의 대화`}</p>
                         <div className={styles.item__keyword}>
                           <p className={styles.item__keyword__title}>대화 키워드</p>
                           <div className={styles.item__tag}>
-                            {conv.keywords.map((kw, idx) => (
-                              <p key={idx} className={idx === 0 ? styles.item__tag__1 : styles.item__tag__2}>{kw}</p>
-                            ))}
+                            <p className={styles.item__tag__1}>{conv.keyword1}</p>
+                            {conv.keyword2 && <p className={styles.item__tag__2}>{conv.keyword2}</p>}
                           </div>
                         </div>
-                      </Link>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -222,7 +360,7 @@ function totalReportPage() {
           </div>
         </div>
         <Footer />
-      </div>
+      </div >
     </>
   )
 }

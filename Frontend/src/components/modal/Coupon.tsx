@@ -34,7 +34,7 @@ function Coupon({ isOpen, onClose }: ModalProps) {
         const handlePaymentMessage = (event: MessageEvent) => {
             console.log("📩 쿠폰 모달에서 결제 완료 메시지 수신:", event.data, "from:", event.origin);
 
-            if (event.origin !== "http://localhost:8080") return;
+            if (event.origin !== "https://peachpitch.site") return;
 
             if (event.data === "paymentSuccess") {
                 onClose(); // ✅ 쿠폰 모달 닫기
@@ -50,6 +50,8 @@ function Coupon({ isOpen, onClose }: ModalProps) {
 
     if (!isOpen) return null;
 
+
+    const userId = localStorage.getItem("userId");
     const handlePayment = async () => {
         if (totalPrice === 0) {
             setAlertMessage("최소 1개 이상 선택해야 합니다!");
@@ -57,11 +59,13 @@ function Coupon({ isOpen, onClose }: ModalProps) {
         }
 
         try {
-            const response = await fetch("http://localhost:8080/api/pay/ready", {
+            const response = await fetch("https://peachpitch.site/api/pay/ready", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    item: { name: "이용권" },
+                    // item: { name: "이용권" },
+                    userId: userId,
+                    itemName: "이용권", 
                     totalPrice: totalPrice,
                     ea: counts.reduce((acc, count, index) => acc + count * ((index * 2) + 1), 0),
                 }),
@@ -96,24 +100,24 @@ function Coupon({ isOpen, onClose }: ModalProps) {
     };
 
     // 무료 쿠폰 받기
-    const handleFreeCoupon = async () => {
-        try {
-            const response = await fetch("http://localhost:8080/api/users/coupon/login/2", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-            });
+    // const handleFreeCoupon = async () => {
+    //     try {
+    //         const response = await fetch("https://peachpitch.site/api/users/coupon/login/2", {
+    //             method: "POST",
+    //             headers: { "Content-Type": "application/json" },
+    //         });
     
-            if (!response.ok) {
-                throw new Error("쿠폰 요청 실패");
-            }
+    //         if (!response.ok) {
+    //             throw new Error("쿠폰 요청 실패");
+    //         }
     
-            const data = await response.json();
-            alert("무료 쿠폰이 지급되었습니다!"); // 성공 메시지
-        } catch (error) {
-            console.error("🚨 쿠폰 요청 오류:", error);
-            setAlertMessage("무료 쿠폰 요청 중 문제가 발생했습니다.");
-        }
-    };
+    //         const data = await response.json();
+    //         alert("무료 쿠폰이 지급되었습니다!"); // 성공 메시지
+    //     } catch (error) {
+    //         console.error("🚨 쿠폰 요청 오류:", error);
+    //         setAlertMessage("무료 쿠폰 요청 중 문제가 발생했습니다.");
+    //     }
+    // };
     
     return (
         <>

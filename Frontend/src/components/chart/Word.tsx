@@ -1,6 +1,8 @@
+import { useEffect, useState } from "react";
+import { Bar } from "react-chartjs-2";
+
 import styles from './styles/Word.module.scss'
 
-import { Bar } from "react-chartjs-2";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -14,65 +16,106 @@ import {
 // Chart.js 등록
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const Word = () => {
-    // 데이터 설정
-    const data = {
-        labels: ["날씨", "동물", "영화", "책", "드라마", "기타"], // x축 라벨
-        datasets: [
-            {
-                label: "2025",
-                data: [80.61, 22.88, 20.98, 14.6, 56.74, 94.26], // 데이터 값
-                backgroundColor: [
-                    "#8B5D33", // 날씨
-                    "#D9A34A", // 동물
-                    "#8B5D33", // 영화
-                    "#F3D181", // 책
-                    "#FAC10B", // 드라마
-                    "#D9A34A", // 기타
-                ],
-                borderWidth: 1, // 막대 테두리 두께
-                barThickness: 40, // 막대 굵기
-            },
-        ],
+interface WordChartProps {
+    keywords: string[];  // Receive keywords array
+}
+
+const WordChart: React.FC<WordChartProps> = ({ keywords }) => {
+    const [chartData, setChartData] = useState<any>(null);
+
+    // ✅ Function to calculate frequency and get top 5 keywords + 기타
+    const processKeywords = (keywords: string[]) => {
+        const frequency: { [key: string]: number } = {};
+        keywords.forEach(keyword => {
+            frequency[keyword] = (frequency[keyword] || 0) + 1;
+        });
+
+        // Sort by frequency
+        const sortedKeywords = Object.entries(frequency)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5);
+
+        const topKeywords = sortedKeywords.map(item => item[0]);
+        const topValues = sortedKeywords.map(item => item[1]);
+
+        // Add "기타" category
+        const otherKeywords = Object.entries(frequency)
+            .filter(item => !topKeywords.includes(item[0]))
+            .reduce((acc, item) => acc + item[1], 0);
+
+        if (otherKeywords > 0) {
+            topKeywords.push("기타");
+            topValues.push(otherKeywords);
+        }
+
+        return { topKeywords, topValues };
     };
 
-    // 옵션 설정
+    useEffect(() => {
+        if (keywords.length === 0) return; // Avoid unnecessary state updates
+        const { topKeywords, topValues } = processKeywords(keywords);
+
+        setChartData({
+            labels: topKeywords,
+            datasets: [
+                {
+                    label: "Keyword Frequency",
+                    data: topValues,
+                    backgroundColor: [
+                        "#8B5D33", "#D9A34A", "#8B5D33", "#F3D181", "#FAC10B", "#D9A34A"
+                    ],
+                    borderWidth: 1,
+                    barThickness: 40,
+                },
+            ],
+        });
+    }, [keywords]);  // Only run when `keywords` change
+
+    if (!chartData) return <p>Loading...</p>;
+
     const options = {
         responsive: true,
         plugins: {
             legend: {
-                display: false, // 범례 숨기기
+                display: false, // Hide legend
             },
             tooltip: {
-                enabled: false, // 툴팁 비활성화
+                enabled: false, // Disable tooltip
             },
             datalabels: {
-                display: false, // 데이터 라벨 숨기기
+                display: false, // Disable data labels
             },
         },
         scales: {
             x: {
                 grid: {
-                    display: false, // x축 격자선 숨기기
+                    display: false, // Hide x-axis grid lines
+                    // drawBorder:false,
+                    // drawTicks:false,
                 },
+                ticks:{
+                    // display:false,
+                }
             },
             y: {
                 beginAtZero: true,
                 ticks: {
-                    display: false, // y축 눈금 숫자 숨기기
+                    display: false, // Hide y-axis ticks
                 },
                 grid: {
-                    display: false, // y축 격자선 숨기기
+                    display: false, // Hide y-axis grid lines
+                    drawTicks:false,
                 },
             },
         },
     };
 
     return (
-        <div className={styles.chart} style={{ width: "400px", height: "400px", margin: "0 auto", border: "solid #000 1px" }}>
-            <Bar data={data} options={options} />
+        <div className={styles.wrap}>
+            <div className={styles.back}></div>
+            <Bar data={chartData} options={options} className={styles.chart} />
         </div>
     );
 };
 
-export default Word;
+export default WordChart;
