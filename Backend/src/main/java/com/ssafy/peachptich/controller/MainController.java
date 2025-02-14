@@ -6,6 +6,7 @@ import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.service.UserKeywordService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,17 +20,18 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class MainController {
     private final UserKeywordService userKeywordService;
 
     @GetMapping("/api/main")
     public ResponseEntity<Map<String, Object>> mainP(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, Object> response = new HashMap<>();
-        System.out.println("MainController 입성");
-        System.out.println(userDetails);
+        log.info("MainController 입성");
 
         if (userDetails != null) {
             // 인증된 사용자가 있는 경우
+            log.info(userDetails.getUserEmail());
             response.put("isAuthenticated", true);
             response.put("email", userDetails.getUserEmail());
             response.put("birth", userDetails.getBirth());
@@ -40,7 +42,6 @@ public class MainController {
             response.put("isAuthenticated", false);
             response.put("message", "Not authenticated user");
         }
-
         return ResponseEntity.ok(response);
     }
 

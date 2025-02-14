@@ -70,9 +70,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                                 .requestMatchers("/api/ws/**").permitAll() // WebSocket 엔드포인트
                                 .requestMatchers("/pub/**", "/sub/**").permitAll() // STOMP 메시징 경로
-                                .requestMatchers("/api/main/**", "/api/index", "/api/users/login", "/api/users/signup", "/api/pay/ready", "/api/pay/completed",
-                                        "/api/chat/ai/keywords/**", "/api/chat/ai/check", "/api/users/coupon/**", "/error", "/api/chat/report/**", "/api/users/check",
-                                        "/api/chat/video/close", "/api/users/login/social/**", "/api/login/oauth2/code/*", "/login/oauth2/code/*").permitAll()
+                                .requestMatchers("/api/main/**", "/api/index", "/api/users/login", "/api/users/signup").permitAll()
+                                .requestMatchers("/api/pay/ready", "/api/pay/completed", "/api/chat/ai/keywords/**",
+                                        "/api/chat/ai/check", "/api/users/coupon/**", "/error", "/api/chat/report/**",
+                                        "/api/users/check", "/api/chat/video/close", "/api/users/login/social/**",
+                                        "/api/login/oauth2/code/*", "/login/oauth2/code/*").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
@@ -120,21 +122,6 @@ public class SecurityConfig {
 
         AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
 
-        // JWTFilter 등록
-        /*
-        http
-                .addFilterBefore(new JwtFilter(tokenProvider, userRepository, tokenBlacklistService), CustomLoginFilter.class)
-                // OAuth2 설정
-                .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(endpoint -> endpoint
-                                .baseUri("/api/users/login/social"))
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService))
-                        .successHandler(customOauthSuccessHandler)
-                );
-
-
-         */
         // OAuth2 설정을 JWT 필터보다 먼저 배치
         http
                 .oauth2Login(oauth2 -> oauth2
@@ -145,14 +132,6 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(customOauthSuccessHandler)
                 )
-                /*
-                    .oauth2Login(oauth2 -> oauth2
-                    .userInfoEndpoint(userInfo -> userInfo
-                        .oidcUserService(customOidcUserService)    // OIDC 서비스 추가
-                        .userService(customOAuth2UserService))     // 기존 OAuth2 서비스
-                    .successHandler(customOauthSuccessHandler)
-                )
-                 */
 
                 // JWT 필터를 OAuth2LoginAuthenticationFilter 뒤에 명시적으로 배치
                 .addFilterAfter(new JwtFilter(tokenProvider, userRepository, tokenBlacklistService),
