@@ -38,8 +38,6 @@ function VoiceChatPage() {
   /* 키워드 상태 */
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
   const [selectedKeywordId, setSelectedKeywordId] = useState<number | null>(null);
-  const [hints, setHints] = useState<string[] |null>(null);
-
   /* 음성 인식 관련 상태 */
   const [isListening, setIsListening] = useState(false);
   const { transcript, resetTranscript, listening } = useSpeechRecognition();
@@ -50,9 +48,11 @@ function VoiceChatPage() {
 
   const [historyId, setHistoryId] = useState<number | null>(null);
 
+  const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
+
   useEffect(() => {
     if (listening && transcript !== currentMessage) {
-      setCurrentMessage(transcript);
+      setCurrentMessage(addQuestionMark(transcript));
     }
   }, [transcript, listening, currentMessage]);
 
@@ -96,8 +96,6 @@ function VoiceChatPage() {
 
       const hintResponse = responseFromSpring.data;
       const historyIdFromResponse = hintResponse.data.historyId || null;
-      const hints = hintResponse.data.hints; // 힌트 배열
-      setHints(hints)
 
       console.log("Extracted historyId:", historyIdFromResponse);
       setHistoryId(historyIdFromResponse); // 대화 내역 id 저장
@@ -182,7 +180,6 @@ function VoiceChatPage() {
   /* AI 응답이 발생할 때 새로운 영상으로 전환 */
   const handleNewAIResponse = (aiResponse: string) => {
     console.log("🚀 handleNewAIResponse 실행됨!");
-    console.log(aiResponse);
 
     let randomVideo;
     do {
@@ -200,7 +197,7 @@ function VoiceChatPage() {
   const handleUserMessage = async () => {
     if (!currentMessage.trim()) return;
 
-    const modifiedMessage = currentMessage;
+    const modifiedMessage = addQuestionMark(currentMessage);
     setMessageHistory((prev) => [...prev, { role: "user", message: modifiedMessage }]);
     setLastUserMessage(modifiedMessage);
 
@@ -260,35 +257,35 @@ function VoiceChatPage() {
   };
 
   /* 특정 대화에 물음표 붙이기 */
-  // const addQuestionMark = (sentence: string): string => {
-  //   const questionWords = ["넌", "너는", "어디", "뭐", "뭘까", "왜", "어떻게", "언제", "무엇", "몇", "누가", "누구", "어떤"];
-  //   const lastChar = sentence.trim().slice(-1);
+  const addQuestionMark = (sentence: string): string => {
+    const questionWords = ["넌", "너는", "어디", "뭐", "뭘까", "왜", "어떻게", "언제", "무엇", "몇", "누가", "누구", "어떤"];
+    const lastChar = sentence.trim().slice(-1);
 
-  //   // 문장이 비어있거나 마지막에 이미 물음표가 있다면 그대로 반환
-  //   if (!sentence.trim() || lastChar === "?" || lastChar === "!" || lastChar === ".") {
-  //     return sentence;
-  //   }
+    // 문장이 비어있거나 마지막에 이미 물음표가 있다면 그대로 반환
+    if (!sentence.trim() || lastChar === "?" || lastChar === "!" || lastChar === ".") {
+      return sentence;
+    }
 
-  //   // 질문 단어 포함 여부 확인 후 물음표 추가
-  //   if (questionWords.some(word => sentence.includes(word))) {
-  //     return `${sentence.trim()}?`;
-  //   }
+    // 질문 단어 포함 여부 확인 후 물음표 추가
+    if (questionWords.some(word => sentence.includes(word))) {
+      return `${sentence.trim()}?`;
+    }
 
-  //   return sentence; // 기본적으로 변경 없음
-  // };
+    return sentence; // 기본적으로 변경 없음
+  };
 
   /* 대화 종료 모달창 */
   const navigate = useNavigate();
 
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
-  const [turnCount, setTurnCount] = useState(2);
+  const [turnCount, setTurnCount] = useState(10);
   const [isChatEnd, setIsChatEnd] = useState(false);
-  const [isOverlay, _setIsOverlay] = useState(false);
+  const [isOverlay, setIsOverlay] = useState(false);
 
-  // /* 대화 재시작 */
-  // const restartChat = () => {
-  //   window.location.href = "/chat/ai";
-  // };
+  /* 대화 재시작 */
+  const restartChat = () => {
+    window.location.href = "/chat/ai";
+  };
 
   /* 대화 종료 후 /report 페이지 이동 */
   const endChat = () => {
@@ -298,7 +295,7 @@ function VoiceChatPage() {
   const videos = [Video_AI_1, Video_AI_2, Video_AI_4, Video_AI_3];
 
   // 기본 영상
-  // const [videoState, setVideoState] = useState<string>(videos[1]);
+  const [videoState, setVideoState] = useState<string>(videos[1]);
 
   // ai 영상 상태 변화
   const [currentVideo, setCurrentVideo] = useState<string>(videos[1]);
@@ -308,7 +305,7 @@ function VoiceChatPage() {
   const [aiMessage, setAiMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
-  const [_aiResponseBuffer, setAiResponseBuffer] = useState('');
+  const [aiResponseBuffer, setAiResponseBuffer] = useState('');
   const [lastAiMessage, setLastAiMessage] = useState(''); // 마지막 AI 응답 저장
   const [lastUserMessage, setLastUserMessage] = useState<string>(''); // 마지막 사용자 메시지 저장
 
@@ -355,7 +352,7 @@ function VoiceChatPage() {
       <ChatEnd isOpen={isChatEnd} onClose={endChat} historyId={historyId} />
 
       <div className={styles.menu}>
-        <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} turnCount={turnCount} hints={hints}/>
+        <Drawer selectedKeyword={selectedKeyword} hints={hints} chatHistory={messageHistory} turnCount={turnCount} />
       </div>
 
       <div className={styles.chat}>
@@ -422,6 +419,8 @@ function VoiceChatPage() {
           <div className={styles.btn} onClick={handleStartClick}>시작하기</div>
         </KeywordModal>
       )}
+
+
 
       {/* 키워드 미선택 시 alert */}
       {showAlert && (
