@@ -50,6 +50,9 @@
   &__sub {
     font-weight: 700;
     font-size: 24px;
+    display: flex;
+    width: 100%;
+    padding-left: 60px;
 
     &__wrap {
       display: flex;
