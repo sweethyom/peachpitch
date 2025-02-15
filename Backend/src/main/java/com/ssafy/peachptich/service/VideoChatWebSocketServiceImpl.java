@@ -180,7 +180,12 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         catch (Exception e) {
             String msg = e.getMessage();
             System.err.println("예외 발생: " + msg);
-            //e.printStackTrace();
+            if (msg.contains("404")){
+                System.out.println("세션이 이미 종료되었습니다: " + closeRequest.getSessionId());
+            }
+            else {
+                e.printStackTrace();
+            }
         }
         finally {
             chatHistoryService.updateStatusFalse(closeRequest.getHistoryId());
