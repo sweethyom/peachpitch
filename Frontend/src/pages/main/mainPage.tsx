@@ -18,7 +18,7 @@ import CompletePay from '@/components/modal/SuccessPay';
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
 import StartChat from '@/components/modal/StartChat'
-import { access } from 'fs';
+// import { access } from 'fs';
 
 function MainPage() {
   const defaultMessage = "포시랍네요. 광수님 좀 포시랍네요."
@@ -43,6 +43,7 @@ function MainPage() {
   });
 
   const [rank, setRank] = useState<string[] | null>(null);
+  const [couponNum, setCouponNum] = useState(0)
 
   // ✅ 핑거프린트 생성 함수
   const generateFingerprint = async () => {
@@ -153,6 +154,8 @@ function MainPage() {
   const handleAIChatClick = async (e: React.MouseEvent) => {
     e.preventDefault();
 
+    // if(coupon)
+
     try {
       // 1. 권한 체크 먼저 수행
       const hasPermission = await checkPermissions();
@@ -163,12 +166,14 @@ function MainPage() {
 
       // 2. 로그인 상태 확인
       const isLoggedIn = localStorage.getItem('accessToken') !== null;
-
       if (isLoggedIn) {
         // 로그인된 사용자는 쿠폰만 확인
         const hasCoupon = await checkCouponAvailability();
+        console.log("! " + hasCoupon)
+
         if (hasCoupon) {
           setIsChatModalOpen(true);
+          // 쿠폰을 구매해주세요
         }
       } else {
         // 비로그인 사용자는 fingerprint 확인
@@ -277,14 +282,14 @@ function MainPage() {
   const checkCouponAvailability = async () => {
     try {
       // const response = await axios.get(`https://peachpitch.site/api/users/coupon/${userId}`);
-      // const response = await axios.get(`http://localhost:8080/api/users/coupon/${userId}`);
       const response = await axios.post(
         'http://localhost:8080/api/users/coupon/have',
         { userId: userId }, // Body 데이터
       );
-      console.log(response.data.data.ea);
+      setCouponNum(response.data.data)
+      console.log("coupon " + couponNum);
 
-      if (response.data < 1) {
+      if (couponNum < 1) {
         setAlertMessage("이용권이 부족합니다.");
         return false;
       }
