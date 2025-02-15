@@ -18,6 +18,7 @@ import CompletePay from '@/components/modal/SuccessPay';
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
 import StartChat from '@/components/modal/StartChat'
+import { access } from 'fs';
 
 function MainPage() {
   const defaultMessage = "포시랍네요. 광수님 좀 포시랍네요."
@@ -114,7 +115,7 @@ function MainPage() {
     const handlePaymentMessage = (event: MessageEvent) => {
       console.log("📩 결제 완료 메시지 수신:", event.data, "from:", event.origin);
 
-      const allowedOrigins = ["http://localhost:8080", "http://localhost:5173"];
+      const allowedOrigins = ["http://localhost:8080", "http://127.0.0.1:8000"];
       if (!allowedOrigins.includes(event.origin)) return;
 
       if (event.data === 'paymentSuccess') {
@@ -158,7 +159,7 @@ function MainPage() {
     // }
 
     // try {
-    // const response = await axios.post('http://localhost:8080/api/trial/check', {
+    // const response = await axios.post('/api/trial/check', {
     //   fingerprint: fingerprint,
     // });
 
@@ -256,15 +257,20 @@ function MainPage() {
     setIsChatModalOpen(false);
     navigate('/chat/ai');
   };
+  const accessToken = localStorage.getItem("accessToken");
+  const userId = localStorage.getItem("userId");
 
-  const userId = localStorage.getItem("userId")
-  // 쿠폰 관련
+  // console.log("access" + accessToken)
+  console.log("user" + userId)
   const checkCouponAvailability = async () => {
     try {
-      const response = await axios.get(`https://peachpitch.site/api/users/coupon/${userId}`);
-      // const response = await axios.get(`http://localhost:8080/api/users/coupon/1`);
-      
-      console.log("쿠폰수: " + response.data);
+      // const response = await axios.get(`https://peachpitch.site/api/users/coupon/${userId}`);
+      // const response = await axios.get(`http://localhost:8080/api/users/coupon/${userId}`);
+      const response = await axios.post(
+        'http://localhost:8080/api/users/coupon/have',
+        { userId: userId }, // Body 데이터
+      );
+      console.log(response.data.data.ea);
 
       if (response.data < 1) {
         setAlertMessage("이용권이 부족합니다.");
@@ -277,6 +283,8 @@ function MainPage() {
       return false;
     }
   };
+
+
 
   return (
     <>
