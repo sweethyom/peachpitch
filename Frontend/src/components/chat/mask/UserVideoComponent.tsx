@@ -12,7 +12,7 @@ type UserVideoComponentProps = {
     isLocalUser:boolean;
 };
 
-const maskOptions = ["mask1", "mask2", "mask3", "mask4"]
+const maskOptions = ["mask1", "mask2", "mask3", "mask4"];
 
 function UserVideoComponent({ streamManager, selectedMask, isLocalUser }: UserVideoComponentProps) {
 

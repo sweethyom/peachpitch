@@ -327,7 +327,7 @@ function MainPage() {
 
             {/* StartChat 모달 */}
             {isChatModalOpen && (
-              <StartChat isOpen={isChatModalOpen} onClose={handleCloseChatModal} onStart={handleStartChat} />
+              <StartChat isOpen={isChatModalOpen} onClose={handleCloseChatModal} onStart={handleStartChat} isFinger={fingerprint != null}/>
             )}
             {alertMessage && (
               <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
