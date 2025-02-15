@@ -14,6 +14,11 @@ import { OpenVidu, Session, Publisher, Subscriber } from "openvidu-browser";
 import axios from "axios";
 import FeedbackModal from "@components/modal/Feedback.tsx";
 
+// stt
+import "regenerator-runtime/runtime";
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
+
 const VideoChatPage: React.FC = () => {
     /* 대화 나가기 모달창 */
     const [isLeaveOpen, setIsLeaveOpen] = useState<boolean>(false);
@@ -235,6 +240,49 @@ const VideoChatPage: React.FC = () => {
         }
     }
 
+    // stt
+    // const [history, setHistory] = useState<string[]>([]);
+    const [previousTranscript, setPreviousTranscript] = useState<string>(""); // 이전 문장 저장
+    const [isRestarting, setIsRestarting] = useState(false); // 자동 재시작 여부
+    const sentenceEndRegex = /.*(했다|어요|습니다)[.!?]?$/;
+
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition
+    } = useSpeechRecognition();
+
+    if (!browserSupportsSpeechRecognition) {
+        return <span>Browser doesn't support speech recognition.</span>;
+    }
+
+    // // ✅ 문장이 완성되었는지 확인하는 정규식
+    // const sentenceEndRegex = /.*(했다|어요|습니다)[.!?]?$/;
+
+    // // 🎙 음성 인식이 멈추면 자동 재시작
+    // useEffect(() => {
+    //     if (!listening && !isRestarting) {
+    //         setIsRestarting(true);
+    //         setTimeout(() => {
+    //             SpeechRecognition.startListening({ continuous: true, language: "ko-KR" });
+    //             setIsRestarting(false);
+    //         }, 500); // 0.5초 후 다시 시작
+    //     }
+    // }, [listening, isRestarting]);
+
+    // // 📜 STT 기록 저장 (문장이 완성되었을 때만)
+    // useEffect(() => {
+    //     if (transcript && transcript !== previousTranscript) {
+    //         // ✅ 문장이 완성된 경우 저장 (길이 10자 이상 OR 종결어미 OR 마침표 포함)
+    //         if (transcript.length > 100 || sentenceEndRegex.test(transcript)) {
+    //             setHistory((prevHistory) => [...prevHistory, transcript]); // 기존 기록에 추가
+    //             setPreviousTranscript(transcript); // 이전 문장 업데이트
+    //             resetTranscript(); // 저장 후 초기화
+    //         }
+    //     }
+    // }, [transcript, previousTranscript]);
+
     return (
         <div className={styles.page}>
             {/* 설정 메뉴바 */}
@@ -265,27 +313,34 @@ const VideoChatPage: React.FC = () => {
 
                         {/* <button >세션 종료</button> */}
                         <div id="video-container">
-
+                            {/* 상대방 캠 */}
                             {subscribers.map((sub) => (
-                                <div
-                                    key={sub.stream.connection.connectionId}
-                                    className="stream-container col-md-6 col-xs-6"
-                                >
-                                    <span>{sub.stream.connection.data}</span>
-                                    <UserVideoComponent streamManager={sub} />
+                                <div className={styles.chat__other}>
+                                    <div
+                                        key={sub.stream.connection.connectionId}
+                                        className={styles.chat__other__video}
+                                    >
+                                        <span>{sub.stream.connection.data}</span>
+                                        <UserVideoComponent streamManager={sub} />
+                                    </div>
                                 </div>
                             ))}
-
+                            {/* 사용자 캠 */}
                             {publisher && (
-                                <div className="stream-container col-md-6 col-xs-6">
-                                    <UserVideoComponent streamManager={publisher} />
+                                <div className={styles.chat__user}>
+                                    <div
+                                        className={styles.chat__user__video}
+                                    >
+                                        <UserVideoComponent streamManager={publisher} />
+                                    </div>
                                 </div>
                             )}
                             <div className={styles.chat__input}>
-                                <p className={styles.chat__input__content}>
+                                {/* <p className={styles.chat__input__content}>
                                     최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                                </p>
-                                <img src={sstBtn} className={styles.chat__input__img} alt="sst button" />
+                                </p> */}
+
+                                {/* <img src={sstBtn} className={styles.chat__input__img} alt="sst button" /> */}
                             </div>
                         </div>
                     </>
