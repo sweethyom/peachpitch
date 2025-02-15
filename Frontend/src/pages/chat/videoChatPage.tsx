@@ -248,25 +248,24 @@ const VideoChatPage: React.FC = () => {
 
             <div className={styles.chat}>
                 {/* 채팅 헤더 부분 */}
-                <div className={styles.chat__header}>
-                    <p className={styles.chat__header__title}>1:1 매칭 스몰토크(오픈비듀)</p>
-                    {/* 대화 나가기 아이콘 */}
-                    <img
-                        src={leaveBtn}
-                        onClick={toggleLeave}
-                        className={styles.chat__header__img}
-                        alt="leave button"
-                    />
-                </div>
+
                 {session ? (
                     <>
-                        <button onClick={leaveSession}>세션 종료</button>
+                        <div className={styles.chat__header}>
+                            <p className={styles.chat__header__title}>1:1 매칭 스몰토크(오픈비듀)</p>
+                            {/* 대화 나가기 아이콘 */}
+                            <img
+                                src={leaveBtn}
+                                onClick={leaveSession}
+                                // onClick={toggleLeave}
+                                className={styles.chat__header__img}
+                                alt="leave button"
+                            />
+                        </div>
+
+                        {/* <button >세션 종료</button> */}
                         <div id="video-container">
-                            {publisher && (
-                                <div className="stream-container col-md-6 col-xs-6">
-                                    <UserVideoComponent streamManager={publisher} />
-                                </div>
-                            )}
+
                             {subscribers.map((sub) => (
                                 <div
                                     key={sub.stream.connection.connectionId}
@@ -276,6 +275,12 @@ const VideoChatPage: React.FC = () => {
                                     <UserVideoComponent streamManager={sub} />
                                 </div>
                             ))}
+
+                            {publisher && (
+                                <div className="stream-container col-md-6 col-xs-6">
+                                    <UserVideoComponent streamManager={publisher} />
+                                </div>
+                            )}
                             <div className={styles.chat__input}>
                                 <p className={styles.chat__input__content}>
                                     최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.

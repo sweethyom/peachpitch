@@ -164,15 +164,16 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
     useEffect(() => {
         const fetchCouponCount = async () => {
             try {
-                const storedUserId = localStorage.getItem("userId");
+                const userId = localStorage.getItem("userId");
 
-                if (!storedUserId) {
-                    // console.error("User ID가 없습니다.");
-                    return;
-                }
+                // if (!userId) {
+                //     console.error("User ID가 없습니다.");
+                //     return;
+                // }
 
-                const response = await axios.get(`http://localhost:8080/api/users/coupon/${storedUserId}`);
+                const response = await axios.get(`http://localhost:8080/api/users/coupon/${userId}`);
                 setCouponCount(response.data);
+                console.log("쿠폰 개수: " + response.data)
             } catch (error) {
                 console.error("쿠폰 수 조회 실패:", error);
             }
