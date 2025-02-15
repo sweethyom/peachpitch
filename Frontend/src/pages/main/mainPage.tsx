@@ -29,7 +29,7 @@ function MainPage() {
   const [rotate, setRotate] = useState(false);
 
   const [showCompletePay, setShowCompletePay] = useState(false);
-  const [_fingerprint, setFingerprint] = useState<string | null>(null);
+  const [fingerprint, setFingerprint] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const [showWelcomeAlert, setShowWelcomeAlert] = useState(false);
@@ -153,34 +153,46 @@ function MainPage() {
   const handleAIChatClick = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    // if (!fingerprint) {
-    //   console.error('Fingerprint not generated');
-    //   return;
-    // }
+    try {
+      // 1. 권한 체크 먼저 수행
+      const hasPermission = await checkPermissions();
+      if (!hasPermission) {
+        setAlertMessage("마이크 및 카메라 권한을 허용해야 합니다!");
+        return;
+      }
 
-    // try {
-    // const response = await axios.post('/api/trial/check', {
-    //   fingerprint: fingerprint,
-    // });
+      // 2. 로그인 상태 확인
+      const isLoggedIn = localStorage.getItem('accessToken') !== null;
 
-    // if (response.data.canAccess) {
-    const hasCoupon = await checkCouponAvailability();
-    if (hasCoupon) {
-      setIsChatModalOpen(true);
-    }
-    // } else {
-    // setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
-    // navigate('/login');
-    // }
-    // } catch (error) {
-    // console.error('Trial check failed:', error);
-    // setAlertMessage("서비스 이용에 문제가 발생했습니다.");
-    // }
+      if (isLoggedIn) {
+        // 로그인된 사용자는 쿠폰만 확인
+        const hasCoupon = await checkCouponAvailability();
+        if (hasCoupon) {
+          setIsChatModalOpen(true);
+        }
+      } else {
+        // 비로그인 사용자는 fingerprint 확인
+        if (!fingerprint) {
+          // fingerprint가 없으면 생성
+          await generateFingerprint();
+        }
 
-    const hasPermission = await checkPermissions();
-    if (!hasPermission) {
-      setAlertMessage("마이크 및 카메라 권한을 허용해야 합니다!");
-      return;
+        // fingerprint로 시도 여부 확인
+        const response = await axios.post('http://localhost:8080/api/chat/ai/check', {
+          fingerprint: fingerprint,
+        });
+
+        // Redis에 fingerprint가 없으면 처음 시도하는 것이므로 바로 채팅 가능
+        if (response.data.data) {
+          setIsChatModalOpen(true);
+        } else {
+          setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
+          navigate('/login');
+        }
+      }
+    } catch (error) {
+      console.error('Trial check failed:', error);
+      setAlertMessage("서비스 이용에 문제가 발생했습니다.");
     }
   };
 
