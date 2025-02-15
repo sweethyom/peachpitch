@@ -28,7 +28,7 @@ function UserVideoComponent({ streamManager }: UserVideoComponentProps) {
         videoRef.current = videoElement;
 
         // ✅ 얼굴 감지 모델 초기화
-        const initializeFaceDetector = async () => {
+        /* const initializeFaceDetector = async () => {
             try {
                 const vision = await FilesetResolver.forVisionTasks(
                     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
@@ -53,7 +53,7 @@ function UserVideoComponent({ streamManager }: UserVideoComponentProps) {
 
         return () => {
             faceDetectorRef.current = null;
-        };
+        };*/
     }, [streamManager]);
 
     // ✅ 얼굴 감지 실행
@@ -112,9 +112,9 @@ function UserVideoComponent({ streamManager }: UserVideoComponentProps) {
             </div>
 
             {/* 감지된 얼굴 위에 CatFace 추가 */}
-            {detectedFaces.map((face, index) => (
+            {/*detectedFaces.map((face, index) => (
                 <Mask key={index} x={face.x} y={face.y} width={face.width} height={face.height} />
-            ))}
+            ))*/}
         </div>
     );
 }

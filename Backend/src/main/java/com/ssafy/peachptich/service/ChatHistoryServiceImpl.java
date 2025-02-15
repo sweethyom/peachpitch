@@ -80,7 +80,7 @@ public class ChatHistoryServiceImpl implements ChatHistoryService {
     }
 
     @Override
-    public void updateStatus(Long historyId) {
-        chatHistoryRepository.updateStatusByHistoryId(historyId);
+    public void updateStatusFalse(Long historyId) {
+        chatHistoryRepository.updateStatusFalseByHistoryId(historyId);
     }
 }

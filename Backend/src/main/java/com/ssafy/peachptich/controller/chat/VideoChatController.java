@@ -1,10 +1,8 @@
 package com.ssafy.peachptich.controller.chat;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
+import com.ssafy.peachptich.dto.request.*;
 import com.ssafy.peachptich.dto.request.CloseRequest;
-import com.ssafy.peachptich.dto.request.FeedbackRequest;
-import com.ssafy.peachptich.dto.request.CloseRequest;
-import com.ssafy.peachptich.dto.request.VideoChatRequest;
 import com.ssafy.peachptich.dto.response.*;
 import com.ssafy.peachptich.service.*;
 import io.openvidu.java.client.OpenViduHttpException;
@@ -70,6 +68,7 @@ public class VideoChatController {
     public ResponseEntity<ResponseDto<Void>> requestVideoChatClose(
             @RequestBody CloseRequest closeRequest
     ) throws OpenViduJavaClientException, OpenViduHttpException {
+        System.out.println("chat history 상태 변경 요청");
         videoChatWebSocketService.closeSession(closeRequest);
         return ResponseEntity.ok().body(ResponseDto.<Void>builder().message("Successfully closed session").build());
     }
