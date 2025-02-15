@@ -261,7 +261,7 @@ function MainPage() {
   const userId = localStorage.getItem("userId");
 
   // console.log("access" + accessToken)
-  console.log("user" + userId)
+  // console.log("user" + userId)
   const checkCouponAvailability = async () => {
     try {
       // const response = await axios.get(`https://peachpitch.site/api/users/coupon/${userId}`);
