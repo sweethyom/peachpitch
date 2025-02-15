@@ -27,7 +27,7 @@ public class CouponContorller {
     }
 
     // 사용자의 보유 쿠폰 수 조회
-    @GetMapping("/have")
+    @PostMapping("/have")
     public ResponseEntity<ResponseDto<CouponResponse>> getAvailableCoupons(@RequestBody CouponRequest request) {
         int couponCount = couponService.getAvailableCoupons(request.getUserId());
         CouponResponse response = CouponResponse.builder()

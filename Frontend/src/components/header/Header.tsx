@@ -171,8 +171,12 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 //     return;
                 // }
 
-                const response = await axios.get(`http://localhost:8080/api/users/coupon/${userId}`);
-                setCouponCount(response.data);
+                const response = await axios.post(
+                    'http://localhost:8080/api/users/coupon/have',
+                    { userId: userId }, // Body 데이터
+                );
+
+                setCouponCount(response.data.data.ea);
                 console.log("쿠폰 개수: " + response.data)
             } catch (error) {
                 console.error("쿠폰 수 조회 실패:", error);
