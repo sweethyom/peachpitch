@@ -7,6 +7,7 @@ import com.ssafy.peachptich.repository.HaveCouponRepository;
 import com.ssafy.peachptich.repository.ItemRepository;
 import com.ssafy.peachptich.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional
 public class CouponServiceImpl implements CouponService {
@@ -89,26 +91,42 @@ public class CouponServiceImpl implements CouponService {
     @Transactional(readOnly = true)
     @Override
     public int getAvailableCoupons(Long userId) {
-        // 무료 쿠폰 수 조회 (만료되지 않은)
-        Optional<HaveCoupon> freeCoupon = haveCouponRepository
-                .findByUserIdAndItemTypeAndExpirationDateAfter(
-                        userId,
-                        Item.ItemType.FREE,
-                        LocalDateTime.now()
-                );
+        try {
+            // 디버깅을 위한 로그 추가
+            log.debug("Checking coupons for userId: {}", userId);
 
-        // 유료 쿠폰 수 조회
-        Optional<HaveCoupon> paidCoupon = haveCouponRepository
-                .findByUser_IdAndItem(
-                        userId,
-                        itemRepository.findByType(Item.ItemType.PAID).orElseThrow()
-                );
+            // null 체크 추가
+            if (userId == null) {
+                throw new IllegalArgumentException("userId cannot be null");
+            }
 
-        int freeCoupons = freeCoupon.map(HaveCoupon::getEa).orElse(0);
-        int paidCoupons = paidCoupon.map(HaveCoupon::getEa).orElse(0);
+            // 무료 쿠폰 수 조회
+            Optional<HaveCoupon> freeCoupon = haveCouponRepository
+                    .findByUserIdAndItemTypeAndExpirationDateAfter(
+                            userId,
+                            Item.ItemType.FREE,
+                            LocalDateTime.now()
+                    );
 
-        return freeCoupons + paidCoupons;
+            // 유료 쿠폰 수 조회
+            Optional<HaveCoupon> paidCoupon = haveCouponRepository
+                    .findByUser_IdAndItem(
+                            userId,
+                            itemRepository.findByType(Item.ItemType.PAID)
+                                    .orElseThrow(() -> new RuntimeException("Paid item not found"))
+                    );
+            log.info("쿠폰 수 조회 중");
+            int freeCoupons = freeCoupon.map(HaveCoupon::getEa).orElse(0);
+            int paidCoupons = paidCoupon.map(HaveCoupon::getEa).orElse(0);
+            log.info("쿠폰 수 조회 중2");
+
+            return freeCoupons + paidCoupons;
+        } catch (Exception e) {
+            log.error("Error while getting available coupons: ", e);
+            throw e;
+        }
     }
+
 
     @Override
     @Transactional
