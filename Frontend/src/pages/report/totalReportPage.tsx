@@ -274,6 +274,7 @@ function totalReportPage() {
                 <div id="list"
                   className={styles.report__list}>
                   <p className={styles.report__sub}>대화 리스트</p>
+                  <p className={styles.report__alert}>리포트를 생성하는데 <strong>최대 3분</strong>이 소요됩니다.</p>
 
                   <div className={styles.report__list__items}>
 
