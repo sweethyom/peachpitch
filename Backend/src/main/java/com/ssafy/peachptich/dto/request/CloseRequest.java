@@ -10,4 +10,5 @@ import lombok.Getter;
 public class CloseRequest {
     private Long historyId;
     private String sessionId;
+    private String sessionEndType; //강제 종료, 에러, 자동 종료
 }

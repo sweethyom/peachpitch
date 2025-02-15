@@ -265,7 +265,7 @@ function MainPage() {
       // const response = await axios.get(`http://localhost:8080/api/users/coupon/1`);
       
       console.log("쿠폰수: " + response.data);
-      
+
       if (response.data < 1) {
         setAlertMessage("이용권이 부족합니다.");
         return false;
