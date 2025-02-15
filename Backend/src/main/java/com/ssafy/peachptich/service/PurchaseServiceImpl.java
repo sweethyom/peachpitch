@@ -131,6 +131,7 @@ public class PurchaseServiceImpl implements PurchaseService{
         }
 
     }
+
     @Override
     @Transactional
     public void savePaymentInfo(ApproveResponse response) {
@@ -193,14 +194,6 @@ public class PurchaseServiceImpl implements PurchaseService{
         return purchaseRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new RuntimeException("결제 정보를 찾을 수 없습니다."));
     }
-
-    // getCurrentUserId 메서드 구현 필요
-//    private Long getCurrentUserId() {
-//        // 현재 로그인한 사용자의 ID를 반환하는 로직 구현
-//        // 예: SecurityContext에서 가져오기
-//        return null; // 실제 구현 필요
-//    }
-    // 카카오페이 측에 요청 시 헤더부에 필요한 값
 
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
