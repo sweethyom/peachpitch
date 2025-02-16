@@ -8,8 +8,6 @@ import timerIcon from "@/assets/icons/drawer_timer.png";
 import hintIcon from "@/assets/icons/drawer_hint.png";
 import chatBtn from "@/assets/icons/drawer_chatting.png";
 
-import Setting from "@/components/modal/Setting";
-
 type DrawerProps = {
     selectedKeyword: string | null;
     hints: { hint: string }[] | string[] | null;
@@ -162,7 +160,7 @@ const Drawer = ({ selectedKeyword, hints, chatHistory, turnCount }: DrawerProps)
                 </div>
             </div>
 
-            <Setting isOpen={isSettingOpen} onClose={toggleSetting} />
+            {/* <Setting isOpen={isSettingOpen} onClose={toggleSetting} /> */}
 
             {/* 열기 버튼 */}
             {!isOpen && (
