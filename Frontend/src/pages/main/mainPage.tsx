@@ -145,8 +145,26 @@ function MainPage() {
   }, []);
 
   const handleCloseSuccessModal = () => {
+    // stopCameraStream();
     setShowCompletePay(false);
+    reloadPage()
   };
+
+  //   const stopCameraStream = () => {
+  //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  //     .then((stream) => {
+  //       stream.getTracks().forEach(track => track.stop());
+  //     })
+  //     .catch((error) => {
+  //       console.error("카메라 스트림 정리 중 오류 발생:", error);
+  //     });
+  // };
+
+  const reloadPage = () => {
+    console.log("🔄 페이지 새로고침 실행됨");
+    window.location.reload();
+  };
+
 
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 
@@ -216,7 +234,7 @@ function MainPage() {
     e.preventDefault();
     const userJwtFromStorage = localStorage.getItem("accessToken");
 
-    if(!userJwtFromStorage) {
+    if (!userJwtFromStorage) {
       setAlertMessage("로그인을 해주세요.");
       return;
     }
@@ -270,6 +288,20 @@ function MainPage() {
     checkSocialLogin();
   }, []);
 
+  useEffect(() => {
+    const handleChatCancel = () => {
+      console.log("🔄 Chat modal cancelled. Reloading page...");
+      window.location.reload();
+    };
+
+    window.addEventListener("chatModalCancelled", handleChatCancel);
+
+    return () => {
+      window.removeEventListener("chatModalCancelled", handleChatCancel);
+    };
+  }, []);
+
+
   // AI 접근 모달창 닫기
   const handleCloseChatModal = () => {
     setIsChatModalOpen(false);
@@ -292,9 +324,9 @@ function MainPage() {
         { userId: userId }, // Body 데이터
       );
       setCouponNum(response.data.data)
-      console.log("coupon " + couponNum);
+      // console.log("coupon " + couponNum);
 
-      if (couponNum < 1) {
+      if (response.data.data < 1) {
         setAlertMessage("이용권이 부족합니다.");
         return false;
       }
@@ -332,7 +364,7 @@ function MainPage() {
 
             {/* StartChat 모달 */}
             {isChatModalOpen && (
-              <StartChat isOpen={isChatModalOpen} onClose={handleCloseChatModal} onStart={handleStartChat} isFinger={fingerprint != null}/>
+              <StartChat isOpen={isChatModalOpen} onClose={handleCloseChatModal} onStart={handleStartChat} isFinger={fingerprint != null} />
             )}
             {alertMessage && (
               <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
