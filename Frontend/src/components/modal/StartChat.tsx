@@ -11,6 +11,12 @@ type ModalProps = {
 };
 
 function StartChat({ isOpen, onClose, onStart, isFinger, children }: ModalProps) {
+  const handleCancel = () => {
+    window.dispatchEvent(new Event("chatModalCancelled")); // Dispatch an event
+    onClose(); // Close modal
+  };
+  
+  
   if (!isOpen) return null;
 
   return (
@@ -40,7 +46,7 @@ function StartChat({ isOpen, onClose, onStart, isFinger, children }: ModalProps)
         </div>
         {children}
         <div className={styles.modal__btn}>
-          <div onClick={onClose} className={styles.modal__btn__cancle}>취소하기</div>
+          <div onClick={handleCancel} className={styles.modal__btn__cancle}>취소하기</div>
           <div onClick={onStart} className={styles.modal__btn__start}>시작하기</div>
         </div>
       </div>
