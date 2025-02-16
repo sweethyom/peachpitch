@@ -38,7 +38,6 @@ const VideoChatPage: React.FC = () => {
         transcript,
         listening,
         resetTranscript,
-        browserSupportsSpeechRecognition
     } = useSpeechRecognition();
 
     // ✅ 문장이 완성되었는지 확인하는 정규식
@@ -99,6 +98,8 @@ const VideoChatPage: React.FC = () => {
 
     const [sessionEndType, setSessionEndType] = useState<SessionEndType | null>(null);
     const [matchedUserEmail, setMatchedUserEmail] = useState<string | null>(null);
+
+    const [_selectedMask, setSelectedMask] = useState<string | null>("mask1")
 
     // 음성인식 있을 때만 자동 재시작
     useEffect(() => {
@@ -540,6 +541,7 @@ const VideoChatPage: React.FC = () => {
                     selectedKeywords={selectedKeywords}
                     hints={hints}
                     historyId={historyId ?? 0}
+                    setSelectedMask={setSelectedMask}
                 />
             </div>
 
