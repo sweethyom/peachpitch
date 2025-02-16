@@ -66,7 +66,7 @@ function Feedback({ isOpen, historyId }: ModalProps) {
             };
 
             // 서버에 피드백 전송
-            const response = await axios.post('http://localhost:8080/api/chat/video/feedback', feedbackData, {
+            const response = await axios.post('https://peachpitch.site/api/chat/video/feedback', feedbackData, {
                 headers: {
                     access: userJwtFromStorage
                 }

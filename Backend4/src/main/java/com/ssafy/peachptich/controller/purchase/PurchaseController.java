@@ -26,7 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/pay")
 @SessionAttributes({"tid", "orderNum", "totalPrice"})  // 추가
-@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true", methods = {
+@CrossOrigin(origins = "https://peachpitch.site", allowedHeaders = "*", allowCredentials = "true", methods = {
         RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE
 })
 public class PurchaseController {
@@ -51,9 +51,9 @@ public class PurchaseController {
                 .quantity(purchaseRequest.getEa())
                 .total_amount(purchaseRequest.getTotalPrice())
                 .tax_free_amount(0)
-                .approval_url("http://localhost:8080/api/pay/completed")
-                .cancel_url("http://localhost:8080/api/pay/cancel")
-                .fail_url("http://localhost:8080/api/pay/fail")
+                .approval_url("https://peachpitch.site/api/pay/completed")
+                .cancel_url("https://peachpitch.site/api/pay/cancel")
+                .fail_url("https://peachpitch.site/api/pay/fail")
                 .build();
 
         log.info("주문 상품 이름: {}", readyRequest.getItem_name());

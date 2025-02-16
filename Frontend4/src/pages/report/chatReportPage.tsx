@@ -57,7 +57,7 @@ function chatReportPage(_id : any) {
     const fetchChatReport = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:8080/api/users/reports/totalreport",
+          "https://peachpitch.site/api/users/reports/totalreport",
           { userId: userId },
           {
             headers: {
@@ -87,7 +87,7 @@ function chatReportPage(_id : any) {
     const fetchReportDetail = async () => {
       try {
         const response = await axios.post(
-          "http://localhost:8080/api/users/reports/report",
+          "https://peachpitch.site/api/users/reports/report",
           {
             userId: userId,
             reportId: Number(reportId),
