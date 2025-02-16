@@ -4,6 +4,8 @@ import closeBtn from "@/assets/icons/modal__close.png";
 import couponImg from "@/assets/images/coupon_img.png";
 
 import RedAlert from "../alert/redAlert";
+import GreenAlert from '@/components/alert/greenAlert';
+
 
 type ModalProps = {
     isOpen: boolean;
@@ -13,8 +15,10 @@ type ModalProps = {
 function Coupon({ isOpen, onClose }: ModalProps) {
     const [counts, setCounts] = useState([0, 0, 0]);
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
+    const [greenAlertMessage, setGreenAlertMessage] = useState<string | null>(null);
     const prices = [1000, 3000, 5000];
     const totalPrice = counts.reduce((acc, count, index) => acc + count * prices[index], 0);
+    const [hasReceivedCoupon, setHasReceivedCoupon] = useState<boolean>(false);
 
     const increment = (index: number) => {
         setCounts((prevCounts) =>
@@ -27,6 +31,27 @@ function Coupon({ isOpen, onClose }: ModalProps) {
             prevCounts.map((count, i) => (i === index && count > 0 ? count - 1 : count))
         );
     };
+
+    useEffect(() => {
+        const fetchCouponStatus = async () => {
+            const userId = localStorage.getItem("userId");
+            if (!userId) return;
+
+            try {
+                const response = await fetch(`http://localhost:8080/api/users/coupon/status?userId=${userId}`, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                const data = await response.json();
+                setHasReceivedCoupon(data.data); // 서버에서 Boolean 값을 받음
+            } catch (error) {
+                console.error("🚨 무료 쿠폰 상태 확인 오류:", error);
+            }
+        };
+
+        fetchCouponStatus();
+    }, []);
 
     // ✅ 결제 완료 메시지를 감지하여 모달 닫기
     useEffect(() => {
@@ -124,7 +149,15 @@ function Coupon({ isOpen, onClose }: ModalProps) {
             }
 
             const data = await response.json();
-            alert("🎉 무료 쿠폰이 지급되었습니다!"); // 성공 메시지
+
+            // ✅ 모달 닫기 및 메인 페이지 이동
+            onClose();
+            window.location.href = "/main"; // ✅ 이동 후 새로고침
+
+            // ✅ 3초 후에 GreenAlert 메시지 표시
+            setTimeout(() => {
+                setGreenAlertMessage("무료 쿠폰이 지급되었습니다!");
+            }, 3000);
         } catch (error) {
             console.error("🚨 쿠폰 요청 오류:", error);
             setAlertMessage("무료 쿠폰 요청 중 문제가 발생했습니다.");
@@ -132,9 +165,12 @@ function Coupon({ isOpen, onClose }: ModalProps) {
     };
 
 
+
     return (
         <>
             {alertMessage && <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />}
+            {greenAlertMessage && <GreenAlert message={greenAlertMessage} onClose={() => setGreenAlertMessage(null)} />}
+
 
             <div className={styles.overlay}>
                 <div className={styles.modal}>
@@ -143,9 +179,12 @@ function Coupon({ isOpen, onClose }: ModalProps) {
                         <p className={styles.modal__header__logo}>PeachPitch</p>
                     </div>
                     <p className={styles.modal__header__title}>이용권 구매</p>
-                    <div className={styles.free} onClick={handleFreeCoupon}>
-                        AI 무료 쿠폰 받기
-                    </div>
+                    {!hasReceivedCoupon && (
+                        <div className={styles.free} onClick={handleFreeCoupon}>
+                            AI 무료 쿠폰 받기
+                        </div>
+                    )}
+
                     <div className={styles.modal__contents}>
                         {[...Array(3)].map((_, index) => (
                             <div key={index} className={styles.modal__contents__item}>

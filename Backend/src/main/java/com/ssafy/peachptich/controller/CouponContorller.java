@@ -26,6 +26,19 @@ public class CouponContorller {
         );
     }
 
+    // 무료 쿠폰 수령 여부 확인
+    @GetMapping("/status")
+    public ResponseEntity<ResponseDto<Boolean>> checkFreeCouponStatus(@RequestParam Long userId) {
+        boolean hasReceived = couponService.hasReceivedFreeCouponToday(userId);
+        return ResponseEntity.ok().body(
+                ResponseDto.<Boolean>builder()
+                        .message("Successfully checked coupon status")
+                        .data(hasReceived)
+                        .build()
+        );
+    }
+
+
     // 사용자의 보유 쿠폰 수 조회
     @PostMapping("/have")
     public ResponseEntity<ResponseDto<CouponResponse>> getAvailableCoupons(@RequestBody CouponRequest request) {
