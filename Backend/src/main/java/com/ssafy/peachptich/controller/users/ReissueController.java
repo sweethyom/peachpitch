@@ -70,10 +70,15 @@ public class ReissueController {
         }
 
         // make new JWT
-        String newAccess = tokenProvider.createJwt("access", userEmail, role, 600000L);
+        String newAccess = tokenProvider.createJwt("access", userEmail, role, 82000000L);
         String newRefresh = tokenProvider.createJwt("refresh", userEmail, role, 86400000L);
 
-        addToken("RT:AT:" + userEmail, newAccess, 18000000L);
+        // Refresh Token 저장
+        // DB에 기존의 Refresh Token 삭제 후 새 Refresh Token 저장
+        // refreshRepository.deleteByRefresh(refresh);
+        // addToken(userEmail, newRefresh, 86400000L);
+
+        addToken("RT:AT:" + userEmail, newAccess, 82000000L);
         addToken("RT:RT:" + userEmail, newRefresh, 86400000L);
 
         // response

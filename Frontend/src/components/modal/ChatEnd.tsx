@@ -18,6 +18,8 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
         window.location.href = "/chat/ai";
     };
 
+    const userId = localStorage.getItem("userId")
+
     /* ✅ 종료 버튼 클릭 시 데이터 저장 후 /report 페이지로 이동 */
     const endChat = async () => {
         if (!historyId) {
@@ -33,18 +35,28 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
         }
 
         try {
+
             // ✅ Step 1: Save chat history in the database
-            await axios.post("http://localhost:8080/api/chat/save",
+            await axios.post(
+                "http://localhost:8080/api/chat/save",
                 { historyId },
-                { headers: { access: accessToken } }
+                {
+                    headers: {
+                        access: accessToken  // ✅ access token 추가
+                    },
+                    withCredentials: true,
+                }
             );
+
+
             console.log("채팅 기록 저장 완료");
+            console.log("리포트가 생성중입니다..");
 
             navigate("/main");
 
             setTimeout(async () => {
                 try {
-                    const response = await axios.post("http://127.0.0.1:8000/ai/users/reports/refine/",
+                    await axios.post("http://127.0.0.1:8000/ai/users/reports/refine/",
                         { history_id: historyId }
                     );
 

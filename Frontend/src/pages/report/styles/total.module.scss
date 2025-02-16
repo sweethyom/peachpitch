@@ -4,6 +4,12 @@
     align-items: center;
 }
 
+.loading {
+    margin: 220px 0;
+    width: 335px;
+    height: 192px;
+}
+
 .page {
     display: flex;
     justify-content: center;
@@ -33,7 +39,7 @@
 
     position: sticky;
     top: 10px;
-    z-index: 100;
+    z-index: 2;
 
     &__item {
         font-weight: 400;
@@ -54,6 +60,12 @@
         font-size: 24px;
     }
 
+    &__alert {
+        font-weight: 500;
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
     &__status {
         display: flex;
         flex-direction: row;
@@ -63,7 +75,7 @@
     &__sub {
         font-weight: 700;
         font-size: 18px;
-        margin-bottom: 20px;
+        margin-bottom: 2px;
     }
 
     &__habits {}
@@ -298,7 +310,7 @@
     padding: 10px 0;
 }
 
-.report__paging__button, 
+.report__paging__button,
 .report__paging__number {
     background: none;
     border: none;
@@ -311,7 +323,7 @@
     transition: color 0.2s ease-in-out;
 }
 
-.report__paging__button:hover, 
+.report__paging__button:hover,
 .report__paging__number:hover {
     color: var(--color-red-200);
 }

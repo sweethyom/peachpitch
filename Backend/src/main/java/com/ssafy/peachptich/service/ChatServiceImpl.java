@@ -185,13 +185,32 @@ public class ChatServiceImpl implements ChatService {
         return chatRepository.findByChatHistory_HistoryIdOrderByCreatedAtAsc(historyId);
     }
 
-    // 대화 리포트 데이터 띄우기
     @Override
     public ChatReport getReport(@RequestBody ReportRequest reportRequest) {
-        return reportRepository.findByUserIdAndChatHistoryId(reportRequest.getUserId(), reportRequest.getHistoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Chat Report not found"));
-    }
+        log.info("리포트 조회 시작 - userId: {}, reportId: {}",
+                reportRequest.getUserId(), reportRequest.getReportId());
 
+        try {
+            ChatReport chatReport = reportRepository
+                    .findByUserIdAndReportId(reportRequest.getUserId(), reportRequest.getReportId())
+                    .orElseThrow(() -> {
+                        log.error("리포트를 찾을 수 없습니다 - userId: {}, reportId: {}",
+                                reportRequest.getUserId(), reportRequest.getReportId());
+                        return new EntityNotFoundException("Chat Report not found");
+                    });
+
+            log.info("리포트 조회 완료 - reportId: {}, historyId: {}",
+                    chatReport.getReportId(),
+                    chatReport.getChatHistory() != null ? chatReport.getChatHistory().getHistoryId() : "null");
+
+            return chatReport;
+
+        } catch (Exception e) {
+            log.error("리포트 조회 중 예외 발생 - userId: {}, reportId: {}",
+                    reportRequest.getUserId(), reportRequest.getReportId(), e);
+            throw e;
+        }
+    }
 
     @Override
     public TotalReportResponse getTotalReport(Long userId) {

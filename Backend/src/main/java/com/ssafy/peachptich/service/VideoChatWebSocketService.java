@@ -8,5 +8,6 @@ import io.openvidu.java.client.OpenViduJavaClientException;
 public interface VideoChatWebSocketService {
     void handleVideoChatWebSocket(String userEmail) throws OpenViduHttpException, OpenViduJavaClientException;
     void handleVideoChatKeyword(AudioChatRequest videoChatRequest, Long historyId, String userEmail);
-    void closeSession(CloseRequest closeRequest) throws OpenViduJavaClientException, OpenViduHttpException;
+    void handleCloseVideoChat(CloseRequest closeRequest, String userEmail) throws OpenViduJavaClientException, OpenViduHttpException;
+    void handleVideoChatWebSocketDisconnect(String userEmail);
 }

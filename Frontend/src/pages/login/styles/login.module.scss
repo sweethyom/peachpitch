@@ -21,6 +21,30 @@
     // margin: 100px auto 100px auto;
 }
 
+.kakao {
+    display: flex;
+    width: 440px;
+    align-items: center;
+    background-color: var(--color-white-500);
+    border-radius: 4px;
+    padding: 10px 12px;
+    justify-content: center;
+    margin: 20px 0;
+    cursor: pointer;
+
+    p {
+        margin-left: 20px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--color-white-000);
+    }
+}
+
+.kakao:hover {
+    background-color: var(--color-white-600);
+
+}
+
 .login {
     width: 443px;
     display: flex;
