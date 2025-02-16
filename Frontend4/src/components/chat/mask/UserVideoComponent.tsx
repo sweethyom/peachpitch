@@ -23,7 +23,7 @@ function UserVideoComponent({ streamManager, selectedMask, isLocalUser }: UserVi
     const faceDetectorRef = useRef<FaceDetector | null>(null);
     const [detectedFaces, setDetectedFaces] = useState<{ x: number; y: number; width: number; height: number }[]>([]);
 
-    const [randomMask, setRandomMask] = useState<string>(maskOptions[Math.floor(Math.random() * maskOptions.length)])
+    const [randomMask, _setRandomMask] = useState<string>(maskOptions[Math.floor(Math.random() * maskOptions.length)])
 
     useEffect(() => {
         if (!streamManager) return;

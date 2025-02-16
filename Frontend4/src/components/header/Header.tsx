@@ -30,7 +30,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const userRef = useRef<HTMLSpanElement>(null); // ✅ 아이디 크기 가져오기 위한 ref
-    const [dropdownWidth, setDropdownWidth] = useState(100);
+    const [dropdownWidth, _setDropdownWidth] = useState(100);
 
     // ✅ 로그인 상태 확인 함수
     const checkLoginStatus = () => {

@@ -279,7 +279,7 @@ function MainPage() {
     setIsChatModalOpen(false);
     navigate('/chat/ai');
   };
-  const accessToken = localStorage.getItem("accessToken");
+  // const accessToken = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
 
   // console.log("access" + accessToken)
