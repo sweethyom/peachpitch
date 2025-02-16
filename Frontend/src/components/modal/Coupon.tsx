@@ -65,7 +65,7 @@ function Coupon({ isOpen, onClose }: ModalProps) {
                 body: JSON.stringify({
                     // item: { name: "이용권" },
                     userId: userId,
-                    itemName: "이용권", 
+                    itemName: "이용권",
                     totalPrice: totalPrice,
                     ea: counts.reduce((acc, count, index) => acc + count * ((index * 2) + 1), 0),
                 }),
@@ -100,25 +100,38 @@ function Coupon({ isOpen, onClose }: ModalProps) {
     };
 
     // 무료 쿠폰 받기
-    // const handleFreeCoupon = async () => {
-    //     try {
-    //         const response = await fetch("https://peachpitch.site/api/users/coupon/login/2", {
-    //             method: "POST",
-    //             headers: { "Content-Type": "application/json" },
-    //         });
-    
-    //         if (!response.ok) {
-    //             throw new Error("쿠폰 요청 실패");
-    //         }
-    
-    //         const data = await response.json();
-    //         alert("무료 쿠폰이 지급되었습니다!"); // 성공 메시지
-    //     } catch (error) {
-    //         console.error("🚨 쿠폰 요청 오류:", error);
-    //         setAlertMessage("무료 쿠폰 요청 중 문제가 발생했습니다.");
-    //     }
-    // };
-    
+    const handleFreeCoupon = async () => {
+        const userId = localStorage.getItem("userId");
+        const accessToken = localStorage.getItem("access"); // Assuming access token is stored
+
+        if (!userId) {
+            setAlertMessage("로그인이 필요합니다!");
+            return;
+        }
+
+        try {
+            const response = await fetch("http://localhost:8080/api/users/coupon/login/free", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}` // Add access token if required
+                },
+                body: JSON.stringify({ userId }),
+            });
+
+            if (!response.ok) {
+                throw new Error("무료 쿠폰 요청 실패");
+            }
+
+            const data = await response.json();
+            alert("🎉 무료 쿠폰이 지급되었습니다!"); // 성공 메시지
+        } catch (error) {
+            console.error("🚨 쿠폰 요청 오류:", error);
+            setAlertMessage("무료 쿠폰 요청 중 문제가 발생했습니다.");
+        }
+    };
+
+
     return (
         <>
             {alertMessage && <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />}
@@ -130,7 +143,7 @@ function Coupon({ isOpen, onClose }: ModalProps) {
                         <p className={styles.modal__header__logo}>PeachPitch</p>
                     </div>
                     <p className={styles.modal__header__title}>이용권 구매</p>
-                    <div className={styles.free}>
+                    <div className={styles.free} onClick={handleFreeCoupon}>
                         AI 무료 쿠폰 받기
                     </div>
                     <div className={styles.modal__contents}>
