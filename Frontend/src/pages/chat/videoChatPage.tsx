@@ -20,6 +20,7 @@ import FeedbackModal from "@components/modal/Feedback.tsx";
 import { useNavigate } from "react-router-dom";
 
 import MatchingWait from "@/assets/images/chat_matching.png"
+import MatchingEnd from "@/assets/images/chat_end.png"
 
 enum SessionEndType {
     MANUAL = "MANUAL",
@@ -602,12 +603,10 @@ const VideoChatPage: React.FC = () => {
                             </div>
 
                         ) : (
-                            <div>
-
-                                <p>
-                                    끝났어
-                                </p>
-
+                            <div className={styles.wait}>
+                                <div className={styles.wait__wrap}>
+                                    <img src={MatchingEnd} className={styles.wait__img} />
+                                </div>
                             </div>
                         )}
 
