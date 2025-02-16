@@ -12,7 +12,7 @@ import { RiKakaoTalkFill } from "react-icons/ri";
 
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
-import { color } from 'echarts';
+// import { color } from 'echarts';
 
 function loginPage() {
   const navigate = useNavigate();

@@ -40,7 +40,7 @@ const VideoChatPage: React.FC = () => {
         transcript,
         listening,
         resetTranscript,
-        browserSupportsSpeechRecognition
+        // browserSupportsSpeechRecognition
     } = useSpeechRecognition();
 
     // ✅ 문장이 완성되었는지 확인하는 정규식
@@ -49,7 +49,7 @@ const VideoChatPage: React.FC = () => {
 
     /* 대화 나가기 모달창 */
     const [isLeaveOpen, setIsLeaveOpen] = useState<boolean>(false);
-    const toggleLeave = () => setIsLeaveOpen((prev) => !prev);
+    // const toggleLeave = () => setIsLeaveOpen((prev) => !prev);
 
     /* 키워드 모달창 - 매칭 후에 뜨도록 초기 상태 false로 변경 */
     const [isKeywordOpen, setIsKeywordOpen] = useState<boolean>(false);
@@ -62,7 +62,7 @@ const VideoChatPage: React.FC = () => {
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [alertMessage, setAlertMessage] = useState<string>(""); //alert 재사용을 위한 메세지
 
-    const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+    const [chatHistory, _setChatHistory] = useState<{ role: string; message: string }[]>([]);
     const [selectedKeywords, setSelectedKeywords] = useState<string[] | null>(); // 사용자들이 고른 키워드
     // const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
     const [hints, setHints] = useState<{ hint: string }[][]>([]);
@@ -99,7 +99,7 @@ const VideoChatPage: React.FC = () => {
 
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false); // 10초 후 경고창
 
-    const [sessionEndType, setSessionEndType] = useState<SessionEndType | null>(null);
+    const [_sessionEndType, setSessionEndType] = useState<SessionEndType | null>(null);
     const [matchedUserEmail, setMatchedUserEmail] = useState<string | null>(null);
 
     const [selectedMask, setSelectedMask] = useState<string | null>("mask1")
