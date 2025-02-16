@@ -1,34 +1,26 @@
 package com.ssafy.peachptich.global.config.jwt;
 
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.repository.UserRepository;
-import com.ssafy.peachptich.service.CustomUserDetailsService;
 import com.ssafy.peachptich.service.TokenBlacklistService;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.time.LocalDate;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -38,28 +30,6 @@ public class JwtFilter extends OncePerRequestFilter {
     private final TokenProvider tokenProvider;
     private final UserRepository userRepository;
     private final TokenBlacklistService tokenBlacklistService;
-
-    // 토큰 검증 결과를 건너뛸 API URL들
-    // private final List<String> excludedPaths = Arrays.asList("/login", "/join");
-    private final List<String> excludedPaths = Arrays.asList(
-            "/login",
-            "/join",
-            "/api/users/signup",
-            "/api/users/login/social",
-            "/login/oauth2/code",
-            "/oauth2/authorization",
-            "/oauth2/token",
-            "/oauth2/userinfo",
-            "/api/main/randomscript"
-    );
-
-
-    @Override
-    // 로그인, 회원가입 API URL이 포함되는지 확인하는 함수
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException{
-        String path = request.getRequestURI();
-        return (path.equals("/") || excludedPaths.stream().anyMatch(path::startsWith));
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException{
@@ -80,10 +50,9 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 토큰이 없다면 다음 필터로 넘기지 않음
+        // 토큰이 없다면 다음 필터로 넘김
         if (accessToken == null || accessToken.isEmpty()){
-            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "Authentication failed: Access token is missing");
-            return;
+            filterChain.doFilter(request, response);
         }
 
         // 토큰이 blackList에 존재하는지 확인
@@ -101,14 +70,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 토큰이 access인지 확인 (발급시 페이로드에 명시)
-        String category = tokenProvider.getCategory(accessToken);
-
-        if (!category.equals("access")){
-            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, "invalid access token");
-            return;
-        }
-
         // userEmail, role 값 획득
         String userEmail = tokenProvider.getUserEmail(accessToken);
 
@@ -118,7 +79,7 @@ public class JwtFilter extends OncePerRequestFilter {
         log.info("JWTFilter에서 userId = " + userEntity.getUserId() + ", userEmail = " + userEntity.getEmail() + ", role = " + userEntity.getRole() + ", birth = " + userEntity.getBirth());
 
         CustomUserDetails customUserDetails = new CustomUserDetails(userEntity);
-        
+
         // Spring Security 인증 토큰 생성
         Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
 
