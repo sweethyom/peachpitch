@@ -12,7 +12,10 @@ import "regenerator-runtime/runtime";
 
 import { Client } from "@stomp/stompjs";
 import { OpenVidu, Session, Publisher, Subscriber } from "openvidu-browser";
-import axios from "axios";
+// import axios from "axios";
+
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+
 import FeedbackModal from "@components/modal/Feedback.tsx";
 import { useNavigate } from "react-router-dom";
 
@@ -28,6 +31,21 @@ enum MessageType {
 
 const VideoChatPage: React.FC = () => {
     const navigate = useNavigate();
+
+    // stt
+    const [history, setHistory] = useState<string[]>([]);
+    const [previousTranscript, setPreviousTranscript] = useState<string>(""); // 이전 문장 저장
+    const [isRestarting, setIsRestarting] = useState(false); // 자동 재시작 여부
+    const {
+        transcript,
+        listening,
+        resetTranscript,
+        browserSupportsSpeechRecognition
+    } = useSpeechRecognition();
+
+    // ✅ 문장이 완성되었는지 확인하는 정규식
+    const sentenceEndRegex = /.*(했다|어요|습니다)[.!?]?$/;
+
 
     /* 대화 나가기 모달창 */
     const [isLeaveOpen, setIsLeaveOpen] = useState<boolean>(false);
@@ -85,6 +103,49 @@ const VideoChatPage: React.FC = () => {
     const [matchedUserEmail, setMatchedUserEmail] = useState<string | null>(null);
 
     const [selectedMask, setSelectedMask] = useState<string | null>("mask1")
+
+    // 음성인식 있을 때만 자동 재시작
+    useEffect(() => {
+        if (!listening && !isRestarting && session) {
+            setIsRestarting(true);
+            const timer = setTimeout(() => {
+                try {
+                    // mediaStream이 있는 경우에만 STT 재시작
+                    if (publisher?.stream) {
+                        const mediaStream = publisher.stream.getMediaStream();
+                        if (mediaStream && mediaStream.getAudioTracks().length > 0) {
+                            const audioTrack = mediaStream.getAudioTracks()[0];
+                            const audioStream = new MediaStream([audioTrack]);
+                            SpeechRecognition.startListening({
+                                stream: audioStream,
+                                continuous: true,
+                                language: "ko-KR"
+                            } as any);
+                        }
+                    }
+                } catch (error) {
+                    console.error('STT 재시작 실패:', error);
+                }
+                setIsRestarting(false);
+            }, 500);
+
+            return () => clearTimeout(timer);
+        }
+    }, [listening, isRestarting, session, publisher]);
+
+
+    // 📜 STT 기록 저장 (문장이 완성되었을 때만)
+    useEffect(() => {
+        if (transcript && transcript !== previousTranscript) {
+            // ✅ 문장이 완성된 경우 저장 (길이 10자 이상 OR 종결어미 OR 마침표 포함)
+            if (transcript.length > 100 || sentenceEndRegex.test(transcript)) {
+                setHistory((prevHistory) => [...prevHistory, transcript]); // 기존 기록에 추가
+                setPreviousTranscript(transcript); // 이전 문장 업데이트
+                resetTranscript(); // 저장 후 초기화
+            }
+        }
+    }, [transcript, previousTranscript]);
+
     useEffect(() => {
         if (selectedKeyword) {  // null이 아닐 때만 추가
             setSelectedKeywords(prev => prev ? [...prev, selectedKeyword] : [selectedKeyword]);
@@ -201,8 +262,57 @@ const VideoChatPage: React.FC = () => {
                             mirror: false,
                         });
 
+                        // stt 권한 가져감
+                        //const mediaStream = publisher?.stream.getMediaStream();
+                        //console.log("mediaStream "+mediaStream);
+                        const devices = await ov.getDevices();
+
+                        console.log("Devices:", devices.map(device => ({
+                            kind: device.kind,
+                            label: device.label,
+                            deviceId: device.deviceId
+                        })));
+
+                        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                        console.log("Video Devices:", videoDevices.map(device => ({
+                            label: device.label,
+                            deviceId: device.deviceId
+                        })));
+
+                        // newPublisher.on('streamCreated') 대신 다음 이벤트들을 사용
+                        newPublisher.on('accessAllowed', () => {
+                            console.log("미디어 접근 허용됨");
+                        });
+
+                        newPublisher.on('streamCreated', () => {
+                            console.log("publisher 초기화");
+                            if (newPublisher?.stream) {
+                                console.log("publisher stream")
+                                const mediaStream = newPublisher.stream.getMediaStream();
+                                if (mediaStream && mediaStream.getAudioTracks().length > 0) {
+                                    const audioTrack = mediaStream.getAudioTracks()[0];
+                                    const audioStream = new MediaStream([audioTrack]);
+                                    try {
+                                        //SpeechRecognition.stopListening();
+                                        SpeechRecognition.startListening({
+                                            stream: audioStream,  // 전체 스트림 사용
+                                            //continuous: true // true 하면 로컬에서는 충돌
+
+                                        } as any);
+                                        console.log("speech recognition")
+                                    } catch (error) {
+                                        console.error('STT 초기화 실패:', error);
+                                        // STT 실패해도 화상회의는 계속 진행되도록
+                                    }
+                                }
+                                else console.log("mediastream 없음");
+                            }
+                            else console.log("publisher stream 없음")
+                        })
+
                         console.log("📡 로컬 비디오 퍼블리싱 시작");
-                        newSession.publish(newPublisher);
+                        // newSession.publish(newPublisher);
+                        await newSession.publish(newPublisher);
                         setPublisher(newPublisher);
                     } catch (error) {
                         console.error("❌ 카메라 또는 마이크 사용 불가:", error);
@@ -364,7 +474,8 @@ const VideoChatPage: React.FC = () => {
                     console.error("STOMP client가 연결되어 있지 않습니다 (자동 종료).");
                 }
             }
-        }, 20000);
+            // }, 20000);
+        }, 100000);
 
         return () => clearTimeout(autoEndTimeout);
     }, [session, token, isSessionClosed, sessionId]);
@@ -417,6 +528,22 @@ const VideoChatPage: React.FC = () => {
                                 className={styles.chat__header__img}
                                 alt="leave button"
                             />
+                        </div>
+
+                        <p>🎤 Microphone: {listening ? 'on' : 'off'}</p>
+                        <button onClick={() => SpeechRecognition.startListening({ continuous: true, language: "ko-KR" })}>
+                            Start
+                        </button>
+                        <button onClick={() => SpeechRecognition.stopListening()}>Stop</button>
+                        <button onClick={resetTranscript}>Reset</button>
+                        <h3>📝 실시간 STT</h3>
+                        <p>{transcript}</p>
+
+                        <h3>📜 이전 대화 기록</h3>
+                        <div id="history">
+                            {history.map((item, index) => (
+                                <p key={index}>🗣 {item}</p>
+                            ))}
                         </div>
 
                         {/* <button >세션 종료</button> */}
