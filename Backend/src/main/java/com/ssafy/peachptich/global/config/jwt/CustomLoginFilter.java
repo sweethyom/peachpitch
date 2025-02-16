@@ -143,13 +143,13 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
             String role = auth.getAuthority();
 
-            // 토큰 생성
-            String access = tokenProvider.createJwt("access", userEmail, role, 18000000L);
+            // 토큰 생성 만료 기간 7일
+            String access = tokenProvider.createJwt("access", userEmail, role, 604800000L);
             String refresh = tokenProvider.createJwt("refresh", userEmail, role, 86400000L);
 
             try {
                 // access token과 refresh Token Redis 저장
-                addToken("RT:AT:" + userEmail, access, 18000000L);
+                addToken("RT:AT:" + userEmail, access, 604800000L);
                 addToken("RT:RT:" + userEmail, refresh, 86400000L);
             } catch (Exception e) {
                 throw new TokenStorageException("Failed to store refresh token: " + e.getMessage());
@@ -192,8 +192,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private void addToken(String key, String value, Long expiredMs) {
         log.info("login, expiredMS = " + expiredMs);
         redisTemplate.opsForValue().set(
-            key,                    // key 값
-            value,                  // value
+            key,       // key 값
+            value,                // value
             expiredMs,     // 만료 시간
             TimeUnit.MILLISECONDS
         );

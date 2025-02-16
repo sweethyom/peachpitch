@@ -33,6 +33,6 @@ public interface ChatHistoryRepository extends JpaRepository<ChatHistory, Long> 
     @Modifying
     @Transactional
     @Query("UPDATE ChatHistory c SET c.status = false WHERE c.historyId = :historyId")
-    void updateStatusByHistoryId(@Param("historyId") Long historyId);
+    void updateStatusFalseByHistoryId(@Param("historyId") Long historyId);
 }
 

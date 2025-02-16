@@ -17,9 +17,10 @@ type DrawerProps = {
     selectedKeywords: string[] | null;
     hints: Array<Array<{hint: string}>> | null;  // 2차원 배열 타입으로 수정
     historyId: number | null;
+    setSelectedMask: (mask : string | null) => void;
 };
 
-const Drawer = ({ selectedKeywords, hints, chatHistory, historyId }: DrawerProps) => {
+const Drawer = ({ selectedKeywords, hints, chatHistory, historyId, setSelectedMask }: DrawerProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [keyword1, setKeyword1] = useState<string | null>(null);
     const [keyword2, setKeyword2] = useState<string | null>(null);
@@ -222,7 +223,7 @@ const Drawer = ({ selectedKeywords, hints, chatHistory, historyId }: DrawerProps
                 </div>
             </div>
 
-            <Setting isOpen={isSettingOpen} onClose={toggleSetting} />
+            <Setting isOpen={isSettingOpen} onClose={toggleSetting} setSelectedMask={setSelectedMask}/>
 
             {/* 열기 버튼 */}
             {!isOpen && (

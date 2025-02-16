@@ -7,5 +7,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReportRequest {
     private Long userId;
-    private Long historyId;
+    private Long reportId;
 }
