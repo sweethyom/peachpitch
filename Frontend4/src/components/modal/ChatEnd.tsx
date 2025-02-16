@@ -38,7 +38,7 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
 
             // ✅ Step 1: Save chat history in the database
             await axios.post(
-                "http://localhost:8080/api/chat/save",
+                "https://peachpitch.site/api/chat/save",
                 { historyId },
                 {
                     headers: {
@@ -56,7 +56,7 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
 
             setTimeout(async () => {
                 try {
-                    await axios.post("http://127.0.0.1:8000/ai/users/reports/refine/",
+                    await axios.post("https://peachpitch.site/ai/users/reports/refine/",
                         { history_id: historyId }
                     );
                     console.log("리포트 생성 완료");
