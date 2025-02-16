@@ -19,6 +19,8 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 import FeedbackModal from "@components/modal/Feedback.tsx";
 import { useNavigate } from "react-router-dom";
 
+import MatchingWait from "@/assets/images/chat_matching.png"
+
 enum SessionEndType {
     MANUAL = "MANUAL",
     AUTO = "AUTO",
@@ -591,7 +593,23 @@ const VideoChatPage: React.FC = () => {
                     </>
                 ) : (
                     <>
-                        {isMatching ? "매칭 중입니다. 잠시만 기다려 주세요..." : "끝났어"}
+                        {isMatching ? (
+                            <div className={styles.wait}>
+                                <div className={styles.wait__wrap}>
+                                    <img src={MatchingWait} className={styles.wait__img} />
+                                    <p className={styles.wait__red}>[주의] 화면을 벗어나면 매칭이 취소됩니다.</p>
+                                </div>
+                            </div>
+
+                        ) : (
+                            <div>
+
+                                <p>
+                                    끝났어
+                                </p>
+
+                            </div>
+                        )}
 
                     </>
                 )}
