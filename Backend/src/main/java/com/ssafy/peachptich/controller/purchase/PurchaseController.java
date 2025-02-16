@@ -51,9 +51,9 @@ public class PurchaseController {
                 .quantity(purchaseRequest.getEa())
                 .total_amount(purchaseRequest.getTotalPrice())
                 .tax_free_amount(0)
-                .approval_url("http://localhost:8080/api/pay/completed")
-                .cancel_url("http://localhost:8080/api/pay/cancel")
-                .fail_url("http://localhost:8080/api/pay/fail")
+                .approval_url("http://localhost:5173/pay/completed")
+                .cancel_url("http://localhost:5173/pay/cancel")
+                .fail_url("http://localhost:5173/pay/fail")
                 .build();
 
         log.info("주문 상품 이름: {}", readyRequest.getItem_name());
@@ -82,12 +82,26 @@ public class PurchaseController {
             <head>
                 <title>결제 완료</title>
                 <script>
-                    window.onload = function() {
-                        if (window.opener) {
-                            window.opener.postMessage("paymentSuccess", "*");
-                            window.close();
-                        }
-                    };
+                    // 결제 완료 후 창을 자동으로 닫음
+                    // 결제 완료 후 자동으로 메시지 전송
+                                    window.onload = function() {
+                                        // 부모 창이 없을 경우 localhost:5173으로 직접 메시지 보내기
+                                        const paymentMessage = { status: "paymentSuccess", message: "paymentSuccess" };
+                                        console.log("전송할 메시지:", paymentMessage);
+                
+                                        // localhost:5173에 메시지를 전송
+//                                        window.postMessage(paymentMessage, "*");
+//                                        console.log("결제 완료 메시지를 전송했습니다.");
+const targetWindow = window.open("http://localhost:5173/main"); // 이미 열린 창이 있다면 해당 창 참조
+
+if (targetWindow) {
+    targetWindow.postMessage("paymentSuccess", "*"); // 정확한 도메인 설정
+} else {
+    console.error("❌ 메시지를 보낼 창이 존재하지 않습니다.");
+}
+                                        // 결제 완료 후 창을 닫음
+//                                        window.close();
+                                    };
                 </script>
             </head>
             <body>
