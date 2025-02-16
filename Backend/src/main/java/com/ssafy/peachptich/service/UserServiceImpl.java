@@ -277,7 +277,7 @@ public class UserServiceImpl implements UserService {
         // BlackList와 Redis Token List 확인
         boolean isBlacked = tokenBlacklistService.isContainToken("BL:AT:" + access);
         boolean hasExistingToken = tokenListService.isContainToken("RT:AT:" + userEmail);
-        
+
         // BlackList에 추가되어 있으면
         if (isBlacked){
             Map<String, Object> responseData = new HashMap<>();
@@ -289,7 +289,7 @@ public class UserServiceImpl implements UserService {
             );
             return ResponseEntity.status(401).body(responseDto);
         }
-        
+
         // Redis에 access token이 없으면
         if (!hasExistingToken) {
             Map<String, Object> responseData = new HashMap<>();
@@ -351,7 +351,7 @@ public class UserServiceImpl implements UserService {
                     "Invalid or expired token",
                     responseData
             );
-            
+
             return ResponseEntity.status(401).body(responseDto);
         }
     }
