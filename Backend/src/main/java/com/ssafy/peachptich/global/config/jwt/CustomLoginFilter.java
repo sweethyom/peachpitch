@@ -62,36 +62,36 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         // 요청 본문(JSON)을 DTO로 변환
         ObjectMapper objectMapper = new ObjectMapper();
-        LoginRequest loginRequest;
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
         try {
-            loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
-        } catch (IOException e) {
-            log.error("Failed to parse login request", e);
+            LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
+            String userEmail = loginRequest.getEmail();
+            String password = loginRequest.getPassword();
 
-            throw new AuthenticationServiceException("Invalid login request format", e);
-        }
+            log.info("로그인 시도 userEmail = " + userEmail);
 
-        String userEmail = loginRequest.getEmail();
-        String password = loginRequest.getPassword();
+            // 입력값 검증
+            if (StringUtils.isEmpty(userEmail) || StringUtils.isEmpty(password)) {
+                // throw new BadCredentialsException("Email and password must not be empty.");
+                sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Email and password must not be empty");
+                return null;
+            }
 
-        log.info("로그인 시도 userEmail = " + userEmail);
+            // 이메일 마스킹 후 로깅 (보안상)
+            String maskedEmail = maskEmail(userEmail);
+            log.info("Login attempt for user: {}", maskedEmail);
 
-        // 입력값 검증
-        if (StringUtils.isEmpty(userEmail) || StringUtils.isEmpty(password)) {
-            throw new BadCredentialsException("Email and password must not be empty.");
-        }
-
-        // 이메일 마스킹 후 로깅 (보안상)
-        String maskedEmail = maskEmail(userEmail);
-        log.info("Login attempt for user: {}", maskedEmail);
-
-        // 탈퇴한 회원인지 확인
-        try{
             User userEntity = userRepository.findByEmail(userEmail)
-                    .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + maskedEmail));
+                    .orElseThrow(() -> {
+                        sendErrorResponse(response, HttpServletResponse.SC_NOT_FOUND, "User not found");
+                        return new UsernameNotFoundException("User not found");
+                    });
 
             if (!userEntity.getStatus()) {
-                throw new DisabledException("Account is deactivated. Please contact support.");
+                sendErrorResponse(response, HttpServletResponse.SC_FORBIDDEN, "Account is deactivated");
+                return null;
             }
 
             boolean hasExistingToken = tokenListService.isContainToken("RT:RT:" + userEmail);
@@ -111,10 +111,12 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
             // 데이터가 담긴 토큰을 검증을 위해 AuthenticationManager로 전달함
             return authenticationManager.authenticate(authToken);
-
-        } catch (Exception e){
-            log.error("Authentication failed for user: {}", maskedEmail, e);
-            throw e;
+        } catch (IOException e) {
+            sendErrorResponse(response, HttpServletResponse.SC_BAD_REQUEST, "Invalid request format");
+            return null;
+        } catch (AuthenticationException e) {
+            sendErrorResponse(response, HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+            return null;
         }
     }
 
@@ -179,15 +181,16 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private Cookie createCookie(String key, String value){
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24*60*60);     // 쿠키 생명 주기
-        cookie.setSecure(true);        // https 통신을 진행해야 하는 경우
-        cookie.setPath("/");         // 쿠키가 적용될 범위
+        cookie.setMaxAge(24*60*24);     // 쿠키 생명 주기
+        cookie.setSecure(true);         // https 통신을 진행해야 하는 경우
+        cookie.setPath("/");            // 쿠키가 적용될 범위
         cookie.setHttpOnly(false);       // true: 클라이언트단에서 javascript로 해당 쿠키에 접근하지 못하게 막아줌
 
         return cookie;
     }
 
     private void addToken(String key, String value, Long expiredMs) {
+        log.info("login, expiredMS = " + expiredMs);
         redisTemplate.opsForValue().set(
             key,       // key 값
             value,                // value
@@ -205,6 +208,23 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     public static class TokenStorageException extends RuntimeException {
         public TokenStorageException(String message) {
             super(message);
+        }
+    }
+
+    private void sendErrorResponse(HttpServletResponse response, int status, String message) {
+        try {
+            response.setStatus(status);
+            Map<String, String> errorData = new HashMap<>();
+            errorData.put("errorMessage", message);
+
+            ResponseDto<Map<String, String>> responseDto = ResponseDto.<Map<String, String>>builder()
+                    .message("Authentication failed")
+                    .data(errorData)
+                    .build();
+
+            new ObjectMapper().writeValue(response.getWriter(), responseDto);
+        } catch (IOException e) {
+            log.error("Error writing response", e);
         }
     }
 }

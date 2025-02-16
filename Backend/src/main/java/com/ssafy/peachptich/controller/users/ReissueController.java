@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -63,18 +65,9 @@ public class ReissueController {
         // Redis에 저장되어 있는지 확인
         boolean isExist = tokenListService.isContainToken("RT:RT:" + userEmail);
         if(!isExist){
-            // response body
+            // response
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
         }
-
-        /* 기존 코드
-        // DB에 저장되어 있는지 확인
-        Boolean isExist = refreshRepository.existsByRefresh(refresh);
-        if (!isExist) {
-            // response body
-            return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
-        }
-         */
 
         // make new JWT
         String newAccess = tokenProvider.createJwt("access", userEmail, role, 82000000L);
@@ -89,10 +82,14 @@ public class ReissueController {
         addToken("RT:RT:" + userEmail, newRefresh, 86400000L);
 
         // response
-        response.setHeader("access", newAccess);
+//        response.setHeader("access", newAccess);
         response.addCookie(createCookie("refresh", newRefresh));
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        Map<String, String> responseBody = new HashMap<>();
+        responseBody.put("accessToken", newAccess);
+        responseBody.put("refreshToken", newRefresh);
+
+        return new ResponseEntity<>(responseBody, HttpStatus.OK);
     }
 
     private Cookie createCookie(String key, String value){
@@ -109,8 +106,8 @@ public class ReissueController {
         redisTemplate.opsForValue().set(
                 key,       // key 값
                 value,                // value
-                System.currentTimeMillis() + expiredMs,     // 만료 시간
-                TimeUnit.MICROSECONDS
+                expiredMs,     // 만료 시간
+                TimeUnit.MILLISECONDS
         );
     }
 

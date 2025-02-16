@@ -121,21 +121,6 @@ public class SecurityConfig {
 
         AuthenticationManager authManager = authenticationManager(authenticationConfiguration);
 
-        // JWTFilter 등록
-        /*
-        http
-                .addFilterBefore(new JwtFilter(tokenProvider, userRepository, tokenBlacklistService), CustomLoginFilter.class)
-                // OAuth2 설정
-                .oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(endpoint -> endpoint
-                                .baseUri("/api/users/login/social"))
-                        .userInfoEndpoint(userInfo -> userInfo
-                                .userService(customOAuth2UserService))
-                        .successHandler(customOauthSuccessHandler)
-                );
-
-
-         */
         // OAuth2 설정을 JWT 필터보다 먼저 배치
         http
                 .oauth2Login(oauth2 -> oauth2
@@ -146,14 +131,6 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService))
                         .successHandler(customOauthSuccessHandler)
                 )
-                /*
-                    .oauth2Login(oauth2 -> oauth2
-                    .userInfoEndpoint(userInfo -> userInfo
-                        .oidcUserService(customOidcUserService)    // OIDC 서비스 추가
-                        .userService(customOAuth2UserService))     // 기존 OAuth2 서비스
-                    .successHandler(customOauthSuccessHandler)
-                )
-                 */
 
                 // JWT 필터를 OAuth2LoginAuthenticationFilter 뒤에 명시적으로 배치
                 .addFilterAfter(new JwtFilter(tokenProvider, userRepository, tokenBlacklistService),
