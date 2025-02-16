@@ -102,6 +102,7 @@ public class ChatController {
         log.info("대화리포트 조회시작");
         // 리포트 내용 가져오기
         ChatReport chatReport = chatService.getReport(reportRequest);
+        log.info("채팅 내역 불러오기");
         ChatHistory chatHistory = chatReport.getChatHistory();
 
         log.info("채팅 내역 조회 시작");
