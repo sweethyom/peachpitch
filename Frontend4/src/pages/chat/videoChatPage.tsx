@@ -333,6 +333,8 @@ const VideoChatPage: React.FC = () => {
 
         const stompClient = new Client({
             brokerURL: "wss://peachpitch.site/api/ws",
+            heartbeatIncoming: 4000,  // 4초마다 서버로부터 heart-beat 수신
+            heartbeatOutgoing: 4000,   // 4초마다 서버로 heart-beat 전송
             connectHeaders: {
                 access: `${userJwt}`,
             },
@@ -340,7 +342,17 @@ const VideoChatPage: React.FC = () => {
             onConnect: () => {
                 setIsConnecting(false);
                 console.log("✅ STOMP 연결됨");
-
+                if(!isMatching) {
+                    console.log("🔍 매칭 시도 중...");
+                    setIsMatching(true);
+                    // 매칭 요청
+                    stompClient.publish({
+                        destination: "/pub/chat",
+                        body: JSON.stringify({
+                            type: "REQUEST",
+                        }),
+                    });
+                }
                 // 매칭 메시지 구독
                 stompClient.subscribe("/user/sub/call", (message) => {
                     console.log("📩 받은 메시지:", message.body);
