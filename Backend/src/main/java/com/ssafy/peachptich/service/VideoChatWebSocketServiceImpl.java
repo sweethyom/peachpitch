@@ -9,24 +9,35 @@ import com.ssafy.peachptich.entity.ChatHistory;
 import com.ssafy.peachptich.entity.RandomName;
 import io.openvidu.java.client.*;
 import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Service
 @RequiredArgsConstructor
 public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService {
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    public static class RoomInfo {
+        Long historyId;
+        SessionType sessionType;
+        String sessionId;
+    }
 
     enum SessionType {
         MATCHING,
-        KEYWORD
+        KEYWORD,
+        OPENVIDU,
+        TERMINATED
     }
     private final ChatHistoryService chatHistoryService;
     private final UserService userService;
@@ -38,12 +49,9 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
     private OpenVidu openvidu;
     private final SimpMessagingTemplate messagingTemplate;
     private final Queue<Long> waitingUsers = new ConcurrentLinkedQueue<>();
-    private Map<String, SessionType> userSessions = new ConcurrentHashMap<>(); //지금 활성화된 웹소켓 세션
+    private final Map<Set<String>, RoomInfo> roomMap = new ConcurrentHashMap<>(); // 매칭된 사용자들과 관련된 정보 저장
+    private final Map<String, Set<String>> userRoomMap = new ConcurrentHashMap<>();  // 사용자 정보 저장
 
-    // 매칭된 사용자와 관련된 채팅 히스토리 정보를 저장 (userId -> historyId)
-    // private final Map<Long, Long> activeChatHistoryByUserId = new ConcurrentHashMap<>();
-    // 채팅 히스토리별 오픈비듀 세션 정보를 저장 (historyId -> Session)
-    // private final Map<Long, Session> activeSessionsByHistoryId = new ConcurrentHashMap<>();
 
     @Value("${OPENVIDU_URL}")
     private String OPENVIDU_URL;
@@ -56,12 +64,13 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         this.openvidu = new OpenVidu(OPENVIDU_URL, OPENVIDU_SECRET);
     }
 
+
     // 웹소켓 방식: 매칭 및 세션 생성
     @Override
     public synchronized void handleVideoChatWebSocket(String userEmail) throws OpenViduHttpException, OpenViduJavaClientException {
         Long userId = userService.getUserByEmail(userEmail).get().getUserId(); // 현재 userId
         if (waitingUsers.isEmpty()) {
-            // 첫 번째 사용자는 대기열에 추가
+            // 첫 번째 사용자는 대기열에 추가, 아직 매칭 전
             waitingUsers.add(userId);
             VideoChatRoomResponse waitingResponse = VideoChatRoomResponse.builder()
                     .status("waiting")
@@ -72,9 +81,8 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
             Long matchedUserId = waitingUsers.peek();
             if (matchedUserId.equals(userId)) {
                 // 첫 번째 사용자랑 두 번째 사용자가 같음
-                System.out.println("첫번째와 두번째가 같음");
                 VideoChatRoomResponse waitingResponse = VideoChatRoomResponse.builder()
-                        .status("waiting")
+                        .status("equal")
                         .build();
                 messagingTemplate.convertAndSendToUser(userEmail, "/sub/call", waitingResponse);
             } else {
@@ -96,10 +104,16 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
                 String userName = randomName.getRandomName();        // 늦게 들어온 사람 이름
                 Long historyId = chatHistoryService.addVideoChatHistory(matchedUserId, userId, matchedUserName, userName);
 
-                // 매칭된 사용자와의 매핑정보 저장
-                // activeChatHistoryByUserId.put(matchedUserId, historyId);
-                // activeChatHistoryByUserId.put(userId, historyId);
-                // activeSessionsByHistoryId.put(historyId, session);
+                // 매칭된 사용자와의 방 정보를 roomMap, userRoomMap에 저장
+                Set<String> roomKey = new HashSet<>(Arrays.asList(userEmail, matchedUserEmail));
+                RoomInfo roomInfo = RoomInfo.builder()
+                        .historyId(historyId)
+                        .sessionType(SessionType.MATCHING)
+                        .sessionId(session.getSessionId())
+                        .build();
+                roomMap.put(roomKey, roomInfo);
+                userRoomMap.put(userEmail, roomKey);
+                userRoomMap.put(matchedUserEmail, roomKey);
 
                 VideoChatRoomResponse user1Response = VideoChatRoomResponse.builder()
                         .token(token1)
@@ -107,6 +121,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
                         .historyId(historyId)
                         .userName(matchedUserName)
                         .matchedUserName(userName)
+                        .matchedUserEmail(userEmail)
                         .build();
 
                 VideoChatRoomResponse user2Response = VideoChatRoomResponse.builder()
@@ -115,6 +130,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
                         .historyId(historyId)
                         .userName(userName)
                         .matchedUserName(matchedUserName)
+                        .matchedUserEmail(matchedUserEmail)
                         .build();
 
                 messagingTemplate.convertAndSendToUser(matchedUserEmail, "/sub/call", user1Response);
@@ -128,7 +144,6 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         Long keywordId = videoChatRequest.getKeywordId();
         Long userId = userService.getUserByEmail(userEmail).get().getUserId();
         String keyword = keywordService.getKeyword(keywordId);
-
         // 키워드 업데이트 (채팅 히스토리에 해당 유저의 키워드 기록)
         try {
             chatHistoryService.updateKeywordByUserId(historyId, userId, keywordId);
@@ -147,6 +162,20 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         // 업데이트된 채팅 히스토리 조회
         ChatHistory chatHistory = chatHistoryService.getChatHistory(historyId);
 
+        // RoomInfo 업데이트: 유저가 속한 방의 RoomInfo를 찾아 sessionType을 변경
+        Set<String> roomKey = userRoomMap.get(userEmail);
+        if (roomKey != null) {
+            RoomInfo oldRoomInfo = roomMap.get(roomKey);
+            if (oldRoomInfo != null) {
+                RoomInfo updatedRoomInfo = RoomInfo.builder()
+                        .historyId(oldRoomInfo.getHistoryId())
+                        .sessionType(SessionType.KEYWORD)
+                        .sessionId(oldRoomInfo.getSessionId())
+                        .build();
+                roomMap.put(roomKey, updatedRoomInfo);
+            }
+        }
+
         ChatRoomResponse.ChatRoomResponseBuilder responseBuilder = ChatRoomResponse.builder()
                 .hints(hints)
                 .keyword(keyword)
@@ -155,6 +184,17 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
 
         // 두 명 모두 키워드 입력 시
         if (chatHistory.getKeyword1Id() != null && chatHistory.getKeyword2Id() != null) {
+            if (roomKey != null) {
+                RoomInfo oldRoomInfo = roomMap.get(roomKey);
+                if (oldRoomInfo != null) {
+                    RoomInfo updatedRoomInfo = RoomInfo.builder()
+                            .historyId(oldRoomInfo.getHistoryId())
+                            .sessionType(SessionType.OPENVIDU)
+                            .sessionId(oldRoomInfo.getSessionId())
+                            .build();
+                    roomMap.put(roomKey, updatedRoomInfo);
+                }
+            }
             responseBuilder.status("completed");
         }
 
@@ -164,32 +204,63 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
     }
 
     @Override
-    public synchronized void closeSession(CloseRequest closeRequest) throws OpenViduJavaClientException, OpenViduHttpException {
-        System.out.println("closeRequest.getHistoryId() 종료 요청= " + closeRequest.getHistoryId());
+    public synchronized void handleCloseVideoChat(CloseRequest closeRequest, String userEmail) throws OpenViduJavaClientException, OpenViduHttpException {
+        String sessionId = closeRequest.getSessionId();
+        String matchedUserEmail = closeRequest.getMatchedUserEmail();
+        String sessionEndType = closeRequest.getSessionEndType();
 
-        Session session = openvidu.getActiveSession(closeRequest.getSessionId());
+        System.out.println("sessionEndType = " + sessionEndType);
+        System.out.println("matchedUserEmail = " + matchedUserEmail);
+        if(sessionId != null) {
+            Session session = openvidu.getActiveSession(sessionId);
+            try {
+                if (session == null) {
+                    System.out.println("세션이 이미 종료되었습니다: " + closeRequest.getSessionId());
+                } else {
+                    session.close();
+                    System.out.println("세션이 성공적으로 종료되었습니다: " + closeRequest.getSessionId());
+                }
+            }
+            catch (Exception e) {
+                String msg = e.getMessage();
+                System.err.println("예외 발생: " + msg);
+                if (msg.contains("404")){
+                    System.out.println("세션이 이미 종료되었습니다: " + closeRequest.getSessionId());
+                }
+                else {
+                    e.printStackTrace();
+                }
+            }
+            finally {
+                chatHistoryService.updateStatusFalse(closeRequest.getHistoryId());
+            }
+        }
+        System.out.println("종료 요청");
+        if (sessionEndType.equals("MANUAL")){
+            //강제 종료.
+            VideoChatRoomResponse manualResponse = VideoChatRoomResponse.builder()
+                    .status("manual")
+                    .build();
+            messagingTemplate.convertAndSendToUser(matchedUserEmail, "/sub/call", manualResponse);
+            //messagingTemplate.convertAndSendToUser(userEmail, "/sub/call", status);
+        }
+        else if (sessionEndType.equals("AUTO")){
+            //자동 종료
+            VideoChatRoomResponse autoResponse = VideoChatRoomResponse.builder()
+                    .status("auto")
+                    .build();
+            messagingTemplate.convertAndSendToUser(matchedUserEmail, "/sub/call", autoResponse);
+            messagingTemplate.convertAndSendToUser(userEmail, "/sub/call", autoResponse);
+        }
+        else if(sessionEndType.equals("ERROR")){
+            // 에러
+            String status = "error";
+            messagingTemplate.convertAndSendToUser(userEmail, "/sub/call", status);
+        }
+        // 종료 후 방 매핑 정보 제거
+        removeRoomMapping(userEmail);
+        removeRoomMapping(matchedUserEmail);
 
-        try {
-            if (session == null) {
-                System.out.println("세션이 이미 종료되었습니다: " + closeRequest.getSessionId());
-            } else {
-                session.close();
-                System.out.println("세션이 성공적으로 종료되었습니다: " + closeRequest.getSessionId());
-            }
-        }
-        catch (Exception e) {
-            String msg = e.getMessage();
-            System.err.println("예외 발생: " + msg);
-            if (msg.contains("404")){
-                System.out.println("세션이 이미 종료되었습니다: " + closeRequest.getSessionId());
-            }
-            else {
-                e.printStackTrace();
-            }
-        }
-        finally {
-            chatHistoryService.updateStatusFalse(closeRequest.getHistoryId());
-        }
     }
 
     @Override
@@ -198,6 +269,47 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         System.out.println("handleVideoChatDisconnect: " + userEmail + " (userId=" + userId + ")");
         if (waitingUsers.remove(userId)) {
             System.out.println("대기열에서 사용자 제거: " + userEmail);
+        }
+        // 만약 해당 유저가 방에 속해 있다면, 그 방의 상대방에게 알림 전송 및 매핑 제거
+        Set<String> roomKey = userRoomMap.get(userEmail);
+        if (roomKey != null) {
+            // 원본을 보호하기 위해 복사본 생성
+            Set<String> roomKeyCopy = new HashSet<>(roomKey);
+            roomKeyCopy.remove(userEmail);  // 나간 유저 제외
+            RoomInfo roomInfo = roomMap.get(roomKey);
+            System.out.println(roomInfo.getSessionType());
+            if(roomInfo.getSessionType().equals(SessionType.KEYWORD)
+            || roomInfo.getSessionType().equals(SessionType.MATCHING)) {
+                // 다른 유저들에게 "disconnected" 상태 알림 전송
+                for (String otherUserEmail : roomKeyCopy) {
+                    System.out.println("otherUserEmail = " + otherUserEmail);
+                    VideoChatRoomResponse disconnectResponse = VideoChatRoomResponse.builder()
+                            .status("disconnected")
+                            .build();
+                    messagingTemplate.convertAndSendToUser(otherUserEmail, "/sub/call", disconnectResponse);
+                }
+
+                // 해당 방에 속한 모든 유저의 매핑 제거
+                for (String email : new HashSet<>(roomKey)) {
+                    userRoomMap.remove(email);
+                }
+                roomMap.remove(roomKey);
+                chatHistoryService.updateStatusFalse(roomInfo.getHistoryId()); //상태 변경
+            }
+
+        }
+
+    }
+
+    // 유저가 속한 방 매핑 정보 제거 (roomMap과 userRoomMap에서 삭제)
+    private void removeRoomMapping(String userEmail) {
+        Set<String> roomKey = userRoomMap.get(userEmail);
+        if (roomKey != null) {
+            // 해당 방에 속한 모든 유저의 매핑 제거
+            for (String email : roomKey) {
+                userRoomMap.remove(email);
+            }
+            roomMap.remove(roomKey);
         }
     }
 

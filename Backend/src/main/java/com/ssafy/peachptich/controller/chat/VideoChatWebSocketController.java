@@ -1,10 +1,13 @@
 package com.ssafy.peachptich.controller.chat;
 
 import com.ssafy.peachptich.dto.request.AudioChatRequest;
-import com.ssafy.peachptich.dto.request.VideoChatRequest;
+import com.ssafy.peachptich.dto.request.CloseRequest;
 import com.ssafy.peachptich.service.VideoChatWebSocketService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -41,21 +44,58 @@ public class VideoChatWebSocketController {
         videoChatService.handleVideoChatWebSocket(userId);
     }
      */
+    @Builder
+    @Getter
+    @AllArgsConstructor
+    public static class ChatMessage {
+        private String type;      // "REQUEST", "TERMINATE"
+        private String sessionEndType;  // KEYWORD, AUTO, MANUAL 키워드 고르다가 나감, 자동 종료, 강제 종료
+        private String sessionId;
+        private Long historyId;
+        private String matchedUserEmail;
+    }
+
+    @MessageMapping("/chat")
+    public synchronized void handleVideoChatMessage(
+            StompHeaderAccessor accessor,
+            ChatMessage chatMessage
+    )throws OpenViduJavaClientException, OpenViduHttpException {
+        Principal principal = accessor.getUser();
+        if(principal != null) {
+            String email = principal.getName();
+            System.out.println(chatMessage.getType());
+            switch(chatMessage.getType()) {
+                case "REQUEST":
+                    videoChatService.handleVideoChatWebSocket(email);
+                    break;
+                case "TERMINATE":
+                    CloseRequest closeRequest = CloseRequest.builder()
+                            .sessionId(chatMessage.getSessionId())
+                            .historyId(chatMessage.getHistoryId())
+                            .matchedUserEmail(chatMessage.getMatchedUserEmail())
+                            .sessionEndType(chatMessage.getSessionEndType())
+                            .build();
+                    videoChatService.handleCloseVideoChat(closeRequest, email);
+                    break;
+            }
+        }
+
+    }
 
     // accessor에 있는 principal로 user 각각에게 토큰 전송
-    @MessageMapping("/request")
-    public synchronized void requestVideoChatRoom(
-            StompHeaderAccessor accessor
-    ) throws OpenViduJavaClientException, OpenViduHttpException {
-        // STOMP 세션에서 user 가져오기
-        Principal principal = accessor.getUser();
-        if (principal != null) {
-            String email = principal.getName();
-            videoChatService.handleVideoChatWebSocket(email);
-        } else {
-            log.error("Principal이 null입니다. WebSocket 연결에 실패했습니다.");
-        }
-    }
+//    @MessageMapping("/request")
+//    public synchronized void requestVideoChatRoom(
+//            StompHeaderAccessor accessor
+//    ) throws OpenViduJavaClientException, OpenViduHttpException {
+//        // STOMP 세션에서 user 가져오기
+//        Principal principal = accessor.getUser();
+//        if (principal != null) {
+//            String email = principal.getName();
+//            videoChatService.handleVideoChatWebSocket(email);
+//        } else {
+//            log.error("Principal이 null입니다. WebSocket 연결에 실패했습니다.");
+//        }
+//    }
 
     // 같은 화상 채팅방에 있는 유저 두명이 키워드를 선택할 때마다 힌트 전송
     @MessageMapping("/keyword/{historyId}")
@@ -74,9 +114,9 @@ public class VideoChatWebSocketController {
 
     @EventListener
     public void handleSessionDisconnectListener(SessionDisconnectEvent event) {
-        System.out.println("나감 이벤트 발생");
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
         Principal principal = accessor.getUser();
-        videoChatService.handleVideoChatWebSocketDisconnect(principal.getName());
+        if(principal!=null)
+            videoChatService.handleVideoChatWebSocketDisconnect(principal.getName());
     }
 }

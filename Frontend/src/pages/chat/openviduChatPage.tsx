@@ -8,21 +8,27 @@ import Drawer from '@/components/chat/DrawerVideo';
 import RoomLeaveModal from '@/components/modal/RoomLeave';
 import KeywordModal from '@/components/modal/KeywordVideo';
 import RedAlert from '@/components/alert/redAlert';
+import "regenerator-runtime/runtime";
 
 import { Client } from "@stomp/stompjs";
 import { OpenVidu, Session, Publisher, Subscriber } from "openvidu-browser";
-import axios from "axios";
+
 import FeedbackModal from "@components/modal/Feedback.tsx";
 import {useNavigate} from "react-router-dom";
 
 enum SessionEndType {
-    MANUAL = 'MANUAL',
-    AUTO = 'AUTO',
-    ERROR = 'ERROR'
+    MANUAL = "MANUAL",
+    AUTO = "AUTO",
+    ERROR = "ERROR"
+}
+enum MessageType {
+    REQUEST = "REQUEST",
+    TERMINATE = "TERMINATE"
 }
 
 const VideoChatPage: React.FC = () => {
     const navigate = useNavigate();
+
     /* 대화 나가기 모달창 */
     const [isLeaveOpen, setIsLeaveOpen] = useState<boolean>(false);
     const toggleLeave = () => setIsLeaveOpen((prev) => !prev);
@@ -41,12 +47,13 @@ const VideoChatPage: React.FC = () => {
     //const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
     const [chatHistory] = useState<{ role: string; message: string }[]>([]);
     const [selectedKeywords, setSelectedKeywords] = useState<string[] | null>(null); // 사용자들이 고른 키워드
-    //const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
     const [hints, setHints] = useState<{ hint: string }[][]>([]);
+
+    const [isConnecting, setIsConnecting] = useState(true); // 웹소켓 연결 시도 중
 
     /* stomp client */
     //const [client, setClient] = useState<Client | null>(null);
-    const [, setClient] = useState<Client | null>(null);
+    const [stompClient, setStompClient] = useState<Client | null>(null);
 
     /* openvidu session */
     const [session, setSession] = useState<Session | null>(null);
@@ -76,6 +83,7 @@ const VideoChatPage: React.FC = () => {
     const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
 
     const [sessionEndType, setSessionEndType] = useState<SessionEndType | null>(null);
+    const [matchedUserEmail, setMatchedUserEmail] = useState<string | null>(null);
 
     // 키워드가 선택될 때마다 selectedKeywords에 추가
     useEffect(() => {
@@ -119,11 +127,11 @@ const VideoChatPage: React.FC = () => {
 
             // 상대방이 나갔을 때의 처리
             if (!isSessionClosed) {
-                setSessionEndType(SessionEndType.ERROR);
+                setSessionEndType(SessionEndType.MANUAL);
                 setIsSessionClosed(true);
 
                 // 세션 종료 처리
-                newSession.disconnect();
+                /*newSession.disconnect();
                 closeSession(sessionId)
                     .then(() => {
                         setAlertMessage("상대방이 대화방을 나갔습니다.");
@@ -136,6 +144,8 @@ const VideoChatPage: React.FC = () => {
                     .catch((error) => {
                         console.error("세션 종료 처리 중 오류:", error);
                     });
+
+                 */
             }
         });
 
@@ -146,7 +156,7 @@ const VideoChatPage: React.FC = () => {
             setPublisher(null);
             setSubscribers([]);
             setToken(null);
-            setClient(null);
+            setStompClient(null);
             setSessionId(null);
             setIsMatching(false);
             setIsKeywordOpen(false);
@@ -198,6 +208,7 @@ const VideoChatPage: React.FC = () => {
 
     // STOMP client setup
     useEffect(() => {
+        setIsConnecting(true);
         const userJwtFromStorage = localStorage.getItem("accessToken");
         setUserJwt(userJwtFromStorage || "");
 
@@ -208,24 +219,50 @@ const VideoChatPage: React.FC = () => {
             },
             reconnectDelay: 5000,
             onConnect: () => {
+                setIsConnecting(false);
                 console.log("✅ STOMP 연결됨");
 
                 // 매칭 메시지 구독
                 stompClient.subscribe("/user/sub/call", (message) => {
-                    console.log("📩 받은 메시지:", message.body);
+                    //console.log("📩 받은 메시지:", message.body);
                     const response = JSON.parse(message.body);
 
                     if (response.status === "waiting") {
                         console.log("🔄 매칭 대기 중...");
-                    } else if (response.status === "matched") {
+                    }
+                    else if (response.status === "equal") {
+                        setAlertMessage("자신과 1:1 스몰토크를 할 수 없습니다.");
+                        setShowAlert(true);
+                        stompClient.deactivate();
+                        // 3초 후 메인으로 이동
+                        setTimeout(() => {
+                            navigate("/main");
+                        }, 1000);
+                    }
+                    else if (response.status === "matched") {
                         console.log("🎉 매칭 완료! 토큰:", response.token);
                         setToken(response.token);
                         setHistoryId(response.historyId);
+                        setMatchedUserEmail(response.matchedUserEmail);
                         setIsKeywordOpen(true);
-                        // ※ 여기서 stompClient.deactivate()를 제거
-                        //   => 매칭 후에도 STOMP 연결이 유지되어야 서버가 보내는 채팅 히스토리 업데이트 등을 수신 가능
-                    } else if(response.status == "equal") {
-                        console.log("같은 사람이 들어옴");
+                    }
+                    else if(response.status === "auto"){
+                        // 자동 종료
+                        console.log("자동 종료");
+                        setSessionEndType(SessionEndType.AUTO);
+                        setIsFeedbackOpen(true);
+                        stompClient.deactivate();
+                    }
+                    else if(response.status === "manual" || response.status === "disconnected"){
+                        // 강제 종료
+                        console.log("누군가 나감");
+                        setAlertMessage("상대방이 대화방을 나갔습니다.");
+                        setShowAlert(true);
+                        stompClient.deactivate();
+                        // 3초 후 메인으로 이동
+                        setTimeout(() => {
+                            navigate("/main");
+                        }, 1000);
                     }
                 });
 
@@ -233,10 +270,15 @@ const VideoChatPage: React.FC = () => {
                 setIsMatching(true);
                 // 매칭 요청
                 stompClient.publish({
-                    destination: "/pub/request",
+                    destination: "/pub/chat",
+                    body: JSON.stringify({
+                        type: "REQUEST",
+                    }),
                 });
             },
-            onDisconnect: () => console.log("❌ STOMP 연결 종료됨"),
+            onDisconnect: () => {
+                console.log("❌ STOMP 연결 종료됨")
+            },
             onStompError: (frame) => {
                 console.error("STOMP 에러:", frame);
                 setAlertMessage("STOMP 에러");
@@ -245,14 +287,16 @@ const VideoChatPage: React.FC = () => {
             },
             onWebSocketError: (event) => {
                 console.error("WebSocket 에러:", event);
-                setAlertMessage("WebSocket 에러");
-                setShowAlert(true);
+                if (!isConnecting) {
+                    setAlertMessage("WebSocket 연결 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+                    setShowAlert(true);
+                }
                 stompClient.deactivate();
             }
         });
 
         stompClient.activate();
-        setClient(stompClient);
+        setStompClient(stompClient);
 
         return () => {
             // 언마운트 시 STOMP 연결 해제
@@ -265,19 +309,26 @@ const VideoChatPage: React.FC = () => {
         // 이미 종료된 상태라면 무시
         if (!session || isSessionClosed) return;
 
-        setSessionEndType(SessionEndType.MANUAL);
         setIsSessionClosed(true); // 중복 호출 방지
 
         console.log("📴 사용자가 수동으로 세션 종료");
         session.disconnect();
-        try {
-            await closeSession(sessionId);
-            navigate("/main");
-            // navigate to main
-        } catch (error) {
-            // 이미 종료된 세션에 대한 500 에러 등 처리
-            console.error("세션 종료 중 오류 발생:", error);
+        if (stompClient) {
+            const terminationMessage = {
+                type: MessageType.TERMINATE,
+                sessionId: sessionId,
+                historyId: historyId,
+                matchedUserEmail: matchedUserEmail,
+                sessionEndType: SessionEndType.MANUAL,
+            };
+            stompClient.publish({
+                destination: "/pub/chat",
+                body: JSON.stringify(terminationMessage),
+            });
+        } else {
+            console.error("STOMP client가 연결되어 있지 않습니다.");
         }
+        navigate("/main");
     };
 
     // 자동 종료 처리
@@ -286,21 +337,25 @@ const VideoChatPage: React.FC = () => {
 
         const autoEndTimeout = setTimeout(async () => {
             if (!isSessionClosed) {
-                setSessionEndType(SessionEndType.AUTO);
                 setIsSessionClosed(true);
                 const currentSessionId = sessionId;
                 console.log("⏰ 20초 타임아웃으로 자동 종료");
                 session.disconnect();
 
-                try {
-                    await closeSession(currentSessionId);
-                    setIsFeedbackOpen(true);
-                } catch (error: unknown) {
-                    if (axios.isAxiosError(error) && error.response?.status === 404) {
-                        console.log('세션이 이미 종료됨');
-                        return;
-                    }
-                    console.error("자동 종료 중 오류:", error);
+                if (stompClient) {
+                    const terminationMessage = {
+                        type: MessageType.TERMINATE,
+                        sessionId: currentSessionId,
+                        historyId: historyId,
+                        matchedUserEmail: matchedUserEmail,
+                        sessionEndType: SessionEndType.AUTO,
+                    };
+                    stompClient.publish({
+                        destination: "/pub/chat",
+                        body: JSON.stringify(terminationMessage),
+                    });
+                } else {
+                    console.error("STOMP client가 연결되어 있지 않습니다 (자동 종료).");
                 }
             }
         }, 20000);
@@ -308,21 +363,49 @@ const VideoChatPage: React.FC = () => {
         return () => clearTimeout(autoEndTimeout);
     }, [session, token, isSessionClosed, sessionId]);
 
-    const closeSession = async(sId: string | null) => {
-        console.log(sId+" "+sessionEndType);
-        if(!sId) return;
-        try {
-            const response = await axios.post('http://localhost:8080/api/chat/video/close', {
-                historyId: historyId,
-                sessionId: sId,
-                sessionEndType: sessionEndType
-            });
-            console.log('서버에서 세션 종료 처리 완료: ', response.data)
-        } catch (error) {
-            setSessionEndType(SessionEndType.ERROR);
-            throw error;
-        }
-    }
+    /*useEffect(() => {
+        const handlePopstate = (event) => {
+            console.log("뒤로 가기 또는 앞으로 가기가 발생했습니다.", event);
+
+            if (stompClient) {
+                const terminationMessage = {
+                    type: MessageType.TERMINATE,
+                    sessionId: sessionId,
+                    historyId: historyId,
+                    matchedUserEmail: matchedUserEmail,
+                    sessionEndType: SessionEndType.MANUAL,
+                };
+                stompClient.publish({
+                    destination: "/pub/chat",
+                    body: JSON.stringify(terminationMessage),
+                });
+            } else {
+                console.error("STOMP client가 연결되어 있지 않습니다 (뒤로 가기).");
+            }
+            // 여기에서 웹소켓 연결 해제 등의 처리를 할 수 있습니다.
+        };
+
+        window.addEventListener("popstate", handlePopstate);
+
+        return () => {
+            window.removeEventListener("popstate", handlePopstate);
+        };
+    }, []);*/
+    // const closeSession = async(sId: string | null) => {
+    //     console.log(sId+" "+sessionEndType);
+    //     if(!sId) return;
+    //     try {
+    //         const response = await axios.post('http://localhost:8080/api/chat/video/close', {
+    //             historyId: historyId,
+    //             sessionId: sId,
+    //             sessionEndType: sessionEndType
+    //         });
+    //         console.log('서버에서 세션 종료 처리 완료: ', response.data)
+    //     } catch (error) {
+    //         setSessionEndType(SessionEndType.ERROR);
+    //         throw error;
+    //     }
+    // }
 
     return (
         <div className={styles.page}>
@@ -354,7 +437,7 @@ const VideoChatPage: React.FC = () => {
                         <div id="video-container">
                             {publisher && (
                                 <div className="stream-container col-md-6 col-xs-6">
-                                    <UserVideoComponent streamManager={publisher} />
+                                    <UserVideoComponent streamManager={publisher}/>
                                 </div>
                             )}
                             {subscribers.map((sub) => (
@@ -363,14 +446,15 @@ const VideoChatPage: React.FC = () => {
                                     className="stream-container col-md-6 col-xs-6"
                                 >
                                     <span>{sub.stream.connection.data}</span>
-                                    <UserVideoComponent streamManager={sub} />
+                                    <UserVideoComponent streamManager={sub}/>
                                 </div>
                             ))}
+
                             <div className={styles.chat__input}>
                                 <p className={styles.chat__input__content}>
                                     최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
                                 </p>
-                                <img src={sstBtn} className={styles.chat__input__img} alt="sst button" />
+                                <img src={sstBtn} className={styles.chat__input__img} alt="sst button"/>
                             </div>
                         </div>
                     </>
@@ -421,9 +505,9 @@ const VideoChatPage: React.FC = () => {
             {/* 피드백 모달 */}
             {sessionEndType === SessionEndType.AUTO && (
                 <FeedbackModal
-                isOpen={isFeedbackOpen}
-                historyId={historyId}
-            />)}
+                    isOpen={isFeedbackOpen}
+                    historyId={historyId}
+                />)}
         </div>
     );
 };
