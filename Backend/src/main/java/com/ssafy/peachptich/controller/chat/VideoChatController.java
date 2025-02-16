@@ -2,11 +2,8 @@ package com.ssafy.peachptich.controller.chat;
 
 import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.*;
-import com.ssafy.peachptich.dto.request.CloseRequest;
 import com.ssafy.peachptich.dto.response.*;
 import com.ssafy.peachptich.service.*;
-import io.openvidu.java.client.OpenViduHttpException;
-import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,11 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 public class VideoChatController {
-    private final VideoChatService videoChatService;
+    // private final VideoChatService videoChatService;
     private final ChatHistoryService chatHistoryService;
-    private final VideoChatWebSocketService videoChatWebSocketService;
+    // private final VideoChatWebSocketService videoChatWebSocketService;
 
-    @PostMapping("/request")
+    /* @PostMapping("/request")
     public ResponseEntity<ResponseDto<VideoChatRoomResponse>> requestVideoChatRoom(
             @AuthenticationPrincipal CustomUserDetails userDetails
     ) throws OpenViduJavaClientException, OpenViduHttpException {
@@ -54,6 +51,7 @@ public class VideoChatController {
                         .message("Keyword added successfully")
                         .data(chatRoomResponse).build());
     }
+    */
 
     @PostMapping("/feedback")
     public ResponseEntity<ResponseDto<Void>> requestVideoChatFeedback(
@@ -64,12 +62,13 @@ public class VideoChatController {
         return ResponseEntity.ok().body(ResponseDto.<Void>builder().message("Successfully saved feedback").build());
     }
 
+    /*
     @PostMapping("/close")
     public ResponseEntity<ResponseDto<Void>> requestVideoChatClose(
             @RequestBody CloseRequest closeRequest
     ) throws OpenViduJavaClientException, OpenViduHttpException {
         System.out.println("chat history 상태 변경 요청");
-        videoChatWebSocketService.closeSession(closeRequest);
+        //videoChatWebSocketService.handleCloseVideoChat(closeRequest);
         return ResponseEntity.ok().body(ResponseDto.<Void>builder().message("Successfully closed session").build());
-    }
+    }*/
 }
