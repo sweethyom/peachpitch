@@ -211,7 +211,7 @@ function chatReportPage(_id : any) {
                         key={message.chatId}
                         className={message.userId === Number(userId) ? styles.bubble__right : styles.bubble__left}
                     >
-                      {message.content}
+                      {message.content.replace(/^"|"$/g, '')}
                     </div>
                 ))}
               </div>
