@@ -68,6 +68,25 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
     // 웹소켓 방식: 매칭 및 세션 생성
     @Override
     public synchronized void handleVideoChatWebSocket(String userEmail) throws OpenViduHttpException, OpenViduJavaClientException {
+
+        System.out.println("=== active session  ===");
+        System.out.println("roomMap status:");
+        for (Map.Entry<Set<String>, RoomInfo> entry : roomMap.entrySet()) {
+            System.out.println("Room Key: " + entry.getKey() + " -> RoomInfo: " + entry.getValue());
+        }
+        System.out.println("userRoomMap status:");
+        for (Map.Entry<String, Set<String>> entry : userRoomMap.entrySet()) {
+            System.out.println("User: " + entry.getKey() + " -> Room Key: " + entry.getValue());
+        }
+        // 이미 방에 참여 중이면 추가 처리 없이 응답 전송
+        if (userRoomMap.containsKey(userEmail)) {
+            System.out.println("already in room");
+            VideoChatRoomResponse alreadyResponse = VideoChatRoomResponse.builder()
+                    .status("already_in_room")
+                    .build();
+            messagingTemplate.convertAndSendToUser(userEmail, "/sub/call", alreadyResponse);
+            return;
+        }
         Long userId = userService.getUserByEmail(userEmail).get().getUserId(); // 현재 userId
         if (waitingUsers.isEmpty()) {
             // 첫 번째 사용자는 대기열에 추가, 아직 매칭 전
@@ -203,6 +222,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         messagingTemplate.convertAndSend("/sub/chat/" + historyId, response);
     }
 
+    // 자동 종료, 나가기 버튼 눌러서 강제종료
     @Override
     public synchronized void handleCloseVideoChat(CloseRequest closeRequest, String userEmail) throws OpenViduJavaClientException, OpenViduHttpException {
         String sessionId = closeRequest.getSessionId();
@@ -263,6 +283,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
 
     }
 
+    // 뒤로가기 등으로 종료
     @Override
     public void handleVideoChatWebSocketDisconnect(String userEmail) {
         Long userId = userService.getUserByEmail(userEmail).orElseThrow().getUserId();
@@ -277,9 +298,34 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
             Set<String> roomKeyCopy = new HashSet<>(roomKey);
             roomKeyCopy.remove(userEmail);  // 나간 유저 제외
             RoomInfo roomInfo = roomMap.get(roomKey);
-            System.out.println(roomInfo.getSessionType());
-            if(roomInfo.getSessionType().equals(SessionType.KEYWORD)
-            || roomInfo.getSessionType().equals(SessionType.MATCHING)) {
+            String sessionId = roomInfo.getSessionId();
+            if(roomInfo.getSessionType().equals(SessionType.MATCHING)
+            || roomInfo.getSessionType().equals(SessionType.KEYWORD)) {
+                System.out.println("강제 종료 요청 "+roomInfo.getSessionType()+" "+roomInfo.getSessionId());
+                if(sessionId != null) {
+                    Session session = openvidu.getActiveSession(sessionId);
+                    try {
+                        if (session == null) {
+                            System.out.println("세션이 이미 종료되었습니다: " +sessionId);
+                        } else {
+                            session.close();
+                            System.out.println("세션이 성공적으로 종료되었습니다: " +sessionId);
+                        }
+                    }
+                    catch (Exception e) {
+                        String msg = e.getMessage();
+                        System.err.println("예외 발생: " + msg);
+                        if (msg.contains("404")){
+                            System.out.println("세션이 이미 종료되었습니다: " + sessionId);
+                        }
+                        else {
+                            e.printStackTrace();
+                        }
+                    }
+                    finally {
+                        chatHistoryService.updateStatusFalse(roomInfo.getHistoryId());
+                    }
+                }
                 // 다른 유저들에게 "disconnected" 상태 알림 전송
                 for (String otherUserEmail : roomKeyCopy) {
                     System.out.println("otherUserEmail = " + otherUserEmail);
@@ -294,11 +340,9 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
                     userRoomMap.remove(email);
                 }
                 roomMap.remove(roomKey);
-                chatHistoryService.updateStatusFalse(roomInfo.getHistoryId()); //상태 변경
+                //chatHistoryService.updateStatusFalse(roomInfo.getHistoryId()); //상태 변경
             }
-
         }
-
     }
 
     // 유저가 속한 방 매핑 정보 제거 (roomMap과 userRoomMap에서 삭제)
