@@ -1,0 +1,334 @@
+.wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.loading {
+    margin: 220px 0;
+    width: 335px;
+    height: 192px;
+}
+
+.page {
+    display: flex;
+    justify-content: center;
+    // align-items: center;
+
+    width: 1100px;
+    min-height: 100vh;
+
+    padding-left: 10px;
+    padding-right: 10px;
+
+    flex-direction: row;
+    gap: 50px;
+    margin: 50px auto 100px auto;
+}
+
+.index {
+    padding: 15px;
+    height: 160px;
+    width: 180px;
+    gap: 10px;
+
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--color-white-200);
+
+    position: sticky;
+    top: 10px;
+    z-index: 2;
+
+    &__item {
+        font-weight: 400;
+        font-size: 16px;
+        color: var(--color-white-600);
+        cursor: pointer;
+    }
+}
+
+.report {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+
+    &__title {
+        font-weight: 700;
+        font-size: 24px;
+    }
+
+    &__alert {
+        font-weight: 500;
+        font-size: 16px;
+        margin-bottom: 2px;
+    }
+
+    &__status {
+        display: flex;
+        flex-direction: row;
+        gap: 67px;
+    }
+
+    &__sub {
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 2px;
+    }
+
+    &__habits {}
+
+    &__lead {}
+
+    &__keyword {}
+
+    &__list {
+
+        &__items {
+            position: relative;
+
+            width: 855px;
+            height: 550px;
+            background-color: var(--color-white-100);
+
+            display: flex;
+            flex-direction: column;
+            // justify-content: center;
+            gap: 25px;
+
+            border-radius: 10px;
+            // justify-content: center;
+            padding: 30px 60px;
+        }
+    }
+
+    &__filter {
+        display: flex;
+        gap: 16px;
+
+        &__drop {
+            padding: 5px 20px;
+            background-color: var(--color-white-000);
+        }
+    }
+
+    &__paging {
+        display: flex;
+        margin-top: auto;
+        justify-content: center;
+
+        &__number {
+            font-weight: 500;
+            font-size: 18px;
+            color: var(--color-white-500);
+        }
+    }
+}
+
+.total {
+    width: 390px;
+    height: 150px;
+    background-color: var(--color-yellow-100);
+    border-radius: 15px;
+
+    padding: 0 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+
+    box-shadow: 0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.2);
+
+    &__title {
+        font-weight: 700;
+        font-size: 18px;
+    }
+
+    &__time {
+        font-weight: 500;
+        font-size: 18px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+        gap: 5px;
+
+        &__strong {
+            font-weight: 700;
+            font-size: 38px;
+            color: var(--color-brown-200);
+            line-height: 1;
+        }
+
+        span {
+            display: inline-flex;
+            align-items: flex-end;
+        }
+    }
+}
+
+.pie {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    &__graph {
+        // background-color: var(--color-white-200);
+        width: 100%;
+        height: 400px;
+    }
+
+    &__detail {
+        display: flex;
+        width: 400px;
+        background-color: var(--color-white-200);
+    }
+}
+
+
+.meter {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+
+    &__label {
+        font-weight: 400;
+        font-size: 18px;
+        width: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__graph {
+        padding: 10px 0;
+        display: flex;
+        width: 100%;
+        height: auto;
+        // background-color: var(--color-white-200);
+    }
+}
+
+
+.keyword {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    // align-items: flex-end;
+    // min-height: 30px;
+
+    &__wordcloud {
+        width: 400px;
+        height: 400px;
+    }
+
+    &__bar {
+        // background-color: var(--color-white-300);
+        width: 400px;
+        height: 400px;
+    }
+}
+
+.report__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.item {
+    width: 310px;
+    height: auto;
+    background-color: var(--color-white-000);
+    border-radius: 15px;
+    box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.2);
+
+    padding: 20px 25px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    &__link {
+        text-decoration-thickness: none;
+        color: black;
+    }
+
+    &__name {
+        font-weight: 500;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+
+    &__keyword {
+        display: flex;
+        justify-content: space-between;
+
+        &__title {
+            font-weight: 400;
+            font-size: 16px;
+        }
+
+
+    }
+
+    &__tag {
+        display: flex;
+        gap: 5px;
+
+        &__1 {
+            font-weight: 500;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 8px;
+            background-color: var(--color-yellow-300);
+        }
+
+        &__2 {
+            font-weight: 500;
+            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 8px;
+            color: var(--color-white-000);
+            background-color: var(--color-brown-200);
+        }
+    }
+}
+
+.report__paging {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+
+    position: absolute; // ✅ 부모 요소(.report__list__items) 기준으로 위치 조정
+    bottom: 20px; // ✅ 하단에서 20px 위에 위치
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 100%;
+    padding: 10px 0;
+}
+
+.report__paging__button,
+.report__paging__number {
+    background: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    font-size: 16px;
+    color: var(--color-white-700);
+    transition: color 0.2s ease-in-out;
+}
+
+.report__paging__button:hover,
+.report__paging__number:hover {
+    color: var(--color-red-200);
+}
+
+.report__paging__number.active {
+    font-weight: bold;
+    color: var(--color-red-200);
+}
