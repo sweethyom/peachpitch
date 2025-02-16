@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import styles from "./styles/Keyword.module.scss";
 
-import closeBtn from "@/assets/icons/modal__close.png";
-import { Link } from "react-router-dom";
 import { Client } from "@stomp/stompjs";
 
 type ModalProps = {
@@ -133,9 +131,6 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
                 <div className={styles.overlay}>
                     <div className={styles.modal}>
                         <div className={styles.modal__header}>
-                            <Link to="/main">
-                                <img src={closeBtn} className={styles.modal__header__close} alt="close" />
-                            </Link>
                             <p className={styles.modal__header__logo}>PeachPitch</p>
                         </div>
                         <p className={styles.modal__header__title}>키워드 선택하기</p>

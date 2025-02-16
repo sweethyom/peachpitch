@@ -197,7 +197,12 @@ function MainPage() {
   // ✅ 1:1 매칭 접근 핸들러 (권한 체크 추가)
   const handleVideoChatClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+    const userJwtFromStorage = localStorage.getItem("accessToken");
 
+    if(!userJwtFromStorage) {
+      setAlertMessage("로그인을 해주세요.");
+      return;
+    }
     const hasPermission = await checkPermissions();
     if (!hasPermission) {
       setAlertMessage("마이크 및 카메라 권한을 허용해야 합니다!");
