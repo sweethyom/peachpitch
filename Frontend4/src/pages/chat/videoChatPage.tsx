@@ -474,8 +474,8 @@ const VideoChatPage: React.FC = () => {
                     console.error("STOMP client가 연결되어 있지 않습니다 (자동 종료).");
                 }
             }
-            // }, 20000);
-        }, 100000);
+        }, 20000);
+        //}, 100000);
 
         return () => clearTimeout(autoEndTimeout);
     }, [session, token, isSessionClosed, sessionId]);
