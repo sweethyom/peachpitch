@@ -200,7 +200,6 @@ const VideoChatPage: React.FC = () => {
                     .catch((error) => {
                         console.error("세션 종료 처리 중 오류:", error);
                     });
-
                  */
             }
         });
@@ -335,6 +334,8 @@ const VideoChatPage: React.FC = () => {
 
         const stompClient = new Client({
             brokerURL: "ws://localhost:8080/api/ws",
+            heartbeatIncoming: 4000,  // 4초마다 서버로부터 heart-beat 수신
+            heartbeatOutgoing: 4000,   // 4초마다 서버로 heart-beat 전송
             connectHeaders: {
                 access: `${userJwt}`,
             },
@@ -342,7 +343,6 @@ const VideoChatPage: React.FC = () => {
             onConnect: () => {
                 setIsConnecting(false);
                 console.log("✅ STOMP 연결됨");
-
                 // 매칭 메시지 구독
                 stompClient.subscribe("/user/sub/call", (message) => {
                     //console.log("📩 받은 메시지:", message.body);
@@ -400,6 +400,9 @@ const VideoChatPage: React.FC = () => {
             },
             onDisconnect: () => {
                 console.log("❌ STOMP 연결 종료됨")
+                setIsMatching(false);
+                setSession(null);
+                setStompClient(null);
             },
             onStompError: (frame) => {
                 console.error("STOMP 에러:", frame);
@@ -485,49 +488,35 @@ const VideoChatPage: React.FC = () => {
         return () => clearTimeout(autoEndTimeout);
     }, [session, token, isSessionClosed, sessionId]);
 
-    /*useEffect(() => {
-        const handlePopstate = (event) => {
-            console.log("뒤로 가기 또는 앞으로 가기가 발생했습니다.", event);
 
-            if (stompClient) {
-                const terminationMessage = {
-                    type: MessageType.TERMINATE,
-                    sessionId: sessionId,
-                    historyId: historyId,
-                    matchedUserEmail: matchedUserEmail,
-                    sessionEndType: SessionEndType.MANUAL,
-                };
-                stompClient.publish({
-                    destination: "/pub/chat",
-                    body: JSON.stringify(terminationMessage),
-                });
-            } else {
-                console.error("STOMP client가 연결되어 있지 않습니다 (뒤로 가기).");
-            }
-            // 여기에서 웹소켓 연결 해제 등의 처리를 할 수 있습니다.
-        };
-
-        window.addEventListener("popstate", handlePopstate);
-
+    useEffect(() => {
+        // 컴포넌트가 언마운트될 때 실행되는 cleanup 함수
         return () => {
-            window.removeEventListener("popstate", handlePopstate);
+            // 오디오 스트림 정리
+            if (publisher?.stream) {
+                const mediaStream = publisher.stream.getMediaStream();
+                if (mediaStream) {
+                    mediaStream.getAudioTracks().forEach((track) => {
+                        track.stop();
+                    });
+                }
+            }
+
+            // STT 정리
+            SpeechRecognition.stopListening();
+            resetTranscript();
+
+            // // OpenVidu 세션 정리
+            // if (session) {
+            //     session.disconnect();
+            // }
+            //
+            // // STOMP 연결 정리
+            // if (stompClient) {
+            //     stompClient.deactivate();
+            // }
         };
-    }, []);*/
-    // const closeSession = async(sId: string | null) => {
-    //     console.log(sId+" "+sessionEndType);
-    //     if(!sId) return;
-    //     try {
-    //         const response = await axios.post('http://localhost:8080/api/chat/video/close', {
-    //             historyId: historyId,
-    //             sessionId: sId,
-    //             sessionEndType: sessionEndType
-    //         });
-    //         console.log('서버에서 세션 종료 처리 완료: ', response.data)
-    //     } catch (error) {
-    //         setSessionEndType(SessionEndType.ERROR);
-    //         throw error;
-    //     }
-    // }
+    }, [publisher]);
 
     return (
         <div className={styles.page}>
