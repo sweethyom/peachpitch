@@ -361,6 +361,7 @@ const VideoChatPage: React.FC = () => {
                         }, 1000);
                     }
                     else if (response.status === "matched") {
+                        if(token || session) return;
                         console.log("🎉 매칭 완료! 토큰:", response.token);
                         setToken(response.token);
                         setHistoryId(response.historyId);
@@ -483,7 +484,7 @@ const VideoChatPage: React.FC = () => {
                     console.error("STOMP client가 연결되어 있지 않습니다 (자동 종료).");
                 }
             }
-        }, 100000);
+        }, 80000);
 
         return () => clearTimeout(autoEndTimeout);
     }, [session, token, isSessionClosed, sessionId]);
