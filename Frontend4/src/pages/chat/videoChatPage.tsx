@@ -395,17 +395,17 @@ const VideoChatPage: React.FC = () => {
                         }, 1000);
                     }
                 });
-                if(!isMatching) {
-                    console.log("🔍 매칭 시도 중...");
-                    setIsMatching(true);
-                    // 매칭 요청
-                    stompClient.publish({
-                        destination: "/pub/chat",
-                        body: JSON.stringify({
-                            type: "REQUEST",
-                        }),
-                    });
-                }
+                // if(!isMatching) {
+                //     console.log("🔍 매칭 시도 중...");
+                //     setIsMatching(true);
+                //     // 매칭 요청
+                //     stompClient.publish({
+                //         destination: "/pub/chat",
+                //         body: JSON.stringify({
+                //             type: "REQUEST",
+                //         }),
+                //     });
+                // }
             },
             onDisconnect: () => console.log("❌ STOMP 연결 종료됨"),
             onStompError: (frame) => {
