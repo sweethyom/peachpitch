@@ -21,13 +21,16 @@ interface ChatReport {
 }
 
 interface ReportDetail {
-  // reportId: number;
-  // chatTime: number;
   pros: string;
   cons: string;
   summary: string;
-  // userId: number;
-  // historyId: number;
+  chatMessages: {
+    chatId: number;
+    content: string;
+    userId: number | null;
+    createdAt: string;
+  }[];
+  feedback?: string;
 }
 
 function chatReportPage(_id : any) {
@@ -122,6 +125,18 @@ function chatReportPage(_id : any) {
     }
   }
 
+  // 피드백 데이터 리스트 정의
+  const feedbackItems = [
+    { id: "A", icon: icon_hands, label: "편안했어요" },
+    { id: "B", icon: icon_heart, label: "따뜻해요" },
+    { id: "C", icon: icon_mouth, label: "말이 잘 통해요" },
+    { id: "D", icon: icon_clock, label: "시간 가는 줄 몰랐어요" },
+    { id: "E", icon: icon_laugh, label: "배꼽이 빠졌어요" },
+    { id: "F", icon: icon_score, label: "속도가 잘 맞아요" }
+  ];
+
+
+
   return (
     <>
       <Header />
@@ -151,44 +166,58 @@ function chatReportPage(_id : any) {
             </div>
 
 
-            {/* 반복되는 단어 습관 */}
+            {/*/!* 반복되는 단어 습관 *!/*/}
+            {/*<div className={styles.report__history}>*/}
+            {/*  <p id="history" className={styles.report__sub}>대화 기록</p>*/}
+            {/*  <div className={styles.report__history__wrapper}>*/}
+            {/*    <div className={styles.bubble__left}>*/}
+            {/*      여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.bubble__right}>*/}
+            {/*      최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.bubble__left}>*/}
+            {/*      여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.bubble__right}>*/}
+            {/*      최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.bubble__left}>*/}
+            {/*      여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.bubble__right}>*/}
+            {/*      최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.bubble__left}>*/}
+            {/*      여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.bubble__right}>*/}
+            {/*      최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.bubble__left}>*/}
+            {/*      여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?*/}
+            {/*    </div>*/}
+            {/*    <div className={styles.bubble__right}>*/}
+            {/*      최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.*/}
+            {/*    </div>*/}
+            {/*  </div>*/}
+            {/*</div>*/}
+
             <div className={styles.report__history}>
               <p id="history" className={styles.report__sub}>대화 기록</p>
               <div className={styles.report__history__wrapper}>
-                <div className={styles.bubble__left}>
-                  여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?
-                </div>
-                <div className={styles.bubble__right}>
-                  최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                </div>
-                <div className={styles.bubble__left}>
-                  여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?
-                </div>
-                <div className={styles.bubble__right}>
-                  최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                </div>
-                <div className={styles.bubble__left}>
-                  여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?
-                </div>
-                <div className={styles.bubble__right}>
-                  최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                </div>
-                <div className={styles.bubble__left}>
-                  여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?
-                </div>
-                <div className={styles.bubble__right}>
-                  최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                </div>
-                <div className={styles.bubble__left}>
-                  여행에 대해 이야기 나누기 좋아요! 최근에 여행 간 곳 중에 가장 기억에 남는 곳이 있으신가요?
-                </div>
-                <div className={styles.bubble__right}>
-                  최근에 간 여행 중에 가장 기억에 남는 여행은 강릉 여행이었어. 나는 바다를 보고 왔어.
-                </div>
+                {reportDetail?.chatMessages?.map((message) => (
+                    <div
+                        key={message.chatId}
+                        className={message.userId === Number(userId) ? styles.bubble__right : styles.bubble__left}
+                    >
+                      {message.content.replace(/^"|"$/g, '')}
+                    </div>
+                ))}
               </div>
             </div>
 
-            <hr className={styles.report__divider} />
+            <hr className={styles.report__divider}/>
 
             {/* 총평 */}
             <div className={styles.report__commentary}>
@@ -210,50 +239,51 @@ function chatReportPage(_id : any) {
             </div>
 
             {chatReport?.keyword2 !== null && (
-              <>
-                <hr className={styles.report__divider} />
+                <>
+                  <hr className={styles.report__divider}/>
+                  <div className={styles.report__feedback}>
+                    <p id="feedback" className={styles.report__sub}>상대방의 평가</p>
+                    <p className={styles.report__feedback__comment}>
+                      전반적으로, 이 대화는 자연스러운 흐름과 상호 관심사를 잘 반영하고 있어 성공적인 스몰톡의 사례라고 볼 수 있습니다.<br/>
+                      참여자들이 서로의 경험과 관심사에 대해 더 깊이 있게 탐구하고, 대화 속도를 조금 더 높인다면 더욱 활기찬 대화가 될 것입니다.
+                    </p>
 
-                <div className={styles.report__feedback}>
-                  <p id="feedback" className={styles.report__sub}>상대방의 평가</p>
-                  <p className={styles.report__feedback__comment}>
-                    전반적으로, 이 대화는 자연스러운 흐름과 상호 관심사를 잘 반영하고 있어 성공적인 스몰톡의 사례라고 볼 수 있습니다.<br />
-                    참여자들이 서로의 경험과 관심사에 대해 더 깊이 있게 탐구하고, 대화 속도를 조금 더 높인다면 더욱 활기찬 대화가 될 것입니다.
-                  </p>
-
-                  {/* 상대방이 체크한 평가 */}
-                  <div className={styles.report__feedback__check}>
-                    <div className={styles.check}>
-                      <img src={icon_hands} height="26px" />
-                      <p className={styles.check__label}>편안했어요</p>
-                    </div>
-                    <div className={styles.check}>
-                      <img src={icon_heart} height="26px" />
-                      <p className={styles.check__label}>따뜻해요</p>
-                    </div>
-                    <div className={styles.check} style={{ display: 'none' }}>
-                      <img src={icon_mouth} height="26px" />
-                      <p className={styles.check__label}>말이 잘 통해요</p>
-                    </div>
-                    <div className={styles.check}>
-                      <img src={icon_clock} height="26px" />
-                      <p className={styles.check__label}>시간 가는 줄 몰랐어요</p>
-                    </div>
-                    <div className={styles.check} style={{ display: 'none' }}>
-                      <img src={icon_laugh} height="26px" />
-                      <p className={styles.check__label}>배꼽이 빠졌어요</p>
-                    </div>
-                    <div className={styles.check} style={{ display: 'none' }}>
-                      <img src={icon_score} height="26px" />
-                      <p className={styles.check__label}>속도가 잘 맞아요</p>
+                    {/* 상대방이 체크한 평가 */}
+                    {/*<div className={styles.report__feedback__check}>*/}
+                    {/*  {feedbackItems.map((item) => (*/}
+                    {/*      <div*/}
+                    {/*          key={item.id}*/}
+                    {/*          className={styles.check}*/}
+                    {/*          style={{*/}
+                    {/*            display: reportDetail?.feedback?.includes(item.id) ? 'block' : 'none'*/}
+                    {/*          }}*/}
+                    {/*      >*/}
+                    {/*        <img src={item.icon} height="26px" alt={item.label}/>*/}
+                    {/*        <p className={styles.check__label}>{item.label}</p>*/}
+                    {/*      </div>*/}
+                    {/*  ))}*/}
+                    {/*</div>*/}
+                    <div className={styles.report__feedback__check}>
+                      {feedbackItems.map((item) => (
+                          <div
+                              key={item.id}
+                              className={styles.check}
+                              style={{
+                                display: reportDetail?.feedback?.includes(item.id) ? 'flex' : 'none'
+                              }}
+                          >
+                            <img src={item.icon} height="26px" alt={item.label}/>
+                            <p className={styles.check__label}>{item.label}</p>
+                          </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-              </>
+                </>
             )}
           </div>
         </div>
 
-        <Footer />
+        <Footer/>
       </div>
     </>
   )
