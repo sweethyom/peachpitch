@@ -25,6 +25,7 @@ public class AudioChatServiceImpl implements AudioChatService {
     @Override
     public boolean isAvailable(TrialRequest trialRequest, CustomUserDetails userDetails) {
         if (userDetails == null) {
+            System.out.println(trialRequest.getFingerprint());
             //비로그인 유저는 finger print 확인
             return trialService.checkTrialAccess(trialRequest.getFingerprint()).isCanAccess();
             //return true;

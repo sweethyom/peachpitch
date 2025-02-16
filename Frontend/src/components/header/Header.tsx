@@ -164,20 +164,19 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
     useEffect(() => {
         const fetchCouponCount = async () => {
             try {
-                const userId = localStorage.getItem("userId");
+                const storedUserId = localStorage.getItem("userId");
 
-                // if (!userId) {
-                //     console.error("User ID가 없습니다.");
-                //     return;
-                // }
+                if (!storedUserId) {
+                    return;
+                }
 
-                const response = await axios.post(
-                    'http://localhost:8080/api/users/coupon/have',
-                    { userId: userId }, // Body 데이터
-                );
+                const response = await axios.post(`http://localhost:8080/api/users/coupon/have`, {
+                    userId: Number(storedUserId)
+                });
 
+                // response.data.data에서 실제 쿠폰 카운트 값을 가져옴
                 setCouponCount(response.data.data.ea);
-                console.log("쿠폰 개수: " + response.data)
+                console.log('response:', response.data);
             } catch (error) {
                 console.error("쿠폰 수 조회 실패:", error);
             }
@@ -185,6 +184,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
         fetchCouponCount();
     }, []);
+
     return (
         <div className={headerClass}>
             <div className={styles.header__content}>

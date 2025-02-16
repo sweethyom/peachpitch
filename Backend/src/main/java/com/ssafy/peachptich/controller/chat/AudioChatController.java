@@ -24,7 +24,7 @@ public class AudioChatController {
      * -> 로그인 안되었고 finger print가 없으면 true, 있으면 false
      * @return
      */
-    @GetMapping("/check")
+    @PostMapping("/check")
     public ResponseEntity<ResponseDto<Boolean>> checkAvailable(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody(required = false) TrialRequest trialRequest

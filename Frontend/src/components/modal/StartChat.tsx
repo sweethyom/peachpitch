@@ -2,14 +2,21 @@ import styles from "./styles/StartChat.module.scss";
 import closeBtn from "@/assets/icons/modal__close.png";
 import couponIcon from "@/assets/images/coupon.png";
 
- type ModalProps = {
+type ModalProps = {
   isOpen: boolean;
   onClose: () => void;
   onStart: () => void;
+  isFinger: boolean;
   children?: React.ReactNode;
 };
 
-function StartChat({ isOpen, onClose, onStart, children }: ModalProps) {
+function StartChat({ isOpen, onClose, onStart, isFinger, children }: ModalProps) {
+  const handleCancel = () => {
+    window.dispatchEvent(new Event("chatModalCancelled")); // Dispatch an event
+    onClose(); // Close modal
+  };
+  
+  
   if (!isOpen) return null;
 
   return (
@@ -23,11 +30,23 @@ function StartChat({ isOpen, onClose, onStart, children }: ModalProps) {
         <div className={styles.modal__contents}>
           <p className={styles.modal__sub}>AI와 대화하겠습니까?</p>
           <img src={couponIcon} width={"141px"} height={"165px"} />
-          <p className={styles.modal__sub__red}>[시작하기] 버튼을 누르면 쿠폰이 -1 차감됩니다.</p>
+          {!isFinger ? (
+            <p className={styles.modal__sub__red}>[시작하기] 버튼을 누르면 쿠폰이 -1 차감됩니다.</p>
+          ) : (
+            <>
+              <p className={styles.modal__sub__red}>
+                <strong>! 현재 로그인하지 않은 상태입니다. !</strong> </p>
+              <p className={styles.modal__sub__red}>
+                AI 스몰토크는 비로그인 사용자에게 최초 1회 무료로 제공되며 </p>
+              <p className={styles.modal__sub__red}>
+                이 경우, 리포트가 저장되지 않습니다.
+              </p>
+            </>
+          )}
         </div>
         {children}
         <div className={styles.modal__btn}>
-          <div onClick={onClose} className={styles.modal__btn__cancle}>취소하기</div>
+          <div onClick={handleCancel} className={styles.modal__btn__cancle}>취소하기</div>
           <div onClick={onStart} className={styles.modal__btn__start}>시작하기</div>
         </div>
       </div>
