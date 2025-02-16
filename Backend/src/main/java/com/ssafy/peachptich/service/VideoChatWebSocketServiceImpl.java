@@ -203,6 +203,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         messagingTemplate.convertAndSend("/sub/chat/" + historyId, response);
     }
 
+    // 자동 종료, 나가기 버튼 눌러서 강제종료
     @Override
     public synchronized void handleCloseVideoChat(CloseRequest closeRequest, String userEmail) throws OpenViduJavaClientException, OpenViduHttpException {
         String sessionId = closeRequest.getSessionId();
@@ -263,6 +264,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
 
     }
 
+    // 뒤로가기 등으로 종료
     @Override
     public void handleVideoChatWebSocketDisconnect(String userEmail) {
         Long userId = userService.getUserByEmail(userEmail).orElseThrow().getUserId();
@@ -277,9 +279,34 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
             Set<String> roomKeyCopy = new HashSet<>(roomKey);
             roomKeyCopy.remove(userEmail);  // 나간 유저 제외
             RoomInfo roomInfo = roomMap.get(roomKey);
-            System.out.println(roomInfo.getSessionType());
-            if(roomInfo.getSessionType().equals(SessionType.KEYWORD)
-            || roomInfo.getSessionType().equals(SessionType.MATCHING)) {
+            String sessionId = roomInfo.getSessionId();
+            System.out.println("강제 종료 요청 "+roomInfo.getSessionType()+" "+roomInfo.getSessionId());
+            if(roomInfo.getSessionType().equals(SessionType.MATCHING)
+            || roomInfo.getSessionType().equals(SessionType.KEYWORD)) {
+                if(sessionId != null) {
+                    Session session = openvidu.getActiveSession(sessionId);
+                    try {
+                        if (session == null) {
+                            System.out.println("세션이 이미 종료되었습니다: " +sessionId);
+                        } else {
+                            session.close();
+                            System.out.println("세션이 성공적으로 종료되었습니다: " +sessionId);
+                        }
+                    }
+                    catch (Exception e) {
+                        String msg = e.getMessage();
+                        System.err.println("예외 발생: " + msg);
+                        if (msg.contains("404")){
+                            System.out.println("세션이 이미 종료되었습니다: " + sessionId);
+                        }
+                        else {
+                            e.printStackTrace();
+                        }
+                    }
+                    finally {
+                        chatHistoryService.updateStatusFalse(roomInfo.getHistoryId());
+                    }
+                }
                 // 다른 유저들에게 "disconnected" 상태 알림 전송
                 for (String otherUserEmail : roomKeyCopy) {
                     System.out.println("otherUserEmail = " + otherUserEmail);
@@ -294,11 +321,9 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
                     userRoomMap.remove(email);
                 }
                 roomMap.remove(roomKey);
-                chatHistoryService.updateStatusFalse(roomInfo.getHistoryId()); //상태 변경
+                //chatHistoryService.updateStatusFalse(roomInfo.getHistoryId()); //상태 변경
             }
-
         }
-
     }
 
     // 유저가 속한 방 매핑 정보 제거 (roomMap과 userRoomMap에서 삭제)
