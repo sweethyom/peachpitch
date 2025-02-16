@@ -140,7 +140,11 @@ public class CouponServiceImpl implements CouponService {
                 );
 
         if (freeCoupon.isPresent() && freeCoupon.get().getEa() > 0) {
-            freeCoupon.get().useCoupon();
+//            freeCoupon.get().useCoupon();
+            HaveCoupon coupon = freeCoupon.get();
+            coupon.useCoupon();
+            haveCouponRepository.save(coupon);
+            log.info("🛠️ 무료 쿠폰 차감 후 개수: {}", coupon.getEa());
             return;
         }
 
@@ -152,7 +156,11 @@ public class CouponServiceImpl implements CouponService {
                 );
 
         if (paidCoupon.isPresent() && paidCoupon.get().getEa() > 0) {
-            paidCoupon.get().useCoupon();
+//            paidCoupon.get().useCoupon();
+            HaveCoupon coupon = paidCoupon.get();
+            coupon.useCoupon();
+            haveCouponRepository.save(coupon);
+            log.info("🛠️ 유료 쿠폰 차감 후 개수: {}", coupon.getEa());
             return;
         }
 
