@@ -6,9 +6,9 @@ import Mask3 from "@/assets/images/catMask_3.png"
 import Mask4 from "@/assets/images/catMask_4.png"
 import check from "@/assets/icons/check.png"
 
-import Bg1 from "@/assets/images/setting_bg_1.jpg"
-import Bg2 from "@/assets/images/setting_bg_2.jpg"
-import Bg3 from "@/assets/images/setting_bg_3.jpg"
+// import Bg1 from "@/assets/images/setting_bg_1.jpg"
+// import Bg2 from "@/assets/images/setting_bg_2.jpg"
+// import Bg3 from "@/assets/images/setting_bg_3.jpg"
 
 import { useState } from "react";
 
@@ -16,32 +16,47 @@ import { useState } from "react";
 type ModalProps = {
   isOpen: boolean; // 모달 열림 상태
   onClose: () => void; // 닫기 버튼 클릭 이벤트
+  setSelectedMask: (mask: string | null) => void
 };
 
-function Setting({ isOpen, onClose }: ModalProps) {
-  const [selectedMask, setSelectedMask] = useState<string | null>("mask1");
-  const [selectedBackground, setSelectedBackground] = useState<string | null>("bg1");
+function Setting({ isOpen, onClose, setSelectedMask }: ModalProps) {
+  const [localMask, setLocalMask] = useState<string | null>("mask1");
+  // const [selectedBackground, setSelectedBackground] = useState<string | null>("bg1");
 
   if (!isOpen) return null;
 
+  console.log("setSelectedMask" + setSelectedMask)
+
   const handleMaskClick = (mask: string) => {
-    setSelectedMask(prev => (prev === mask ? null : mask));
+    const newMask = localMask === mask ? null : mask; // 선택된 마스크가 동일하면 해제
+    setLocalMask(newMask);
+    setSelectedMask(newMask);  // ✅ 현재 선택한 값을 반영
+    console.log("선택한 마스크:", newMask);
   };
 
-  const handleBackgroundClick = (bg: string) => {
-    setSelectedBackground(prev => (prev === bg ? null : bg));
-    // setSelectedMask(null); // ✅ 필터 선택 해제
-  };
+  // const handleMaskClick = (mask: string) => {
+  //   // setLocalMask(localMask)
+  //   setSelectedMask(localMask)
+
+  //   console.log("선택한 마스크" + mask)
+  //   setLocalMask(prev => (prev === mask ? null : mask));
+  // };
+
+
+  // const handleBackgroundClick = (bg: string) => {
+  //   setSelectedBackground(prev => (prev === bg ? null : bg));
+  //   // setSelectedMask(null); // ✅ 필터 선택 해제
+  // };
 
   return (
     <div className={styles.overlay}>
       <div className={styles.modal}>
-        <p className={styles.modal__header__title}>설정</p>
+        <p className={styles.modal__header__title}>필터 설정</p>
         <div className={styles.modal__contents}>
-          <p className={styles.modal__sub}>가상배경</p>
-          <div className={styles.modal__sub__wrap}>
-            {/* Background 1 */}
-            <div
+          {/* <p className={styles.modal__sub}>가상배경</p>
+          <div className={styles.modal__sub__wrap}> */}
+          {/* Background 1 */}
+          {/* <div
               className={`${styles.back} ${selectedBackground === "bg1" ? styles.selected : ""}`}
               onClick={() => handleBackgroundClick("bg1")}
             >
@@ -52,10 +67,10 @@ function Setting({ isOpen, onClose }: ModalProps) {
                   <img src={check} className={styles.checkIcon} />
                 </>
               )}
-            </div>
+            </div> */}
 
-            {/* Background 2 */}
-            <div
+          {/* Background 2 */}
+          {/* <div
               className={`${styles.back} ${selectedBackground === "bg2" ? styles.selected : ""}`}
               onClick={() => handleBackgroundClick("bg2")}
             >
@@ -66,10 +81,10 @@ function Setting({ isOpen, onClose }: ModalProps) {
                   <img src={check} className={styles.checkIcon} />
                 </>
               )}
-            </div>
+            </div> */}
 
-            {/* Background 3 */}
-            <div
+          {/* Background 3 */}
+          {/* <div
               className={`${styles.back} ${selectedBackground === "bg3" ? styles.selected : ""}`}
               onClick={() => handleBackgroundClick("bg3")}
             >
@@ -81,13 +96,13 @@ function Setting({ isOpen, onClose }: ModalProps) {
                 </>
               )}
             </div>
-          </div>
+          </div> */}
 
-          <p className={styles.modal__sub}>필터</p>
+          {/* <p className={styles.modal__sub}>필터</p> */}
           <div className={styles.modal__sub__wrap}>
 
             {/* Mask 1 */}
-            <div
+            {/* <div
               className={`${styles.mask} ${selectedMask === "mask1" ? styles.selected : ""}`}
               onClick={() => handleMaskClick("mask1")}>
               <img src={Mask1} width="100px" height="90px" />
@@ -97,46 +112,25 @@ function Setting({ isOpen, onClose }: ModalProps) {
                   <img src={check} className={styles.checkIcon} />
                 </>
               )}
-            </div>
+            </div> */}
 
-            {/* Mask 2 */}
-            <div
-              className={`${styles.mask} ${selectedMask === "mask2" ? styles.selected : ""}`}
-              onClick={() => handleMaskClick("mask2")}>
-              <img src={Mask2} width="100px" height="90px" />
-              {selectedMask === "mask2" && (
-                <>
-                  <div className={styles.overlayEffect} />
-                  <img src={check} className={styles.checkIcon} />
-                </>
-              )}
-            </div>
-
-            {/* Mask 3 */}
-            <div
-              className={`${styles.mask} ${selectedMask === "mask3" ? styles.selected : ""}`}
-              onClick={() => handleMaskClick("mask3")}>
-              <img src={Mask3} width="100px" height="90px" />
-              {selectedMask === "mask3" && (
-                <>
-                  <div className={styles.overlayEffect} />
-                  <img src={check} className={styles.checkIcon} />
-                </>
-              )}
-            </div>
-
-            {/* Mask 4 */}
-            <div
-              className={`${styles.mask} ${selectedMask === "mask4" ? styles.selected : ""}`}
-              onClick={() => handleMaskClick("mask4")}>
-              <img src={Mask4} width="100px" height="90px" />
-              {selectedMask === "mask4" && (
-                <>
-                  <div className={styles.overlayEffect} />
-                  <img src={check} className={styles.checkIcon} />
-                </>
-              )}
-            </div>
+            {["mask1", "mask2", "mask3", "mask4"].map((mask) => (
+              <div
+                key={mask}
+                className={
+                  `${styles.mask} 
+                ${localMask === mask ? styles.selected : ""}`
+                }
+                onClick={() => handleMaskClick(mask)}>
+                <img src={{ mask1: Mask1, mask2: Mask2, mask3: Mask3, mask4: Mask4 }[mask]} width="100px" height="90px" />
+                {localMask === mask && (
+                  <>
+                    <div className={styles.overlayEffect} />
+                    <img src={check} className={styles.checkIcon} />
+                  </>
+                )}
+              </div>
+            ))}
           </div>
         </div>
         <div className={styles.modal__btn}>

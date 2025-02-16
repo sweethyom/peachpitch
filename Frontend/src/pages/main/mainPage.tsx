@@ -18,7 +18,7 @@ import CompletePay from '@/components/modal/SuccessPay';
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
 import StartChat from '@/components/modal/StartChat'
-import { access } from 'fs';
+// import { access } from 'fs';
 
 function MainPage() {
   const defaultMessage = "포시랍네요. 광수님 좀 포시랍네요."
@@ -29,7 +29,7 @@ function MainPage() {
   const [rotate, setRotate] = useState(false);
 
   const [showCompletePay, setShowCompletePay] = useState(false);
-  const [_fingerprint, setFingerprint] = useState<string | null>(null);
+  const [fingerprint, setFingerprint] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const [showWelcomeAlert, setShowWelcomeAlert] = useState(false);
@@ -43,6 +43,7 @@ function MainPage() {
   });
 
   const [rank, setRank] = useState<string[] | null>(null);
+  const [couponNum, setCouponNum] = useState(0)
 
   // ✅ 핑거프린트 생성 함수
   const generateFingerprint = async () => {
@@ -144,8 +145,26 @@ function MainPage() {
   }, []);
 
   const handleCloseSuccessModal = () => {
+    // stopCameraStream();
     setShowCompletePay(false);
+    reloadPage()
   };
+
+  //   const stopCameraStream = () => {
+  //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+  //     .then((stream) => {
+  //       stream.getTracks().forEach(track => track.stop());
+  //     })
+  //     .catch((error) => {
+  //       console.error("카메라 스트림 정리 중 오류 발생:", error);
+  //     });
+  // };
+
+  const reloadPage = () => {
+    console.log("🔄 페이지 새로고침 실행됨");
+    window.location.reload();
+  };
+
 
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
 
@@ -153,34 +172,50 @@ function MainPage() {
   const handleAIChatClick = async (e: React.MouseEvent) => {
     e.preventDefault();
 
-    // if (!fingerprint) {
-    //   console.error('Fingerprint not generated');
-    //   return;
-    // }
+    // if(coupon)
 
-    // try {
-    // const response = await axios.post('/api/trial/check', {
-    //   fingerprint: fingerprint,
-    // });
+    try {
+      // 1. 권한 체크 먼저 수행
+      const hasPermission = await checkPermissions();
+      if (!hasPermission) {
+        setAlertMessage("마이크 및 카메라 권한을 허용해야 합니다!");
+        return;
+      }
 
-    // if (response.data.canAccess) {
-    const hasCoupon = await checkCouponAvailability();
-    if (hasCoupon) {
-      setIsChatModalOpen(true);
-    }
-    // } else {
-    // setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
-    // navigate('/login');
-    // }
-    // } catch (error) {
-    // console.error('Trial check failed:', error);
-    // setAlertMessage("서비스 이용에 문제가 발생했습니다.");
-    // }
+      // 2. 로그인 상태 확인
+      const isLoggedIn = localStorage.getItem('accessToken') !== null;
+      if (isLoggedIn) {
+        // 로그인된 사용자는 쿠폰만 확인
+        const hasCoupon = await checkCouponAvailability();
+        console.log("! " + hasCoupon)
 
-    const hasPermission = await checkPermissions();
-    if (!hasPermission) {
-      setAlertMessage("마이크 및 카메라 권한을 허용해야 합니다!");
-      return;
+        if (hasCoupon) {
+          setIsChatModalOpen(true);
+          // 쿠폰을 구매해주세요
+        }
+      } else {
+        // 비로그인 사용자는 fingerprint 확인
+        if (!fingerprint) {
+          // fingerprint가 없으면 생성
+          await generateFingerprint();
+        }
+
+        // fingerprint로 시도 여부 확인
+        const response = await axios.post('http://localhost:8080/api/chat/ai/check', {
+          fingerprint: fingerprint,
+        });
+
+        // Redis에 fingerprint가 없으면 처음 시도하는 것이므로 바로 채팅 가능
+        if (response.data.data) {
+          setIsChatModalOpen(true);
+        } else {
+          setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
+          navigate('/login');
+        }
+      }
+    } catch (error) {
+      console.error('Trial check failed:', error);
+      setAlertMessage("서비스 이용에 문제가 발생했습니다.");
     }
   };
 
@@ -199,7 +234,7 @@ function MainPage() {
     e.preventDefault();
     const userJwtFromStorage = localStorage.getItem("accessToken");
 
-    if(!userJwtFromStorage) {
+    if (!userJwtFromStorage) {
       setAlertMessage("로그인을 해주세요.");
       return;
     }
@@ -253,6 +288,20 @@ function MainPage() {
     checkSocialLogin();
   }, []);
 
+  useEffect(() => {
+    const handleChatCancel = () => {
+      console.log("🔄 Chat modal cancelled. Reloading page...");
+      window.location.reload();
+    };
+
+    window.addEventListener("chatModalCancelled", handleChatCancel);
+
+    return () => {
+      window.removeEventListener("chatModalCancelled", handleChatCancel);
+    };
+  }, []);
+
+
   // AI 접근 모달창 닫기
   const handleCloseChatModal = () => {
     setIsChatModalOpen(false);
@@ -270,14 +319,14 @@ function MainPage() {
   const checkCouponAvailability = async () => {
     try {
       // const response = await axios.get(`https://peachpitch.site/api/users/coupon/${userId}`);
-      // const response = await axios.get(`http://localhost:8080/api/users/coupon/${userId}`);
       const response = await axios.post(
         'http://localhost:8080/api/users/coupon/have',
         { userId: userId }, // Body 데이터
       );
-      console.log(response.data.data.ea);
+      setCouponNum(response.data.data)
+      // console.log("coupon " + couponNum);
 
-      if (response.data < 1) {
+      if (response.data.data < 1) {
         setAlertMessage("이용권이 부족합니다.");
         return false;
       }
@@ -315,7 +364,7 @@ function MainPage() {
 
             {/* StartChat 모달 */}
             {isChatModalOpen && (
-              <StartChat isOpen={isChatModalOpen} onClose={handleCloseChatModal} onStart={handleStartChat} />
+              <StartChat isOpen={isChatModalOpen} onClose={handleCloseChatModal} onStart={handleStartChat} isFinger={fingerprint != null} />
             )}
             {alertMessage && (
               <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />
