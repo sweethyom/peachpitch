@@ -15,6 +15,7 @@ function Coupon({ isOpen, onClose }: ModalProps) {
     const [alertMessage, setAlertMessage] = useState<string | null>(null);
     const prices = [1000, 3000, 5000];
     const totalPrice = counts.reduce((acc, count, index) => acc + count * prices[index], 0);
+    const [paymentWindow, setPaymentWindow] = useState<Window | null>(null);
 
     const increment = (index: number) => {
         setCounts((prevCounts) =>
@@ -28,27 +29,80 @@ function Coupon({ isOpen, onClose }: ModalProps) {
         );
     };
 
+    window.addEventListener("message", (event) => {
+        console.log("📩 메시지 수신:", event.data, "from:", event.origin);
+    
+        if (event.origin !== "http://localhost:8080") {
+            console.warn("❌ 허용되지 않은 출처의 메시지입니다.");
+            return; // 잘못된 origin이면 메시지 무시
+        }
+    
+        if (event.data === "paymentSuccess") {
+            console.log("✅ 결제 성공 메시지 처리");
+            // 원하는 동작 수행
+        }
+    }, false);
+
     // ✅ 결제 완료 메시지를 감지하여 모달 닫기
     useEffect(() => {
 
         const handlePaymentMessage = (event: MessageEvent) => {
-            console.log("📩 쿠폰 모달에서 결제 완료 메시지 수신:", event.data, "from:", event.origin);
+            console.log("📩  :", event.data, "from:", event.origin);
 
-            if (event.origin !== "http://localhost:8080") return;
-
-            if (event.data === "paymentSuccess") {
-                onClose(); // ✅ 쿠폰 모달 닫기
+            if (event.origin !== "http://localhost:8080") {
+                console.warn("알림: 예상치 못한 출처에서 메시지가 왔습니다:", event.origin);
+                return;
             }
-        };
 
-        window.addEventListener("message", handlePaymentMessage);
-
-        return () => {
-            window.removeEventListener("message", handlePaymentMessage);
-        };
-    }, []);
+            if (event.data?.status === "paymentSuccess") {
+                if (paymentWindow) {
+                  paymentWindow.close();
+                }
+                // 결제 완료 후 처리
+                // onPaymentComplete();
+                console.log("결제 완료 후 처리")
+              }
+            };
+            
+            window.addEventListener("message", handlePaymentMessage);
+            return () => window.removeEventListener("message", handlePaymentMessage);
+          }, [paymentWindow]);
 
     if (!isOpen) return null;
+
+    // useEffect(() => {
+
+    //     const handlePaymentMessage = (event: MessageEvent) => {
+    //         console.log("📩 쿠폰 모달에서 결제 완료 메시지 수신:", event.data, "from:", event.origin);
+
+    //         // 신뢰할 수 있는 origin에서 메시지가 왔는지 확인
+    //         if (event.origin !== "http://localhost:8080") {
+    //             console.warn("알림: 예상치 못한 출처에서 메시지가 왔습니다:", event.origin);
+    //             return;
+    //         }
+
+    //         // 결제 완료 메시지가 올 경우 처리
+    //         if (event.data === "paymentSuccess") {
+    //             console.log("결제가 성공적으로 완료되었습니다.");
+    //             onClose(); // ✅ 쿠폰 모달 닫기
+    //         }
+    //     };
+
+    //     console.log("handlePaymentMessage 등록");
+    //     window.addEventListener("message", handlePaymentMessage);
+
+    //     // 컴포넌트 언마운트 시 이벤트 리스너 해제
+    //     return () => {
+    //         console.log("handlePaymentMessage 등록 해제");
+    //         window.removeEventListener("message", handlePaymentMessage);
+    //     };
+    // }, [onClose]);
+
+    // // 모달이 열려 있지 않으면 null 반환
+    // if (!isOpen){
+    //     console.log("!isOpen")
+    //     return null;
+    // } 
 
 
     const userId = localStorage.getItem("userId");
@@ -77,7 +131,11 @@ function Coupon({ isOpen, onClose }: ModalProps) {
             // ✅ 카카오페이 결제 페이지로 이동 (팝업)
             const paymentWindow = window.open(data.next_redirect_pc_url, "kakaopay", "width=500,height=700");
 
-            if (!paymentWindow) {
+            if (paymentWindow) {
+                console.log("paymentWindow 세팅")
+                setPaymentWindow(paymentWindow);
+              }
+            else {
                 setAlertMessage("팝업 창이 차단되었습니다. 팝업 차단을 해제해주세요.");
                 return;
             }
@@ -88,10 +146,24 @@ function Coupon({ isOpen, onClose }: ModalProps) {
 
                 if (event.data === "paymentSuccess") {
                     if (paymentWindow) {
+                        console.log("팝업창 닫기 완료")
                         paymentWindow.close(); // ✅ 팝업 창 닫기
                     }
                 }
             }, false);
+
+            window.addEventListener("storage", (event) => {
+                if (event.key === "paymentStatus" && event.newValue !== null) {
+                    try {
+                        const paymentData = JSON.parse(event.newValue);
+                        console.log("결제 완료 메시지 감지:", paymentData);
+                        localStorage.removeItem("paymentStatus"); // 데이터 삭제
+                    } catch (error) {
+                        console.error("JSON 파싱 오류:", error);
+                    }
+                }
+            });
+            
 
         } catch (error) {
             console.error("🚨 결제 처리 오류:", error);
