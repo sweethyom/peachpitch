@@ -292,9 +292,9 @@ function MainPage() {
         { userId: userId }, // Body 데이터
       );
       setCouponNum(response.data.data)
-      console.log("coupon " + couponNum);
+      // console.log("coupon " + couponNum);
 
-      if (couponNum < 1) {
+      if (response.data.data < 1) {
         setAlertMessage("이용권이 부족합니다.");
         return false;
       }
