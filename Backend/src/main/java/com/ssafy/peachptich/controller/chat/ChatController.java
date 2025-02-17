@@ -79,16 +79,18 @@ public class ChatController {
 
     // redis에 저장한 사용자와의 대화 db저장
     @PostMapping("/chat/video/save")
-    public ResponseEntity<Void> saveChat(@RequestBody UserChatRequest userChatRequest){
-        log.debug("Request received: {}", userChatRequest);
+    public ResponseEntity<Void> saveChat(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody ChatRequest chatrequest){
+        log.debug("Request received: {}", chatrequest);
 
-        if (userChatRequest.getUserId() == null) {
+        if (userDetails.getUserId() == null) {
             log.error("User ID is missing in the request");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         try {
-            chatService.saveUserChat(userChatRequest);
+            chatService.saveUserChat(chatrequest, userDetails.getUserId());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error("Failed to save chat content", e);
