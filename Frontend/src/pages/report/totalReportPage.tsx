@@ -56,8 +56,7 @@ function totalReportPage() {
   useEffect(() => {
     const fetchReportData = async () => {
       const accessToken = localStorage.getItem("accessToken");
-      const userId = Number(localStorage.getItem("userId"));
-
+      //const userId = Number(localStorage.getItem("userId"));
       // console.log("userId: " + userId);
       // console.log("userId: " + accessToken);
 
@@ -70,14 +69,10 @@ function totalReportPage() {
       try {
         const response = await axios.post(
           "http://localhost:8080/api/users/reports/totalreport",
-          { userId: userId },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${accessToken}`,
-            },
-            withCredentials: true, // ✅ 쿠키 포함
-          }
+            {},
+            {
+              headers: { access: accessToken }
+            }
         );
 
         console.log("✅ Report Data:", response.data);
@@ -117,7 +112,7 @@ function totalReportPage() {
   }));
 
   // 페이징
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchReportData = async () => {
       const accessToken = localStorage.getItem("accessToken");
       const userId = Number(localStorage.getItem("userId"));
@@ -151,6 +146,7 @@ function totalReportPage() {
 
     fetchReportData();
   }, []);
+  */
 
   // 페이징
   const handlePageChange = (page: number) => {

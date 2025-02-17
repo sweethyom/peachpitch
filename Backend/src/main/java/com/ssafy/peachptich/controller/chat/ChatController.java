@@ -105,16 +105,18 @@ public class ChatController {
             @ApiResponse(responseCode = "401", description = "인증 정보가 없음"),
             @ApiResponse(responseCode = "500", description = "채팅 저장 중 오류 발생")
     })
-    public ResponseEntity<Void> saveChat(@RequestBody UserChatRequest userChatRequest){
-        log.debug("Request received: {}", userChatRequest);
+    public ResponseEntity<Void> saveChat(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody ChatRequest chatrequest) {
+        log.debug("Request received: {}", chatrequest);
 
-        if (userChatRequest.getUserId() == null) {
+        if (userDetails.getUserId() == null) {
             log.error("User ID is missing in the request");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         try {
-            chatService.saveUserChat(userChatRequest);
+            chatService.saveUserChat(chatrequest, userDetails.getUserId());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error("Failed to save chat content", e);
@@ -130,10 +132,15 @@ public class ChatController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공적으로 생성함")
     })
-    public ResponseEntity<ResponseDto<ReportResponse>> showReport(@RequestBody ReportRequest reportRequest) {
+    public ResponseEntity<ResponseDto<ReportResponse>> showReport(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody ReportRequest reportRequest) {
         log.info("대화리포트 조회시작");
         // 리포트 내용 가져오기
-        ChatReport chatReport = chatService.getReport(reportRequest);
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        ChatReport chatReport = chatService.getReport(reportRequest, userDetails.getUserId());
         ChatHistory chatHistory = chatReport.getChatHistory();
 
         log.info("채팅 내역 조회 시작");
@@ -185,10 +192,13 @@ public class ChatController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공적으로 조회함")
     })
-    public ResponseEntity<ResponseDto<TotalReportResponse>> showOverview(@RequestBody TotalReportRequest totalReportRequest) {
+    public ResponseEntity<ResponseDto<TotalReportResponse>> showOverview
+    (@AuthenticationPrincipal CustomUserDetails userDetails) {
         // TotalReportResponse를 반환받음
-        TotalReportResponse response = chatService.getTotalReport(totalReportRequest.getUserId());
-
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        TotalReportResponse response = chatService.getTotalReport(userDetails.getUserId());
         return ResponseEntity.ok()
                 .body(new ResponseDto<>("Report showed successfully", response));
     }

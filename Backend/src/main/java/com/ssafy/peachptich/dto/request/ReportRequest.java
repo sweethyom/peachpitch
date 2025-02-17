@@ -6,6 +6,6 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ReportRequest {
-    private Long userId;
+    //private Long userId;
     private Long reportId;
 }

@@ -120,21 +120,22 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
+    // redis 대화 db에 저장
     @Override
-    public void saveUserChat(UserChatRequest userChatRequest) {
+    public void saveUserChat(ChatRequest chatRequest, Long userId) {
         try {
             List<Chat> chatsToSave = new ArrayList<>();
-            String redisKey = "chat:" + userChatRequest.getHistoryId() + ":messages";
-            Long userId = userChatRequest.getUserId();
+            String redisKey = "chat:" + chatRequest.getHistoryId() + ":messages";
+            //Long userId = userChatRequest.getUserId();
 
-            ChatHistory chatHistory = chatHistoryRepository.findById(userChatRequest.getHistoryId())
+            ChatHistory chatHistory = chatHistoryRepository.findById(chatRequest.getHistoryId())
                     .orElseThrow(() -> new RuntimeException("ChatHistory not found"));
 
 
             List<String> messages = redisTemplate.opsForList().range(redisKey, 0, -1);
 
             if (messages == null || messages.isEmpty()) {
-                log.warn("대화내역 {}의 저장할 채팅 메시지가 없습니다.", userChatRequest.getHistoryId());
+                log.warn("대화내역 {}의 저장할 채팅 메시지가 없습니다.", chatRequest.getHistoryId());
                 return;
             }
 
@@ -171,11 +172,11 @@ public class ChatServiceImpl implements ChatService {
             if (!chatsToSave.isEmpty()) {
                 chatRepository.saveAll(chatsToSave);
                 redisTemplate.delete(redisKey);
-                log.info("세션 {}의 Redis 데이터가 성공적으로 삭제되었습니다.", userChatRequest.getHistoryId());
+                log.info("세션 {}의 Redis 데이터가 성공적으로 삭제되었습니다.", chatRequest.getHistoryId());
             }
 
         } catch (Exception e) {
-            log.error("세션 {}의 채팅 저장 중 오류 발생: {}", userChatRequest.getHistoryId(), e.getMessage());
+            log.error("세션 {}의 채팅 저장 중 오류 발생: {}", chatRequest.getHistoryId(), e.getMessage());
             throw new RuntimeException("채팅 저장 실패", e);
         }
     }
@@ -187,8 +188,8 @@ public class ChatServiceImpl implements ChatService {
 
     // 대화 리포트 데이터 띄우기
     @Override
-    public ChatReport getReport(@RequestBody ReportRequest reportRequest) {
-        return reportRepository.findByUserIdAndReportId(reportRequest.getUserId(), reportRequest.getReportId())
+    public ChatReport getReport(@RequestBody ReportRequest reportRequest, Long userId) {
+        return reportRepository.findByUserIdAndReportId(userId, reportRequest.getReportId())
                 .orElseThrow(() -> new EntityNotFoundException("Chat Report not found"));
     }
 
