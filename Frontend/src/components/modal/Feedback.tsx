@@ -71,6 +71,17 @@ function Feedback({ isOpen, historyId }: ModalProps) {
                     access: userJwtFromStorage
                 }
             });
+            // 대화 기록 저장 요청
+            const saveResponse = await axios.post('http://localhost:8080/api/chat/video/save',
+                {
+                    historyId: historyId
+                },
+                {
+                    headers: {
+                        access: userJwtFromStorage
+                    }
+                });
+            console.log(saveResponse);
 
             // 피드백 제출 후 리포트 페이지로 이동
             console.log('피드백 제출 성공:', response.data);

@@ -145,8 +145,8 @@ const VideoChatPage: React.FC = () => {
     // 📜 STT 기록 저장 (문장이 완성되었을 때만)
     useEffect(() => {
         if (transcript && transcript !== previousTranscript) {
-            // ✅ 문장이 완성된 경우 저장 (길이 10자 이상 OR 종결어미 OR 마침표 포함)
-            if (transcript.length > 10 || sentenceEndRegex.test(transcript)) {
+            // ✅ 문장이 완성된 경우 저장 (길이 60자 이상 OR 종결어미 OR 마침표 포함)
+            if (transcript.length > 100 || sentenceEndRegex.test(transcript)) {
                 setHistory((prevHistory) => [...prevHistory, transcript]); // 기존 기록에 추가
                 const saveTranscript = async () => {
                     try {
@@ -500,7 +500,7 @@ const VideoChatPage: React.FC = () => {
                     console.error("STOMP client가 연결되어 있지 않습니다 (자동 종료).");
                 }
             }
-        }, 80000);
+        }, 30000);
 
         return () => clearTimeout(autoEndTimeout);
     }, [session, token, isSessionClosed, sessionId]);
