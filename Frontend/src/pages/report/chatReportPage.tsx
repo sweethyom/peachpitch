@@ -59,17 +59,25 @@ function chatReportPage(_id : any) {
     // ✅ 첫 번째 API 요청: /totalreport 에서 chatReports 가져오기
     const fetchChatReport = async () => {
       try {
+        // const response = await axios.post(
+        //   "http://localhost:8080/api/users/reports/totalreport",
+        //   {
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //       "Authorization": `Bearer ${accessToken}`,
+        //     },
+        //     withCredentials: true,
+        //   }
+        // );
+
         const response = await axios.post(
-          "http://localhost:8080/api/users/reports/totalreport",
-          { userId: userId },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${accessToken}`,
-            },
-            withCredentials: true,
-          }
+            "http://localhost:8080/api/users/reports/totalreport",
+            {},
+            {
+              headers: { access: accessToken }
+            }
         );
+
 
         // ✅ chatReports에서 reportId와 일치하는 데이터 찾기
         const chatReports = response.data?.data?.chatReports || [];
@@ -92,13 +100,11 @@ function chatReportPage(_id : any) {
         const response = await axios.post(
           "http://localhost:8080/api/users/reports/report",
           {
-            userId: userId,
             reportId: Number(reportId),
           },
           {
             headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${accessToken}`,
+              access: accessToken
             },
             withCredentials: true,
           }
