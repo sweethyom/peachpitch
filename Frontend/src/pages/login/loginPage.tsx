@@ -101,24 +101,24 @@ function loginPage() {
     console.log("provider: ", provider);
 
     const popupUrl = `http://localhost:8080/api/users/login/social/${provider}`;
-    const popup = window.open(
-      popupUrl,
-      "Social Login",
-      "width=500,height=600,scrollbars=yes,resizable=no"
-    );
+    // const popup = window.open(
+    //   popupUrl,
+    //   "Social Login",
+    //   "width=500,height=600,scrollbars=yes,resizable=no"
+    // );
 
-    if (!popup || popup.closed || typeof popup.closed === "undefined") {
-      alert("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
-      return;
-    }
+    // if (!popup || popup.closed || typeof popup.closed === "undefined") {
+    //   alert("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
+    //   return;
+    // }
 
-    const timer = setInterval(() => {
-      if (popup.closed) {
-        clearInterval(timer);
-        console.log("팝업이 닫혔습니다.");
-        handlePopupClose();
-      }
-    }, 500);
+    // const timer = setInterval(() => {
+    //   if (popup.closed) {
+    //     clearInterval(timer);
+    //     console.log("팝업이 닫혔습니다.");
+    //     handlePopupClose();
+    //   }
+    // }, 500);
   };
 
   // 팝업 닫힘 핸들러
@@ -127,46 +127,18 @@ function loginPage() {
     checkSocialLogin();
   };
 
-  // 로그인 상태 확인
-  const checkSocialLogin = async () => {
-    try {
-      const response = await fetch("http://localhost:8080/api/users/check-login", {
-        method: "GET",
-        credentials: "include",
-      });
+   // 소셜 로그인 확인 함수
+const checkSocialLogin = () => {
+  const socialLoginAttempt = localStorage.getItem('socialLoginAttempt');
+  if (socialLoginAttempt === 'true') {
+      const tokenData = localStorage.getItem('jwtToken');
+      if (tokenData) {
+          // 토큰 처리 로직 (예: 저장, 리다이렉트 등)
+          console.log("토큰 데이터:", tokenData);
+          localStorage.removeItem('socialLoginAttempt'); // 플래그 초기화
+          window.location.href = 'http://localhost:8080/main'; // 리다이렉트
 
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("서버 응답이 JSON 형식이 아닙니다.");
       }
-
-      const data = await response.json();
-
-      if (!response.ok) throw new Error("로그인 확인 실패");
-
-      const accessToken = response.headers.get("access") || data.access || null;
-      const email = response.headers.get("email") || data.email || null;
-      const userId = response.headers.get("userId") || data.userId || null;
-
-      console.log("🔑 access:", accessToken);
-      console.log("📧 email:", email);
-      console.log("🆔 userId:", userId);
-
-      if (accessToken) {
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("userEmail", email || "");
-        localStorage.setItem("userId", userId || "");
-
-        window.dispatchEvent(new Event("storage"));
-
-        setTimeout(() => {
-          navigate("/main");
-        }, 500);
-      } else {
-        console.warn("🚨 로그인 정보 없음");
-      }
-    } catch (error) {
-      console.error("🚨 로그인 상태 확인 실패:", error);
     }
   };
 
@@ -186,7 +158,7 @@ function loginPage() {
                 <FaGoogle style={{ fontSize: '40px' }} />
               </a> */}
 
-              <a onClick={() => handleSocialLogin('kakao')}>
+                <a href={`http://localhost:8080/api/users/login/social/kakao`}>
                 <div className={styles.kakao}>
                   <RiKakaoTalkFill style={{ fontSize: '40px', color:"#ffffff" }} />
                   <p>카카오 로그인</p>
