@@ -1,4 +1,4 @@
-import { useState } from "react";
+import {useState} from "react";
 import styles from "./styles/Feedback.module.scss";
 import axios from "axios";
 //import closeBtn from "@/assets/icons/modal__close.png";
@@ -18,15 +18,15 @@ type ModalProps = {
 
 // 피드백 데이터 리스트 (아이콘 및 라벨 포함)
 const feedbackItems = [
-    { id: "A", icon: handsIcon, label: "편안했어요" },
-    { id: "B", icon: heartIcon, label: "따뜻해요" },
-    { id: "C", icon: mouthIcon, label: "말이 잘 통해요" },
-    { id: "D", icon: clockIcon, label: "시간 가는 줄 몰랐어요" },
-    { id: "E", icon: laughIcon, label: "배꼽이 빠졌어요" },
-    { id: "F", icon: scoreIcon, label: "속도가 잘 맞아요" }
+    {id: "A", icon: handsIcon, label: "편안했어요"},
+    {id: "B", icon: heartIcon, label: "따뜻해요"},
+    {id: "C", icon: mouthIcon, label: "말이 잘 통해요"},
+    {id: "D", icon: clockIcon, label: "시간 가는 줄 몰랐어요"},
+    {id: "E", icon: laughIcon, label: "배꼽이 빠졌어요"},
+    {id: "F", icon: scoreIcon, label: "속도가 잘 맞아요"}
 ];
 
-function Feedback({ isOpen, historyId }: ModalProps) {
+function Feedback({isOpen, historyId}: ModalProps) {
     const navigate = useNavigate();
     // const [selected, setSelected] = useState<string | null>(null); // 선택한 아이템 저장
     const [selected, setSelected] = useState<string[]>([]);
@@ -47,48 +47,59 @@ function Feedback({ isOpen, historyId }: ModalProps) {
 
 
     const handleSubmitFeedback = async () => {
-        if (isSubmitting || !historyId || selected.length === 0) return; // 중복 체크, historyId 체크
+        if (isSubmitting || !historyId || selected.length === 0) return;
+
+        const userJwtFromStorage = localStorage.getItem("accessToken");
+        if (!userJwtFromStorage) {
+            console.error("No access token found, please log in.");
+            return;
+        }
+
+        setIsSubmitting(true);
 
         try {
-            const userJwtFromStorage = localStorage.getItem("accessToken");
-            if (!userJwtFromStorage) {
-                console.error("No access token found, please log in.");
+            console.log(userJwtFromStorage);
+            const feedbackString = selected.sort().join('');
+            const feedbackData = { feedback: feedbackString, historyId };
+
+            // 피드백 제출 요청
+            try {
+                const response = await axios.post('http://localhost:8080/api/chat/video/feedback', feedbackData, {
+                    headers: { access: userJwtFromStorage }
+                });
+                console.log('피드백 제출 성공:', response.data);
+            } catch (error) {
+                console.error('피드백 제출 실패:', error);
                 return;
             }
-            console.log(userJwtFromStorage);
-            setIsSubmitting(true);
 
-            const feedbackString = selected.sort().join('');
-            // 피드백 데이터 준비
-            const feedbackData = {
-                feedback: feedbackString,
-                historyId: historyId,  // 필요한 경우 props로 전달
-            };
-
-            // 서버에 피드백 전송
-            const response = await axios.post('http://localhost:8080/api/chat/video/feedback', feedbackData, {
-                headers: {
-                    access: userJwtFromStorage
-                }
-            });
             // 대화 기록 저장 요청
-            const saveResponse = await axios.post('http://localhost:8080/api/chat/video/save',
-                {
-                    historyId: historyId
-                },
-                {
-                    headers: {
-                        access: userJwtFromStorage
-                    }
-                });
-            console.log(saveResponse);
+            try {
+                const saveResponse = await axios.post('http://localhost:8080/api/chat/video/save',
+                    { historyId },
+                    { headers: { access: userJwtFromStorage } }
+                );
+                console.log('대화 기록 저장 성공:', saveResponse.data);
+            } catch (error) {
+                console.error('대화 기록 저장 실패:', error);
+                return;
+            }
 
-            // 피드백 제출 후 리포트 페이지로 이동
-            console.log('피드백 제출 성공:', response.data);
             navigate('/main');
+
+            console.log("리포트가 생성중입니다..");
+
+            // 3초 후 리포트 생성 요청
+            setTimeout(async () => {
+                try {
+                    const reportResponse = await axios.post("http://127.0.0.1:8000/ai/users/reports/refine/", { history_id: historyId });
+                    console.log("리포트 생성 완료:", reportResponse.data);
+                } catch (error) {
+                    console.error("리포트 생성 실패:", error);
+                }
+            }, 3000);
         } catch (error) {
-            console.error('피드백 제출 실패:', error);
-            // 에러 처리 로직 추가 가능
+            console.error('알 수 없는 오류 발생:', error);
         } finally {
             setIsSubmitting(false);
         }
