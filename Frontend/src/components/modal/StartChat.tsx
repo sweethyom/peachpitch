@@ -34,13 +34,13 @@ function StartChat({ isOpen, onClose, onStart, isFinger, children }: ModalProps)
             <p className={styles.modal__sub__red}>[시작하기] 버튼을 누르면 쿠폰이 -1 차감됩니다.</p>
           ) : (
             <>
-              <p className={styles.modal__sub__red}>
+              {/* <p className={styles.modal__sub__red}>
                 <strong>! 현재 로그인하지 않은 상태입니다. !</strong> </p>
               <p className={styles.modal__sub__red}>
                 AI 스몰토크는 비로그인 사용자에게 최초 1회 무료로 제공되며 </p>
               <p className={styles.modal__sub__red}>
                 이 경우, 리포트가 저장되지 않습니다.
-              </p>
+              </p> */}
             </>
           )}
         </div>
