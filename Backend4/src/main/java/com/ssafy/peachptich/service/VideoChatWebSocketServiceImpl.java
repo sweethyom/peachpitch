@@ -68,6 +68,24 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
     // 웹소켓 방식: 매칭 및 세션 생성
     @Override
     public synchronized void handleVideoChatWebSocket(String userEmail) throws OpenViduHttpException, OpenViduJavaClientException {
+        System.out.println("=== active session  ===");
+        System.out.println("roomMap status:");
+        for (Map.Entry<Set<String>, RoomInfo> entry : roomMap.entrySet()) {
+            System.out.println("Room Key: " + entry.getKey() + " -> RoomInfo: " + entry.getValue());
+        }
+        System.out.println("userRoomMap status:");
+        for (Map.Entry<String, Set<String>> entry : userRoomMap.entrySet()) {
+            System.out.println("User: " + entry.getKey() + " -> Room Key: " + entry.getValue());
+        }
+        // 이미 방에 참여 중이면 추가 처리 없이 응답 전송
+        if (userRoomMap.containsKey(userEmail)) {
+            System.out.println("already in room");
+            VideoChatRoomResponse alreadyResponse = VideoChatRoomResponse.builder()
+                    .status("already_in_room")
+                    .build();
+            messagingTemplate.convertAndSendToUser(userEmail, "/sub/call", alreadyResponse);
+            return;
+        }
         Long userId = userService.getUserByEmail(userEmail).get().getUserId(); // 현재 userId
         if (waitingUsers.isEmpty()) {
             // 첫 번째 사용자는 대기열에 추가, 아직 매칭 전
@@ -249,7 +267,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         }
         else if (sessionEndType.equals("AUTO")){
             //자동 종료
-             System.out.println("auto request");
+            System.out.println("auto request");
             VideoChatRoomResponse autoResponse = VideoChatRoomResponse.builder()
                     .status("auto")
                     .build();
@@ -286,7 +304,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
             String sessionId = roomInfo.getSessionId();
             System.out.println("out of room request "+roomInfo.getSessionType()+" "+roomInfo.getSessionId());
             if(roomInfo.getSessionType().equals(SessionType.MATCHING)
-            || roomInfo.getSessionType().equals(SessionType.KEYWORD)) {
+                    || roomInfo.getSessionType().equals(SessionType.KEYWORD)) {
                 if(sessionId != null) {
                     Session session = openvidu.getActiveSession(sessionId);
                     try {
