@@ -342,17 +342,6 @@ const VideoChatPage: React.FC = () => {
             onConnect: () => {
                 setIsConnecting(false);
                 console.log("✅ STOMP 연결됨");
-                if(!isMatching) {
-                    console.log("🔍 매칭 시도 중...");
-                    setIsMatching(true);
-                    // 매칭 요청
-                    stompClient.publish({
-                        destination: "/pub/chat",
-                        body: JSON.stringify({
-                            type: "REQUEST",
-                        }),
-                    });
-                }
                 // 매칭 메시지 구독
                 stompClient.subscribe("/user/sub/call", (message) => {
                     console.log("📩 받은 메시지:", message.body);
@@ -370,6 +359,7 @@ const VideoChatPage: React.FC = () => {
                         }, 1000);
                     }
                     else if (response.status === "matched") {
+                        if(session || token) return;
                         console.log("🎉 매칭 완료! 토큰:", response.token);
                         setToken(response.token);
                         setHistoryId(response.historyId);
@@ -395,17 +385,17 @@ const VideoChatPage: React.FC = () => {
                         }, 1000);
                     }
                 });
-                // if(!isMatching) {
-                //     console.log("🔍 매칭 시도 중...");
-                //     setIsMatching(true);
-                //     // 매칭 요청
-                //     stompClient.publish({
-                //         destination: "/pub/chat",
-                //         body: JSON.stringify({
-                //             type: "REQUEST",
-                //         }),
-                //     });
-                // }
+                if(!isMatching) {
+                    console.log("🔍 매칭 시도 중...");
+                    setIsMatching(true);
+                    // 매칭 요청
+                    stompClient.publish({
+                        destination: "/pub/chat",
+                        body: JSON.stringify({
+                            type: "REQUEST",
+                        }),
+                    });
+                }
             },
             onDisconnect: () => console.log("❌ STOMP 연결 종료됨"),
             onStompError: (frame) => {
@@ -508,6 +498,35 @@ const VideoChatPage: React.FC = () => {
     //         throw error;
     //     }
     // }
+
+    useEffect(() => {
+        // 컴포넌트가 언마운트될 때 실행되는 cleanup 함수
+        return () => {
+            // 오디오 스트림 정리
+            if (publisher?.stream) {
+                const mediaStream = publisher.stream.getMediaStream();
+                if (mediaStream) {
+                    mediaStream.getAudioTracks().forEach((track) => {
+                        track.stop();
+                    });
+                }
+            }
+
+            // STT 정리
+            SpeechRecognition.stopListening();
+            resetTranscript();
+
+            // // OpenVidu 세션 정리
+            // if (session) {
+            //     session.disconnect();
+            // }
+            //
+            // // STOMP 연결 정리
+            // if (stompClient) {
+            //     stompClient.deactivate();
+            // }
+        };
+    }, [publisher]);
 
     return (
         <div className={styles.page}>
