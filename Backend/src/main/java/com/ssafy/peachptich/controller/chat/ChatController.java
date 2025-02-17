@@ -89,7 +89,10 @@ public class ChatController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공적으로 저장됨")
     })
-    public ResponseEntity<Void> saveChatTemp(@RequestBody UserChatRequest userChatRequest) {
+
+    public ResponseEntity<Void> saveChatTemp(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody UserChatRequest userChatRequest) {
         chatService.saveUserChatTemp(userChatRequest);
         return ResponseEntity.ok().build();
     }
