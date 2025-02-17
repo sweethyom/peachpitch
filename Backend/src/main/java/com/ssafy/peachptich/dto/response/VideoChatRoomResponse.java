@@ -12,6 +12,7 @@ public class VideoChatRoomResponse {
     private String token;
     private String status;
     private Long historyId;
+    private Long userId;
     private String userName; //나의 이름
     private String matchedUserName; //상대방 이름
     private String matchedUserEmail;
