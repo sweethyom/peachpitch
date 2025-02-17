@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import styles from './styles/video.module.scss';
 
 import leaveBtn from '@/assets/icons/leave.png';
@@ -10,19 +10,21 @@ import KeywordModal from '@/components/modal/KeywordVideo';
 import RedAlert from '@/components/alert/redAlert';
 import "regenerator-runtime/runtime";
 
-import { Client } from "@stomp/stompjs";
-import { OpenVidu, Session, Publisher, Subscriber } from "openvidu-browser";
+import {Client} from "@stomp/stompjs";
+import {OpenVidu, Session, Publisher, Subscriber} from "openvidu-browser";
 
-import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import SpeechRecognition, {useSpeechRecognition} from 'react-speech-recognition';
 
 import FeedbackModal from "@components/modal/Feedback.tsx";
 import {useNavigate} from "react-router-dom";
+import axios from "axios";
 
 enum SessionEndType {
     MANUAL = "MANUAL",
     AUTO = "AUTO",
     ERROR = "ERROR"
 }
+
 enum MessageType {
     REQUEST = "REQUEST",
     TERMINATE = "TERMINATE"
@@ -98,6 +100,7 @@ const VideoChatPage: React.FC = () => {
 
     const [sessionEndType, setSessionEndType] = useState<SessionEndType | null>(null);
     const [matchedUserEmail, setMatchedUserEmail] = useState<string | null>(null);
+    const [userId, setUserId] = useState<number | null>(null);
 
     // 음성인식 있을 때만 자동 재시작
     useEffect(() => {
@@ -135,6 +138,30 @@ const VideoChatPage: React.FC = () => {
             // ✅ 문장이 완성된 경우 저장 (길이 10자 이상 OR 종결어미 OR 마침표 포함)
             if (transcript.length > 100 || sentenceEndRegex.test(transcript)) {
                 setHistory((prevHistory) => [...prevHistory, transcript]); // 기존 기록에 추가
+                const saveTranscript = async () => {
+                    try {
+                        console.log("async 호출");
+                        const response = await axios.post(
+                            'http://localhost:8080/api/chat/video/save/temp',
+                            {
+                                historyId: historyId,
+                                message: transcript,
+                                userId: userId
+                            },
+                            {
+                                headers: {
+                                    access: userJwt
+                                },
+
+                            }
+                        );
+                        console.log(response);
+                    } catch (error) {
+                        console.error("Error saving transcript:", error);
+                    }
+                };
+
+                saveTranscript();
                 setPreviousTranscript(transcript); // 이전 문장 업데이트
                 resetTranscript(); // 저장 후 초기화
             }
@@ -224,10 +251,10 @@ const VideoChatPage: React.FC = () => {
                 console.log("✅ OpenVidu 연결 성공");
                 setSessionId(newSession.sessionId);
 
-                // 10초 후 경고창 표시
+                // 30초 후 경고창 표시
                 setTimeout(() => {
                     setShowTimeAlert(true);
-                }, 10000);
+                }, 30000);
 
                 try {
                     // 로컬 비디오/오디오 스트림
@@ -271,7 +298,7 @@ const VideoChatPage: React.FC = () => {
 
                     newPublisher.on('streamCreated', () => {
                         console.log("publisher 초기화");
-                        if(newPublisher?.stream){
+                        if (newPublisher?.stream) {
                             console.log("publisher stream")
                             const mediaStream = newPublisher.stream.getMediaStream();
                             if (mediaStream && mediaStream.getAudioTracks().length > 0) {
@@ -289,33 +316,14 @@ const VideoChatPage: React.FC = () => {
                                     console.error('STT 초기화 실패:', error);
                                     // STT 실패해도 화상회의는 계속 진행되도록
                                 }
-                            }
-                            else console.log("mediastream 없음");
-                        }
-                        else console.log("publisher stream 없음")
+                            } else console.log("mediastream 없음");
+                        } else console.log("publisher stream 없음")
                     })
-
 
                     console.log("📡 로컬 비디오 퍼블리싱 시작");
                     await newSession.publish(newPublisher);
                     setPublisher(newPublisher);
 
-                    // const mediaStream = newPublisher.stream.getMediaStream();
-                    // console.log("mediaStream "+mediaStream);
-                    //
-                    // if (mediaStream && mediaStream.getAudioTracks().length > 0) {
-                    //     const audioTrack = mediaStream.getAudioTracks()[0];
-                    //     const audioStream = new MediaStream([audioTrack]);
-                    //     try {
-                    //         await SpeechRecognition.startListening({
-                    //             stream: audioStream,  // 전체 스트림 사용
-                    //             continuous: true
-                    //         } as any);
-                    //     } catch (error) {
-                    //         console.error('STT 초기화 실패:', error);
-                    //         // STT 실패해도 화상회의는 계속 진행되도록
-                    //     }
-                    // }
                 } catch (error) {
                     console.error("❌ 카메라 또는 마이크 사용 불가:", error);
                 }
@@ -334,8 +342,8 @@ const VideoChatPage: React.FC = () => {
 
         const stompClient = new Client({
             brokerURL: "ws://localhost:8080/api/ws",
-            heartbeatIncoming: 4000,  // 4초마다 서버로부터 heart-beat 수신
-            heartbeatOutgoing: 4000,   // 4초마다 서버로 heart-beat 전송
+            heartbeatIncoming: 0,  // 4초마다 서버로부터 heart-beat 수신
+            heartbeatOutgoing: 0,   // 4초마다 서버로 heart-beat 전송
             connectHeaders: {
                 access: `${userJwt}`,
             },
@@ -350,8 +358,7 @@ const VideoChatPage: React.FC = () => {
 
                     if (response.status === "waiting") {
                         console.log("🔄 매칭 대기 중...");
-                    }
-                    else if (response.status === "equal") {
+                    } else if (response.status === "equal") {
                         setAlertMessage("자신과 1:1 스몰토크를 할 수 없습니다.");
                         setShowAlert(true);
                         stompClient.deactivate();
@@ -359,23 +366,21 @@ const VideoChatPage: React.FC = () => {
                         setTimeout(() => {
                             navigate("/main");
                         }, 1000);
-                    }
-                    else if (response.status === "matched") {
-                        if(token || session) return;
+                    } else if (response.status === "matched") {
+                        if (token || session) return;
                         console.log("🎉 매칭 완료! 토큰:", response.token);
                         setToken(response.token);
+                        setUserId(response.userId);
                         setHistoryId(response.historyId);
                         setMatchedUserEmail(response.matchedUserEmail);
                         setIsKeywordOpen(true);
-                    }
-                    else if(response.status === "auto"){
+                    } else if (response.status === "auto") {
                         // 자동 종료
                         console.log("자동 종료");
                         setSessionEndType(SessionEndType.AUTO);
                         setIsFeedbackOpen(true);
                         stompClient.deactivate();
-                    }
-                    else if(response.status === "manual" || response.status === "disconnected"){
+                    } else if (response.status === "manual" || response.status === "disconnected") {
                         // 강제 종료
                         console.log("누군가 나감");
                         setAlertMessage("상대방이 대화방을 나갔습니다.");
@@ -387,7 +392,7 @@ const VideoChatPage: React.FC = () => {
                         }, 1000);
                     }
                 });
-                if(!isMatching) {
+                if (!isMatching) {
                     console.log("🔍 매칭 시도 중...");
                     setIsMatching(true);
                     // 매칭 요청
@@ -602,7 +607,7 @@ const VideoChatPage: React.FC = () => {
 
             {/* alert창 */}
             {showAlert && (
-                <div style={{ zIndex: 9999 }}>
+                <div style={{zIndex: 9999}}>
                     <RedAlert
                         message={alertMessage}
                         onClose={() => setShowAlert(false)}
@@ -612,7 +617,7 @@ const VideoChatPage: React.FC = () => {
 
             {/* 10초 후 경고창 */}
             {showTimeAlert && (
-                <div style={{ zIndex: 9999 }}>
+                <div style={{zIndex: 9999}}>
                     <RedAlert
                         message="10초가 경과되었습니다!"
                         onClose={() => setShowTimeAlert(false)}
@@ -624,7 +629,8 @@ const VideoChatPage: React.FC = () => {
             <RoomLeaveModal
                 isOpen={isLeaveOpen}
                 onClose={() => setIsLeaveOpen(false)}
-                stopTTS={() => {}}
+                stopTTS={() => {
+                }}
                 //leaveSession={leaveSession} // 모달 내에서 세션 종료 가능하도록
             />
 

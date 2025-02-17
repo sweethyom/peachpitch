@@ -70,7 +70,9 @@ public class ChatController {
 
     // 사용자와의 대화 redis 저장
     @PostMapping("/chat/video/save/temp")
-    public ResponseEntity<Void> saveChatTemp(@RequestBody UserChatRequest userChatRequest) {
+    public ResponseEntity<Void> saveChatTemp(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody UserChatRequest userChatRequest) {
         chatService.saveUserChatTemp(userChatRequest);
         return ResponseEntity.ok().build();
     }
