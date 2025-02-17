@@ -199,26 +199,6 @@ public class UserServiceImpl implements UserService {
             tokenListService.removeToken("RT:RT:" + userEmail);
             tokenBlacklistService.addTokenToList("BL:AT:" + access);
 
-            /*
-            // 기존 코드
-            // DB에 저장되어 있는지 확인
-            Boolean isExist = refreshRepository.existsByRefresh(refresh);
-            if (!isExist) {
-                // 응답 메시지와 데이터를 포함한 ResponseDto 생성
-                Map<String, Object> responseData = new HashMap<>();
-                responseData.put("error", "refresh token is not available.");
-
-                ResponseDto<Map<String, Object>> responseDto = new ResponseDto<>(
-                        "Bad Request: The token does not exist in database",
-                        responseData
-                );
-
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseDto);
-            }
-
-            // refresh Token을 DB에서 제거
-            refreshRepository.deleteByRefresh(refresh);
-             */
             // 회원 상태(status) false 전환
             User userEntity = userRepository.findByEmail(userEmail).get();
             userEntity.setStatus(false);

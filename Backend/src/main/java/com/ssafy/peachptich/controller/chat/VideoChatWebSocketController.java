@@ -5,6 +5,10 @@ import com.ssafy.peachptich.dto.request.CloseRequest;
 import com.ssafy.peachptich.service.VideoChatWebSocketService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,6 +27,7 @@ import java.security.Principal;
 @Controller
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "VideoChatWebSocketController", description = "화상 채팅 대화 기록 관련 컨트롤러")
 public class VideoChatWebSocketController {
     private final VideoChatWebSocketService videoChatService;
 
@@ -56,6 +61,7 @@ public class VideoChatWebSocketController {
     }
 
     @MessageMapping("/chat")
+    @Operation(summary = "1:1 화상 채팅방 생성 및 종료", description = "1:1 화상 채팅방을 생성/종료합니다.")
     public synchronized void handleVideoChatMessage(
             StompHeaderAccessor accessor,
             ChatMessage chatMessage
@@ -99,6 +105,7 @@ public class VideoChatWebSocketController {
 
     // 같은 화상 채팅방에 있는 유저 두명이 키워드를 선택할 때마다 힌트 전송
     @MessageMapping("/keyword/{historyId}")
+    @Operation(summary = "1:1 화상 채팅 힌트 제공", description = "1:1 화상 채팅 힌트를 전송합니다.")
     public synchronized void sendVideoChatKeyword(
             StompHeaderAccessor accessor,
             @DestinationVariable Long historyId,

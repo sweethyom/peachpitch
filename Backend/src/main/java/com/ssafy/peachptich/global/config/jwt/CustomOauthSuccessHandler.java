@@ -85,12 +85,12 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.setHeader("access", access);
+        // response.setHeader("access", access);
         response.addCookie(createCookie("refresh", refresh));
-        //response.sendRedirect("http://localhost:5173/main");        // redirect 주소
+        response.sendRedirect(String.format("http://localhost:5173/login/social/process?access=%s&userId=%d&email=%s", access, userId, userEmail));        // redirect 주소
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.writeValue(response.getWriter(), responseDto);
+        // ObjectMapper objectMapper = new ObjectMapper();
+        // objectMapper.writeValue(response.getWriter(), responseDto);
 
 
         /*
