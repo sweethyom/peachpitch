@@ -57,7 +57,9 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
             setTimeout(async () => {
                 try {
                     await axios.post("http://127.0.0.1:8000/ai/users/reports/refine/",
-                        { history_id: historyId }
+                        {
+                            history_id: historyId
+                        }
                     );
                     console.log("리포트 생성 완료");
                 } catch (error) {

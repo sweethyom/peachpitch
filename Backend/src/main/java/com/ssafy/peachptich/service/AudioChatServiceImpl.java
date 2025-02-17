@@ -54,8 +54,8 @@ public class AudioChatServiceImpl implements AudioChatService {
             String name = randomName.getRandomName();
             Long historyId = chatHistoryService.addAudioChatHistory(userId, keywordId, name);
             userKeywordService.saveOrUpdate(userId, keywordId);
-            //couponService.useCoupon(userId);
-            //System.out.println("쿠폰 사용");
+            couponService.useCoupon(userId);
+            System.out.println("쿠폰 사용");
             chatRoomResponse = ChatRoomResponse.builder()
                     .hints(hints)
                     .keyword(keyword)
