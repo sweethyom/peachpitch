@@ -5,6 +5,12 @@ import com.ssafy.peachptich.global.config.jwt.TokenProvider;
 import com.ssafy.peachptich.repository.RefreshRepository;
 import com.ssafy.peachptich.service.TokenListService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,13 +26,24 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "ReissueController", description = "회원 관련 토큰 재발행 컨트롤러")
 public class ReissueController {
     private final TokenProvider tokenProvider;
     private final RefreshRepository refreshRepository;
     private final TokenListService tokenListService;
     private final RedisTemplate<String, String> redisTemplate;
 
+    // 매직 넘버 상수 정의
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 82000000L;
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 86400000L;
+
     @PostMapping("/api/users/reissue")
+    @Operation(summary = "Access token 재발행", description = "refresh 토큰을 기반으로 access 토큰을 재발행합니다.",
+    security = {@SecurityRequirement(name = "access"), @SecurityRequirement(name = "refresh")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "재발행 성공"),
+            @ApiResponse(responseCode = "400", description = "refresh 토큰이 존재하지 않거나 유효하지 않음")
+    })
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response){
         // get refresh Token
         String refresh = null;
@@ -67,26 +84,12 @@ public class ReissueController {
             return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
         }
 
-        /* 기존 코드
-        // DB에 저장되어 있는지 확인
-        Boolean isExist = refreshRepository.existsByRefresh(refresh);
-        if (!isExist) {
-            // response body
-            return new ResponseEntity<>("invalid refresh token", HttpStatus.BAD_REQUEST);
-        }
-         */
-
         // make new JWT
-        String newAccess = tokenProvider.createJwt("access", userEmail, role, 82000000L);
-        String newRefresh = tokenProvider.createJwt("refresh", userEmail, role, 86400000L);
-
-        // Refresh Token 저장
-        // DB에 기존의 Refresh Token 삭제 후 새 Refresh Token 저장
-        // refreshRepository.deleteByRefresh(refresh);
-        // addToken(userEmail, newRefresh, 86400000L);
-
-        addToken("RT:AT:" + userEmail, newAccess, 82000000L);
-        addToken("RT:RT:" + userEmail, newRefresh, 86400000L);
+        String newAccess = tokenProvider.createJwt("access", userEmail, role, ACCESS_TOKEN_EXPIRE_TIME);
+        String newRefresh = tokenProvider.createJwt("refresh", userEmail, role, REFRESH_TOKEN_EXPIRE_TIME);
+        
+        addToken("RT:AT:" + userEmail, newAccess, ACCESS_TOKEN_EXPIRE_TIME);
+        addToken("RT:RT:" + userEmail, newRefresh, REFRESH_TOKEN_EXPIRE_TIME);
 
         // response
         response.setHeader("access", newAccess);
@@ -113,5 +116,4 @@ public class ReissueController {
                 TimeUnit.MICROSECONDS
         );
     }
-
 }

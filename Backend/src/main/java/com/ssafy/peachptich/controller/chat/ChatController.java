@@ -14,6 +14,10 @@ import com.ssafy.peachptich.entity.ChatHistory;
 import com.ssafy.peachptich.entity.ChatReport;
 import com.ssafy.peachptich.entity.TotalReport;
 import com.ssafy.peachptich.service.ChatService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,11 +31,18 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api")
+@Tag(name = "ChatController", description = "채팅 기록 관련 컨트롤러")
 public class ChatController {
     private final ChatService chatService;
 
     // Django에서 redis에 저장한 AI 대화내용 db에 저장하기
     @PostMapping("/chat/save")
+    @Operation(summary = "redis에 저장된 AI 대화내용 DB 저장", description = "redis에 저장된 AI 대화 내용을 DB에 저장합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 저장됨"),
+            @ApiResponse(responseCode = "401", description = "인증 정보가 없음"),
+            @ApiResponse(responseCode = "500", description = "채팅 저장 중 오류 발생")
+    })
     public ResponseEntity<Void> saveChatContent(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody ChatRequest chatrequest) {
@@ -54,6 +65,10 @@ public class ChatController {
 
     // 랜덤 스크립트 기능
     @PostMapping("/main/randomscript")
+    @Operation(summary = "랜덤 스크립트 기능", description = "랜덤 스크립트를 가져옵니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "랜덤 스크립트 로드 성공")
+    })
     public ResponseEntity<ResponseDto<RandomScriptResponse>> showRandomScript() {
         // 랜덤 채팅 가져오기
         Chat randomChat = chatService.getRandomChat();
@@ -70,6 +85,10 @@ public class ChatController {
 
     // 사용자와의 대화 redis 저장
     @PostMapping("/chat/video/save/temp")
+    @Operation(summary = "1:1 대화 redis 저장", description = "1:1 대화 내용을 redis에 저장합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 저장됨")
+    })
     public ResponseEntity<Void> saveChatTemp(@RequestBody UserChatRequest userChatRequest) {
         chatService.saveUserChatTemp(userChatRequest);
         return ResponseEntity.ok().build();
@@ -77,6 +96,12 @@ public class ChatController {
 
     // redis에 저장한 사용자와의 대화 db저장
     @PostMapping("/chat/video/save")
+    @Operation(summary = "redis에 저장된 1:1 대화 내용 DB 저장", description = "redis에 저장된 1:1 대화 내용을 DB에 저장합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 저장됨"),
+            @ApiResponse(responseCode = "401", description = "인증 정보가 없음"),
+            @ApiResponse(responseCode = "500", description = "채팅 저장 중 오류 발생")
+    })
     public ResponseEntity<Void> saveChat(@RequestBody UserChatRequest userChatRequest){
         log.debug("Request received: {}", userChatRequest);
 
@@ -98,6 +123,10 @@ public class ChatController {
 
     // 대화 상세 리포트
     @PostMapping("/users/reports/report")
+    @Operation(summary = "대화 상세 리포트 생성", description = "대화 상세 리포트를 생성합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 생성함")
+    })
     public ResponseEntity<ResponseDto<ReportResponse>> showReport(@RequestBody ReportRequest reportRequest) {
         log.info("대화리포트 조회시작");
         // 리포트 내용 가져오기
@@ -149,6 +178,10 @@ public class ChatController {
 
     // 전체 리포트
     @PostMapping("/users/reports/totalreport")
+    @Operation(summary = "전체 리포트 ", description = "대화 상세 리포트를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회함")
+    })
     public ResponseEntity<ResponseDto<TotalReportResponse>> showOverview(@RequestBody TotalReportRequest totalReportRequest) {
         // TotalReportResponse를 반환받음
         TotalReportResponse response = chatService.getTotalReport(totalReportRequest.getUserId());

@@ -4,6 +4,10 @@ import com.ssafy.peachptich.dto.CustomUserDetails;
 import com.ssafy.peachptich.dto.request.*;
 import com.ssafy.peachptich.dto.response.*;
 import com.ssafy.peachptich.service.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/chat/video")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "VideoChatController", description = "1:1 매칭 대화 관련 컨트롤러")
 public class VideoChatController {
     // private final VideoChatService videoChatService;
     private final ChatHistoryService chatHistoryService;
@@ -54,6 +59,10 @@ public class VideoChatController {
     */
 
     @PostMapping("/feedback")
+    @Operation(summary = "1:1 피드백 정보 저장", description = "1:1 피드백 정보를 저장합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 저장됨")
+    })
     public ResponseEntity<ResponseDto<Void>> requestVideoChatFeedback(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody FeedbackRequest feedbackRequest) {
