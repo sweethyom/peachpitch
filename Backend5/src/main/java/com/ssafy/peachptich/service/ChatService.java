@@ -28,7 +28,7 @@ public interface ChatService {
     // 사용자대화 redis 저장
     void saveUserChatTemp(UserChatRequest userChatRequest);
     // 사용자대화 db 저장
-    void saveUserChat(ChatRequest chatRequest, Long userId);
+    void saveUserChat(ChatRequest chatRequest);
     // 특정 대화 조회
     List<Chat> getChatsByHistoryId(Long historyId);
     // 대화 리포트 조회
