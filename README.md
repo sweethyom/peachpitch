@@ -34,7 +34,11 @@
 
 ## 🎥 데모 영상
 
-링크!
+전체 영상 포트폴리오
+(링크)
+
+시연 영상
+(링크)
 
 <br />
 
@@ -42,9 +46,29 @@
 
 ## 💡 주요 기능
 
-### 핵심기능 1,2,3
+### AI 스몰토크
 
-### 로그인, ... 등등등
+### 1대1 스몰토크
+
+### 분석 리포트
+
+### 비회원 핑거프린트
+
+### 채팅관리
+
+### 로그인(일반)
+
+### 로그인(카카오)
+
+### 결제 (카카오 api)
+
+### 블루그린 배포
+
+### 키워드 랭킹
+
+### 랜덤 스크립트
+
+
 
 <br />
 
@@ -76,6 +100,12 @@
 ![Gitlab Badge](https://img.shields.io/badge/gitlab-FC6D26?style=flat-square&logo=gitlab&logoColor=fff)
 ![Jira Badge](https://img.shields.io/badge/Jira-0052CC?logo=jira&logoColor=fff&style=flat-square)
 ![Mattermost Badge](https://img.shields.io/badge/Mattermost-0058CC?logo=mattermost&logoColor=fff&style=flat-square)
+
+
+### 모니터링
+![Grafana Badge](https://img.shields.io/badge/grafana-F46800?style=flat-square&logo=grafana&logoColor=fff)
+![Prometheus Badge](https://img.shields.io/badge/prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=fff)
+![Google Analytics Badge](https://img.shields.io/badge/googleanalytics-E37400?style=flat-square&logo=googleanalytics&logoColor=fff)
 
 
 
@@ -189,11 +219,11 @@
 
 |  이름  |        역할        | <div align="center">개발 내용</div>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | :----: | :----------------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 김미경 | Frontend<br />팀장 | - DB 설계<br />- Spring Data JPA 세팅<br />&nbsp;&nbsp;&nbsp;&nbsp;- 채팅 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 로그인 도메인 개발<br />- TypeScript, Nest.js와 Socket.io를 이용한 실시간 채팅 서버 구현<br />&nbsp;&nbsp;&nbsp;&nbsp;- 웹소켓 연결<br />&nbsp;&nbsp;&nbsp;&nbsp;- 1대1 실시간 채팅 구현<br />- JWT를 이용한 토큰 생성 구현<br />- 채팅 서버 EC2 배포<br />- crontab 이용한 Linux mysql DB 백업 스케줄러 작동<br />- 'ssafymate.site' 도메인 적용                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| 김민주 |      Backend      | - DB 설계<br />- Spring Boot로 RESTful API 작성<br />&nbsp;&nbsp;&nbsp;&nbsp;- 로그인 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 회원가입 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 아이디 찾기 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 비밀번호 재설정 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 회원 정보 조회 및 수정 도메인 개발<br />- SMTP Server, Redis를 이용한 이메일 인증 기능 구현<br />- 스프링 시큐리티, JWT를 이용한 인증 구현<br />- EC2 인프라 환경 세팅<br />- 프론트엔드, 백엔드 EC2 배포<br />- Github Action, Jenkins, Docker를 활용한 CI/CD<br />- Letsencrypt, Certbot을 이용한 서비스 SSL 보안 적용<br />- Nginx 웹서버 적용(Load Balancing, Reverse Proxy, Service Redirect 설정)                                                                                                                                                                                                                                                                                                                                                                           |
-| 이한나 |      AI      | - DB 설계<br />&nbsp;&nbsp;&nbsp;&nbsp;- 기술 스택 데이터 전처리<br />&nbsp;&nbsp;&nbsp;&nbsp;- 교육생 인증 데이터 전처리<br />- 서버에 기술 스택 이미지 업로드<br />- Spring Boot로 RESTful API 작성<br />&nbsp;&nbsp;&nbsp;&nbsp;- 기술 스택 조회 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 팀 생성/수정/삭제 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 팀 상세보기 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 팀 탈퇴 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 팀 리스트 검색 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 팀 합류/지원 요청 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 팀 합류/지원 메세지 조회 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 팀 합류/지원 요청 응답 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 교육생 상세보기 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 교육생 리스트 검색 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 교육생 프로젝트 트랙 선택 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 참여 중인 팀 조회 서비스 도메인 개발                                       |
-| 이효미 |     Backend      | - '싸피 메이트' 서비스 기획<br />- 서비스 메인 홈 페이지 개발<br />- 팀 공고, 교육생 공고 정보 제공 및 검색 서비스 개발<br />- 팀 생성 · 수정 · 삭제 · 탈퇴 서비스 개발<br />- 팀 합류 요청 및 팀 지원 요청 서비스 개발<br />- 404 Not Found 페이지 개발<br />- 팀, 교육생 공고 목록 페이지, 상세 정보 페이지의 Skeleton UI 구현<br />- 'Redux', 'React-Query'를 이용한 상태관리<br />- 'Emotion'을 이용한 CSS-in-JS 방식으로 스타일링 구현 <br />- 'Media Query'와 'React-Responsive'를 이용한 반응형 웹 구현<br />- 검색 엔진 최적화(SEO) 작업<br />&nbsp;&nbsp;&nbsp;&nbsp;- Meta Data들을 설정하고 체계화된 Heading 처리 및 시멘틱 마크업 사용,<br />&nbsp;&nbsp;&nbsp;&nbsp;- SEO Score 100점 달성<br />- 웹 성능 최적화 작업<br />&nbsp;&nbsp;&nbsp;&nbsp;- 'Lazy Loading' 적용<br />&nbsp;&nbsp;&nbsp;&nbsp;- 이미지 파일 최적화 등을 통해 웹 성능 최적화 진행<br />&nbsp;&nbsp;&nbsp;&nbsp;- Performance Score 62점 → 88점으로 개선<br />&nbsp;&nbsp;&nbsp;&nbsp;- Speed Index 속도 3.5초 → 1.3초로 개선<br />- 'Mock Service Worker'를 이용해 목업 API 구현하여 API 테스트 진행 |
-| 정유선 |     Infra      | - Emotion을 이용한 CSS-in-JS 방식으로 스타일링 작업<br />- Media Query를 이용한 반응형 UI 설계<br />&nbsp;&nbsp;&nbsp;&nbsp;- MUI를 이용해 모바일, 태블릿 등의 뷰포트에 따른 채팅 목록 Drawer 적용<br />- Custom hook을 이용한 채팅 입력 상태 관리<br />- Socket.io를 이용한 WebRTC 채팅 구현<br />&nbsp;&nbsp;&nbsp;&nbsp;- 1:1 실시간 채팅 구현, 메시지 주고 받기<br />&nbsp;&nbsp;&nbsp;&nbsp;- Socket의 namespace를 나누어 사용자가 타인의 채팅방에 접속하는 것 제한<br />&nbsp;&nbsp;&nbsp;&nbsp;- Socket으로 로그인, 로그아웃 상태를 전달해 접속 중인 사용자의 온라인 상태 동기화<br />- SWR을 이용한 채팅 목록, 채팅 내역 상태 관리 및 비동기 API 처리<br />&nbsp;&nbsp;&nbsp;&nbsp;- 채팅 내역 스크롤 이동에 따른 데이터 페이징 API 처리, 무한 스크롤링 구현<br />- Mock Service Worker를 이용해 목업 API 구현하여 백엔드 API 설계 이전 API 테스팅 진행                                                                                                                                                                                                                          |
-| 최지원 |     Backend      | - 회원가입 서비스 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- React-hook-form 을 이용한 회원가입 form 관리<br />&nbsp;&nbsp;&nbsp;&nbsp;- 이메일 인증을 통한 회원가입 구현<br />- 로그인<br />&nbsp;&nbsp;&nbsp;&nbsp;- Redux, Redux Saga를 통한 회원 정보 상태 관리<br />- 회원 정보 수정 서비스 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- React custom hook 사용<br />&nbsp;&nbsp;&nbsp;&nbsp;- Redux, Redux-Saga를 통한 회원 정보 상태 관리<br />- Redux를 통한 전역 Alert 서비스 개발<br />- 아이디찾기, 비밀번호 재설정 서비스 개발<br />- 입력값에 대한 유효성 검사를 통해 불필요한 통신 최소화<br />- Emotion을 이용한 CSS-in-JS 방식으로 스타일링 작업<br />- 미디어 쿼리를 이용한 반응형 구현<br />- Mock Service Worker를 이용해 목업 API 구현하여 백엔드 API 설계 이전 API 테스팅 진행                                                                                                                                                                                                                                                                                                      |
+| 김미경 | Frontend<br />팀장 | - DB 설계<br />- Spring Data JPA 세팅                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 김민주 |      Backend      | - DB 설계<br />- 키워드, 힌트 csv 데이터 DB에 저장<br />- Spring Boot와 STOMP, WebRTC를 이용한 1:1 화상 대화 기능 구현<br />&nbsp;&nbsp;&nbsp;&nbsp;- 실시간 매칭 기능 구현<br />&nbsp;&nbsp;&nbsp;&nbsp;- 실시간 키워드 선택 기능 구현<br />&nbsp;&nbsp;&nbsp;&nbsp;- Openvidu(WebRTC) 세션 생성 및 토큰 전달<br />&nbsp;&nbsp;&nbsp;&nbsp;- 종료 기능 구현<br />- TypeScript, React와 STOMP를 이용한 1:1 화상 대화 기능 구현<br />&nbsp;&nbsp;&nbsp;&nbsp;- STOMP 웹소켓 연결<br />&nbsp;&nbsp;&nbsp;&nbsp;- react-speech-recognition으로 1:1 대화 중 stt 연결<br />- Spring Boot로 RESTful API 작성<br />&nbsp;&nbsp;&nbsp;&nbsp;- 대화 내역 업데이트 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- AI 채팅 요청 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 랜덤 키워드 제공 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 많이 선택된 키워드 랭킹 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 키워드 선택 서비스 도메인 개발<br />&nbsp;&nbsp;&nbsp;&nbsp;- 1:1 채팅 후 피드백 기능 개발<br />- Openvidu 배포 자체 테스팅 진행<br />                                                                                                                                                                                                                                                                                                                                                                         |
+| 이한나 |      AI      | - DB 설계<br />&nbsp;&nbsp;&nbsp;&nbsp;- 기술 스택 데이터 전처리                                       |
+| 이효미 |     Backend      | - '싸피 메이트' 서비스 기획<br />- 서비스 메인 홈 페이지 개발<br /> |
+| 정유선 |     Infra      | - 가나다라마바사                                                                                                                                                                                                        |
+| 최지원 |     Backend      | - DB 설계<br />- Swagger UI를 활용한 API 문서 자동화<br />- Spring Security 기반 인증/인가 시스템 구축<br />- JWT 기반 토큰 인증 시스템 설계 및 구현<br />- Redis 활용 토큰 관리<br />- JWT Blacklist를 통한 중복 로그인 방지<br />- OAuth2.0 사용 카카오 소셜 로그인 연동<br />- 회원 CRUD 기능 구현<br />- 비밀번호 암호화 적용<br />                                                                                                                                                                                                                                                                                                    |
 
 <br />
