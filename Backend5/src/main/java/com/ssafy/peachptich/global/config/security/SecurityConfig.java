@@ -111,7 +111,7 @@ public class SecurityConfig {
                             CorsConfiguration configuration = new CorsConfiguration();
 
                             //configuration.setAllowedOrigins(Collections.singletonList("http://localhost:5173"));
-                            configuration.setAllowedOriginPatterns(Collections.singletonList("*")); // Websocket 때문에 바꾼 설정
+                            configuration.setAllowedOriginPatterns(Collections.singletonList("https://peachpitch.site")); // Websocket 때문에 바꾼 설정
                             configuration.setAllowedMethods(Collections.singletonList("*"));
                             configuration.setAllowCredentials(true);        // 프론트에서 credential 설정하면 true로 설정해줘야 함
                             configuration.setAllowedHeaders(Collections.singletonList("*"));
