@@ -1,0 +1,201 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+
+    width: 1100px;
+    min-height: 100vh;
+
+    height: 100vh;
+}
+
+.chat {
+    display: flex;
+    flex-direction: column;
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 20px 0 30px 0; 
+
+        &__title {
+            font-weight: 700;
+            font-size: 40px;
+        }
+
+        &__img {
+            width: 40px;
+            cursor: pointer;
+        }
+    }
+
+    &__ai {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+
+        position: relative;
+        /* 상대 위치 설정 */
+        z-index: 1;
+        /* AI 섹션이 Human 섹션 위로 올라오도록 설정 */
+        margin-bottom: -30px;
+        /* 아래로 겹치게 설정 */
+
+        &__video {
+            position: relative;
+        }
+
+        &__bubble {
+            width: 100%;
+        }
+    }
+
+    &__user {
+        display: flex;
+        flex-direction: row;
+        gap: 20px;
+        justify-content: flex-end;
+
+        position: relative;
+        /* 상대 위치 설정 */
+        z-index: 2;
+        /* Human 섹션이 AI 섹션 뒤로 오도록 설정 */
+        margin-top: -130px;
+        /* 위로 겹치게 설정 */
+
+        &__video {
+            width: 500px;
+            height: 460px;
+
+            position: relative;
+        }
+
+        &__bubble {
+            margin-top: auto;
+            padding-bottom: 30px;
+            padding-top: 30px;
+        }
+    }
+
+    &__input {
+        position: relative;
+        width: 1100px;
+        height: 110px;
+        padding: 20px 80px 20px 30px;
+        border-radius: 25px;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+        margin-top: 30px;
+        margin-bottom: 20px;
+
+        &__content {
+            display: block;
+            font-weight: 700;
+            font-size: 18px;
+            word-break: break-word;
+            white-space: pre-wrap;
+            height: auto;
+
+            max-height: 70px;
+            overflow-y: auto;
+
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        &__img {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+        }
+    }
+}
+
+
+.bubble__left {
+    display: inline-flex;
+    position: relative;
+    background-color: var(--color-white-000);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    font-weight: 700;
+    font-size: 18px;
+    color: #333;
+}
+
+.bubble__left::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 24px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 8px 8px 0 8px;
+    border-color: var(--color-white-000) transparent transparent transparent;
+    filter: drop-shadow(0 0.125rem 0.625rem rgba(0, 0, 0, 0.2));
+}
+
+.bubble__left::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 22px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 10px 0 10px;
+    border-color: var(--color-white-000) transparent transparent transparent;
+}
+
+.bubble__right {
+    display: flex;
+    margin-left: auto;
+    // justify-content: flex-end;
+    position: relative;
+    background-color: var(--color-yellow-300);
+    // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 16px;
+    font-weight: 700;
+    font-size: 18px;
+    line-height: 1.5;
+    max-width: 600px;
+    color: #333;
+}
+
+.bubble__right::before {
+    content: '';
+    position: absolute;
+    bottom: -7px;
+    right: 24px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 8px 8px 0 8px;
+    border-color: var(--color-yellow-300) transparent transparent transparent;
+    // filter: drop-shadow(0 0.0625rem 0.1875rem rgba(0, 0, 0, 0.1));
+}
+
+.btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    width: 135px;
+    height: 52px;
+    background-color: var(--color-brown-200);
+    // border: solid var(--color-white-600) 1px;
+    color: var(--color-white-000);
+    font-weight: 500;
+    font-size: 16px;
+    border-radius: 12px;
+
+    cursor: pointer;
+}
+
