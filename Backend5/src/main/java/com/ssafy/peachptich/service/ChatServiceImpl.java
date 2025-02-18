@@ -127,8 +127,8 @@ public class ChatServiceImpl implements ChatService {
             List<Chat> chatsToSave = new ArrayList<>();
             String redisKey = "chat:" + chatRequest.getHistoryId() + ":messages";
 
-            String userIdKey = "chat:" + chatRequest.getHistoryId() + ":userId";
-            Long userId = Long.parseLong(redisTemplate.opsForValue().get(userIdKey));
+            //String userIdKey = "chat:" + chatRequest.getHistoryId() + ":userId";
+            //Long userId = Long.parseLong(redisTemplate.opsForValue().get(userIdKey));
 
             ChatHistory chatHistory = chatHistoryRepository.findById(chatRequest.getHistoryId())
                     .orElseThrow(() -> new RuntimeException("ChatHistory not found"));
@@ -149,6 +149,7 @@ public class ChatServiceImpl implements ChatService {
 
                     String content = jsonNode.has("message") ? jsonNode.get("message").asText() : "";
                     LocalDateTime createdAt = LocalDateTime.now(); // 기본값 설정
+                    Long userId = jsonNode.has("userId") ? jsonNode.get("userId").asLong() : 0; // null은 ai로 인식
 
                     if (jsonNode.has("createdAt") && !jsonNode.get("createdAt").isNull()) {
                         try {
