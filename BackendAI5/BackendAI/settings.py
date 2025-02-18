@@ -23,7 +23,7 @@ GOOGLE_CX = os.getenv('GOOGLE_CX')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # MySQL 엔진 사용
-        'NAME': 'peachpitch2',           # 데이터베이스 이름
+        'NAME': 'peachpitch',           # 데이터베이스 이름
         'USER': 'root',              # MySQL 사용자 이름
         'PASSWORD': 'pikapikapika1234',      # MySQL 비밀번호
         'HOST': '43.201.5.129',                    # 로컬에서 실행 중이므로 localhost
