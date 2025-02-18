@@ -1,7 +1,8 @@
 # PeachPitch
 ### SSAFY 12기 공통 프로젝트 - D201 Team 노 피카 킵고잉
 
-(배너 이미지 넣기)
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/landingpage.gif?ref_type=heads" />
+
 
 스몰톡이 어려운 사람들을 위한 AI 스피킹 연습
 
@@ -160,7 +161,7 @@
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="" alt="이한나 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/leehanna.jpg?ref_type=heads" alt="이한나 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
