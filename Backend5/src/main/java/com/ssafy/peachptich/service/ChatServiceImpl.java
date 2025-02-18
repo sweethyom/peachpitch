@@ -113,7 +113,7 @@ public class ChatServiceImpl implements ChatService {
 
             log.info("Saving chat - Key: {}, Request: {}", key, userChatRequest);
 
-            objectRedisTemplate.opsForList().leftPush(key, userChatRequest);
+            objectRedisTemplate.opsForList().rightPush(key, userChatRequest);
         } catch (Exception e) {
             log.error("Error saving chat: ", e);
             throw new RuntimeException("Failed to save chat to Redis", e);
@@ -126,7 +126,9 @@ public class ChatServiceImpl implements ChatService {
         try {
             List<Chat> chatsToSave = new ArrayList<>();
             String redisKey = "chat:" + chatRequest.getHistoryId() + ":messages";
-            //Long userId = userChatRequest.getUserId();
+
+            String userIdKey = "chat:" + userChatRequest.getHistoryId() + ":userId";
+            Long userId = Long.parseLong(redisTemplate.opsForValue().get(userIdKey));
 
             ChatHistory chatHistory = chatHistoryRepository.findById(chatRequest.getHistoryId())
                     .orElseThrow(() -> new RuntimeException("ChatHistory not found"));
