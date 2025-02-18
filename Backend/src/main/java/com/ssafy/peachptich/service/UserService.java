@@ -14,7 +14,7 @@ import java.util.Optional;
 public interface UserService {
     Optional<User> joinProcess(JoinRequest joinRequest);
     ResponseEntity<ResponseDto<Map<String, Object>>> withdrawProcess(HttpServletRequest request, HttpServletResponse response,
-                                                                            Authentication authentication);
+                                                                     Authentication authentication);
 
     ResponseEntity<ResponseDto<Map<String, Boolean>>> checkEmail(String email);
 
@@ -23,5 +23,6 @@ public interface UserService {
 
     public ResponseEntity<ResponseDto<Map<String, Object>>> checkLoginStatus(HttpServletRequest request, Authentication authentication);
 
+    String getUserEmail(Long userId);
 }
 

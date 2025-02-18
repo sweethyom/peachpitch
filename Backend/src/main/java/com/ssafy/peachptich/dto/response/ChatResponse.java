@@ -10,7 +10,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 //보낸 시각, 내용, 말하는 유저 id를 포함하는 대화내용
 public class ChatResponse {
-    private Long chatId;
     private LocalDateTime createdAt;
     private String content;
     private Long userId;

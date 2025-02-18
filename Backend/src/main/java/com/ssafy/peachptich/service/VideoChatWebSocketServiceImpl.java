@@ -2,6 +2,8 @@ package com.ssafy.peachptich.service;
 
 import com.ssafy.peachptich.dto.request.AudioChatRequest;
 import com.ssafy.peachptich.dto.request.CloseRequest;
+import com.ssafy.peachptich.dto.request.UserChatRequest;
+import com.ssafy.peachptich.dto.response.ChatResponse;
 import com.ssafy.peachptich.dto.response.ChatRoomResponse;
 import com.ssafy.peachptich.dto.response.HintResponse;
 import com.ssafy.peachptich.dto.response.VideoChatRoomResponse;
@@ -16,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -39,6 +43,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
         OPENVIDU,
         TERMINATED
     }
+
     private final ChatHistoryService chatHistoryService;
     private final UserService userService;
     private final KeywordService keywordService;
@@ -344,6 +349,30 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
                 roomMap.remove(roomKey);
                 //chatHistoryService.updateStatusFalse(roomInfo.getHistoryId()); //상태 변경
             }
+        }
+    }
+
+    // 구독 중인 유저한테 메세지 보내줌
+    @Override
+    public void handleSendVideoChatMessage(UserChatRequest userChatRequest) {
+        ChatResponse chatResponse = ChatResponse.builder()
+                .content(userChatRequest.getMessage())
+                .userId(userChatRequest.getUserId())
+                .createdAt(LocalDateTime.parse(userChatRequest.getCreatedAt()))
+                .build();
+        // 현재 유저에게 메세지 보내줌
+        String userEmail = userService.getUserEmail(userChatRequest.getUserId());
+        Set<String> roomKey = userRoomMap.get(userEmail);
+
+        // roomKey가 null이 아니면 (즉, 유저가 방에 속해 있으면)
+        if (roomKey != null) {
+            // 해당 방에 속한 모든 유저에게 메시지 전송
+            for (String email : roomKey) {
+                messagingTemplate.convertAndSendToUser(email, "/sub/call", chatResponse);
+            }
+        } else {
+            // 방에 속해 있지 않은 경우 자기 자신에게만 전송
+            messagingTemplate.convertAndSendToUser(userEmail, "/sub/call", chatResponse);
         }
     }
 

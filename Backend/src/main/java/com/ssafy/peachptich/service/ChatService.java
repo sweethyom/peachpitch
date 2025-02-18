@@ -6,9 +6,7 @@ import com.ssafy.peachptich.dto.request.ReportRequest;
 import com.ssafy.peachptich.dto.request.UserChatRequest;
 import com.ssafy.peachptich.dto.response.TotalReportResponse;
 import com.ssafy.peachptich.entity.Chat;
-import com.ssafy.peachptich.entity.ChatHistory;
 import com.ssafy.peachptich.entity.ChatReport;
-import com.ssafy.peachptich.entity.TotalReport;
 
 import java.util.List;
 
@@ -28,7 +26,7 @@ public interface ChatService {
     // 사용자대화 redis 저장
     void saveUserChatTemp(UserChatRequest userChatRequest);
     // 사용자대화 db 저장
-    void saveUserChat(ChatRequest chatRequest, Long userId);
+    void saveUserChat(ChatRequest chatRequest);
     // 특정 대화 조회
     List<Chat> getChatsByHistoryId(Long historyId);
     // 대화 리포트 조회
@@ -36,6 +34,8 @@ public interface ChatService {
 
     // 전체 리포트 조회
     TotalReportResponse getTotalReport(Long userId);
+
+    //ChatResponse getTempRecentChat(Long historyId);
 
 //    /**
 //     * 특정 유저의 채팅 내용 조회 (필요한 경우)

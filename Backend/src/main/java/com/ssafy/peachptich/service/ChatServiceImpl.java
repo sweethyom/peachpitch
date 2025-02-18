@@ -15,6 +15,7 @@ import com.ssafy.peachptich.repository.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,9 @@ import java.util.List;
 public class ChatServiceImpl implements ChatService {
     private final RedisTemplate<String, String> redisTemplate;
     private final RedisTemplate<String, Object> objectRedisTemplate;
+
+    // redis 저장 이벤트 발행
+    private final ApplicationEventPublisher publisher;
 
     private final ChatRepository chatRepository;
     private final ReportRepository reportRepository;
@@ -112,8 +116,10 @@ public class ChatServiceImpl implements ChatService {
             String key = CHAT_KEY_PREFIX + userChatRequest.getHistoryId() + ":messages";
 
             log.info("Saving chat - Key: {}, Request: {}", key, userChatRequest);
+            log.info("event");
 
-            objectRedisTemplate.opsForList().leftPush(key, userChatRequest);
+            objectRedisTemplate.opsForList().rightPush(key, userChatRequest);
+            publisher.publishEvent(userChatRequest); // 이벤트 발생
         } catch (Exception e) {
             log.error("Error saving chat: ", e);
             throw new RuntimeException("Failed to save chat to Redis", e);
@@ -122,11 +128,13 @@ public class ChatServiceImpl implements ChatService {
 
     // redis 대화 db에 저장
     @Override
-    public void saveUserChat(ChatRequest chatRequest, Long userId) {
+    public void saveUserChat(ChatRequest chatRequest) {
         try {
             List<Chat> chatsToSave = new ArrayList<>();
             String redisKey = "chat:" + chatRequest.getHistoryId() + ":messages";
-            //Long userId = userChatRequest.getUserId();
+
+            //String userIdKey = "chat:" + chatRequest.getHistoryId() + ":userId";
+            //Long userId = Long.parseLong(redisTemplate.opsForValue().get(userIdKey));
 
             ChatHistory chatHistory = chatHistoryRepository.findById(chatRequest.getHistoryId())
                     .orElseThrow(() -> new RuntimeException("ChatHistory not found"));
@@ -147,6 +155,7 @@ public class ChatServiceImpl implements ChatService {
 
                     String content = jsonNode.has("message") ? jsonNode.get("message").asText() : "";
                     LocalDateTime createdAt = LocalDateTime.now(); // 기본값 설정
+                    Long userId = jsonNode.has("userId") ? jsonNode.get("userId").asLong() : 0; // null은 ai로 인식
 
                     if (jsonNode.has("createdAt") && !jsonNode.get("createdAt").isNull()) {
                         try {
@@ -254,6 +263,35 @@ public class ChatServiceImpl implements ChatService {
                 .build();
     }
 
+    /*
+    public ChatResponse getTempRecentChat(Long historyId) {
+        String redisKey = "chat:" + historyId + ":messages";
+        String message = redisTemplate.opsForList().index(redisKey, -1);
+        ChatResponse chatResponse = ChatResponse.builder().build();
+        try {
+            JsonNode jsonNode = objectMapper.readTree(message);
+            log.info("파싱된 메시지: {}", jsonNode.toString());
+
+            String content = jsonNode.has("message") ? jsonNode.get("message").asText() : "";
+            LocalDateTime createdAt = LocalDateTime.now(); // 기본값 설정
+
+            if (jsonNode.has("createdAt") && !jsonNode.get("createdAt").isNull()) {
+                try {
+                    createdAt = LocalDateTime.parse(jsonNode.get("createdAt").asText(),
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSS"));
+                } catch (Exception e) {
+                    log.error("날짜 파싱 실패: {}", e.getMessage());
+                }
+            }
+            Long userId = jsonNode.has("userId") ? jsonNode.get("userId").asLong() : null;
+            chatResponse = ChatResponse.builder().content(content).createdAt(createdAt).userId(userId).build();
+            return chatResponse;
+        } catch (JsonProcessingException e) {
+            log.error("메시지 변환 중 오류: {}", e.getMessage());
+        }
+        return chatResponse;
+    }
+    */
 
 //
 //    @Override
