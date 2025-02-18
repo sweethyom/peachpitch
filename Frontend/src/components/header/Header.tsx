@@ -176,9 +176,9 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
                 // ✅ 기존 쿠폰 개수와 비교하여 변경된 경우만 저장
                 const prevCouponNum = localStorage.getItem("couponNum");
-
+                setCouponCount(couponEa);
                 if (prevCouponNum !== String(couponEa)) {
-                    setCouponCount(couponEa);
+
                     localStorage.setItem("couponNum", String(couponEa));
                     console.log("✅ 쿠폰 개수 업데이트:", couponEa);
                 } else {
@@ -191,7 +191,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
         };
 
         fetchCouponCount();
-    }, [isLoggedIn]); // ✅ isLoggedIn이 변경될 때만 실행
+    }, []);
 
 
 
@@ -218,7 +218,6 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                             <div className={styles.header__navi__coupon} onClick={() => setIsCouponOpen(true)}>
                                 <img src={couponIcon} width={"30px"} />
                                 <p className={styles.header__navi__item}>{couponCount}개</p>
-                                {/* <p className={styles.header__navi__item}>1개</p> */}
                             </div>
 
                             {/* ✅ 아이디 클릭 시 드롭다운 모달 열기 */}
