@@ -79,7 +79,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
             }
 
             console.log("📡 Access Token 재발급 요청 중...");
-            const response = await axios.post("http://localhost:8080/api/users/reissue", {}, {
+            const response = await axios.post("https://peachpitch.site/api/users/reissue", {}, {
                 headers: {
                     access: accessToken,
                 },
@@ -130,7 +130,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
             // ✅ 로그아웃 요청 (refreshToken을 헤더에 포함)
             await axios.post(
-                "http://localhost:8080/api/users/logout",
+                "https://peachpitch.site/api/users/logout",
                 {},
                 {
                     withCredentials: true, // ✅ 쿠키 자동 포함
@@ -170,7 +170,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                     return;
                 }
 
-                const response = await axios.post(`http://localhost:8080/api/users/coupon/have`, {
+                const response = await axios.post(`https://peachpitch.site/api/users/coupon/have`, {
                     userId: Number(storedUserId)
                 });
 

@@ -46,7 +46,7 @@ function loginPage() {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:8080/api/users/login', {
+      const response = await fetch('https://peachpitch.site/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -100,7 +100,7 @@ function loginPage() {
     localStorage.setItem('socialLoginAttempt', 'true');
     console.log("provider: ", provider);
 
-    const popupUrl = `http://localhost:8080/api/users/login/social/${provider}`;
+    const popupUrl = `https://peachpitch.site/api/users/login/social/${provider}`;
     // const popup = window.open(
     //   popupUrl,
     //   "Social Login",
@@ -136,7 +136,7 @@ const checkSocialLogin = () => {
           // 토큰 처리 로직 (예: 저장, 리다이렉트 등)
           console.log("토큰 데이터:", tokenData);
           localStorage.removeItem('socialLoginAttempt'); // 플래그 초기화
-          window.location.href = 'http://localhost:8080/main'; // 리다이렉트
+          window.location.href = 'https://peachpitch.site/main'; // 리다이렉트
 
       }
     }
@@ -158,7 +158,7 @@ const checkSocialLogin = () => {
                 <FaGoogle style={{ fontSize: '40px' }} />
               </a> */}
 
-                <a href={`http://localhost:8080/api/users/login/social/kakao`}>
+                <a href={`https://peachpitch.site/api/users/login/social/kakao`}>
                 <div className={styles.kakao}>
                   <RiKakaoTalkFill style={{ fontSize: '40px', color:"#ffffff" }} />
                   <p>카카오 로그인</p>
