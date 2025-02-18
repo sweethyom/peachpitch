@@ -31,7 +31,7 @@
 ### 기획 배경
 - 스몰토크의 사회적 필요성
 - 심리적 부담 완화
-- 접근성성
+- 접근성
 
 구글 통계자료 포함시키기
 
@@ -130,15 +130,35 @@ gif 넣고 기술 설명
 
 ### 요구사항 정의서
 
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" />
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" />
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" />
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C4.png?ref_type=heads" />
+
 ### 와이어프레임
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/wireframe.png?ref_type=heads" />
 
 ### ERD 다이어그램
 
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/erd.png?ref_type=heads" />
+
+추가된 부분 수정해서 다시 올리기
+
 ### 시스템 아키텍처
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/system_architecture_with_monitoring.png?ref_type=heads" />
 
 ### API 명세서
 
-완성후 캡쳐 올리기기
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" />
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" />
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" />
 
 <br />
 
@@ -148,9 +168,17 @@ gif 넣고 기술 설명
 
 ### Notion
 
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/notion1.png?ref_type=heads" />
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/notion2.png?ref_type=heads" />
+
 ### Jira
 
+그래프 캡쳐
+
 ### Git
+
+끝나고 소스트리 녹화해서 gif
 
 <br />
 
