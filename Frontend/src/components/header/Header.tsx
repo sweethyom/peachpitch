@@ -30,7 +30,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     const userRef = useRef<HTMLSpanElement>(null); // ✅ 아이디 크기 가져오기 위한 ref
-    const [dropdownWidth, setDropdownWidth] = useState(100);
+    const [dropdownWidth, _setDropdownWidth] = useState(100);
 
     // ✅ 로그인 상태 확인 함수
     const checkLoginStatus = () => {
@@ -158,8 +158,6 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
         }
     };
 
-
-    // 쿠폰 확인
     const [couponCount, setCouponCount] = useState<number>(0);
     useEffect(() => {
         const fetchCouponCount = async () => {
@@ -174,16 +172,28 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                     userId: Number(storedUserId)
                 });
 
-                // response.data.data에서 실제 쿠폰 카운트 값을 가져옴
-                setCouponCount(response.data.data.ea);
-                console.log('response:', response.data);
+                const couponEa = response.data.data.ea;
+
+                // ✅ 기존 쿠폰 개수와 비교하여 변경된 경우만 저장
+                const prevCouponNum = localStorage.getItem("couponNum");
+
+                if (prevCouponNum !== String(couponEa)) {
+                    setCouponCount(couponEa);
+                    localStorage.setItem("couponNum", String(couponEa));
+                    console.log("✅ 쿠폰 개수 업데이트:", couponEa);
+                } else {
+                    console.log("🔹 기존과 동일한 쿠폰 개수, 업데이트 안 함");
+                }
+
             } catch (error) {
-                console.error("쿠폰 수 조회 실패:", error);
+                console.error("❌ 쿠폰 수 조회 실패:", error);
             }
         };
 
         fetchCouponCount();
-    }, []);
+    }, [isLoggedIn]); // ✅ isLoggedIn이 변경될 때만 실행
+
+
 
     return (
         <div className={headerClass}>
