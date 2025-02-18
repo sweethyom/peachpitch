@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { RecoilRoot } from 'recoil';
 
 import ScrollToTop from "@/components/ScrollToTop";
@@ -19,7 +19,7 @@ import '@assets/styles/font.scss'
 function App() {
     return (
         <RecoilRoot>
-            <HashRouter>
+            <BrowserRouter>
                 <ScrollToTop />
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
@@ -32,7 +32,7 @@ function App() {
                     <Route path="/report" element={<TotalReportPage />} />
                     <Route path="/report/detail/:reportId" element={<ChatReportPage />} />
                 </Routes>
-            </HashRouter>
+            </BrowserRouter>
         </RecoilRoot>
     );
 }
