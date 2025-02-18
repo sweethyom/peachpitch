@@ -22,8 +22,8 @@ function App() {
             <BrowserRouter>
                 <ScrollToTop />
                 <Routes>
-                    <Route index path="/" element={<LandingPage />} />
-                    <Route path="/main" element={<MainPage />} />
+                    <Route path="/" element={<LandingPage />} />
+                    <Route index path="/main" element={<MainPage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/login/social/process" element={<SocialLoginProccessPage />} />
                     <Route path="/join" element={<JoinPage />} />
