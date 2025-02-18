@@ -10,7 +10,7 @@ import LeadChart from '@/components/chart/Lead'
 import WordCloud from '@/components/chart/WordCloud'
 import WordChart from '@/components/chart/Word'
 import { useEffect, useState } from 'react'
-import axios from 'axios'
+import axios from 'axios' 
 
 import loading from '@/assets/images/report_loading.png'
 
