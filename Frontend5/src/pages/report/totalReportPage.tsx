@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 
 import Header from '@/components/header/Header'
 import Footer from '@/components/footer/Footer'
@@ -31,12 +31,12 @@ const conversationList = Array.from({ length: 20 }, (_, i) => ({
   date: new Date(2024, 1, i + 1).toISOString().split("T")[0], // 2024-02-01 형식 날짜
 }));
 
-const ITEMS_PER_PAGE = 6; // ✅ 한 페이지당 6개 표시
+// const ITEMS_PER_PAGE = 6; // ✅ 한 페이지당 6개 표시
 
 
 function totalReportPage() {
-  const [keywordFilter, setKeywordFilter] = useState<string>("전체");
-  const [sortOrder, setSortOrder] = useState<string>("최신순");
+  const [keywordFilter, _setKeywordFilter] = useState<string>("전체");
+  const [sortOrder, _setSortOrder] = useState<string>("최신순");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectReportId, setSelectReportId] = useState<number | null>(null);
   const navigate = useNavigate();
@@ -51,7 +51,7 @@ function totalReportPage() {
   const [reportData, setReportData] = useState<{ ansCount: number; questCount: number } | null>(null);
   const [speakingHabits, setSpeakingHabits] = useState<SpeakingHabit[]>([]);
   const [chatReports, setChatReports] = useState<any[]>([]);
-  const [paginatedConversations, setPaginatedConversations] = useState<any[]>([]);
+  const [_paginatedConversations, setPaginatedConversations] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchReportData = async () => {
