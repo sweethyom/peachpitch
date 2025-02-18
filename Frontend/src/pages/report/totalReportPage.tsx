@@ -186,9 +186,9 @@ function totalReportPage() {
       <Header />
       <div className={styles.wrap}>
 
-        {/* {reportData ===null && chatReports === null && (
+        {reportData ===null || chatReports === null && (
           <img src={loading} className={styles.loading} />
-        )} */}
+        )}
 
         {reportData !==null ? (
           <>
@@ -210,12 +210,12 @@ function totalReportPage() {
                 <p className={styles.report__title}>전체 리포트</p>
 
                 {/* 시간 통계 */}
-                <div className={styles.report__status}>
+                {/* <div className={styles.report__status}>
                   <div className={styles.total}>
                     <p className={styles.total__title}>총 대화 시간</p>
                     <p className={styles.total__time}><span className={styles.total__time__strong}>50</span>시간 <span className={styles.total__time__strong}>20</span>분</p>
                   </div>
-                </div>
+                </div> */}
 
                 {/* 반복되는 단어 습관 */}
                 <div id="habits"

@@ -43,7 +43,7 @@ function MainPage() {
   });
 
   const [rank, setRank] = useState<string[] | null>(null);
-  const [couponNum, setCouponNum] = useState(0)
+  const [_couponNum, setCouponNum] = useState(0)
 
   // ✅ 핑거프린트 생성 함수
   const generateFingerprint = async () => {
@@ -191,13 +191,16 @@ function MainPage() {
 
         if (hasCoupon) {
           setIsChatModalOpen(true);
-          // 쿠폰을 구매해주세요
+          console.log("🟢 AI 채팅 모달 열기 (로그인 상태)");
         }
       } else {
         // 비로그인 사용자는 fingerprint 확인
         if (!fingerprint) {
           // fingerprint가 없으면 생성
-          await generateFingerprint();
+          // await generateFingerprint();
+          console.log("🚀 핑거프린트 없음, 첫 무료 체험 가능!");
+          setIsChatModalOpen(true);
+          return; // ✅ 첫 무료 체험이므로 API 요청 없이 실행
         }
 
         // fingerprint로 시도 여부 확인
@@ -205,12 +208,15 @@ function MainPage() {
           fingerprint: fingerprint,
         });
 
+        // console.log("🟢 핑거프린트 체크 결과:", response.data);
+
         // Redis에 fingerprint가 없으면 처음 시도하는 것이므로 바로 채팅 가능
         if (response.data.data) {
-          setIsChatModalOpen(true);
+          // setIsChatModalOpen(true);
+          navigate('/chat/ai')
         } else {
           setAlertMessage("무료 체험은 1회만 가능합니다. 로그인해주세요.");
-          navigate('/login');
+          // navigate('/login');
         }
       }
     } catch (error) {
@@ -308,14 +314,15 @@ function MainPage() {
   };
 
   const handleStartChat = () => {
-    if(!fingerprint) {
+    if (!fingerprint) {
       setAlertMessage("이미 무료로 이용한 적이 있습니다. 로그인 후 이용해주세요.")
       return
     }
     setIsChatModalOpen(false);
     navigate('/chat/ai');
   };
-  const accessToken = localStorage.getItem("accessToken");
+
+  // const accessToken = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
 
   // console.log("access" + accessToken)
