@@ -23,11 +23,11 @@ GOOGLE_CX = os.getenv('GOOGLE_CX')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',   # MySQL 엔진 사용
-        'NAME': 'db',           # 데이터베이스 이름
+        'NAME': 'peachpitch2',           # 데이터베이스 이름
         'USER': 'root',              # MySQL 사용자 이름
-        'PASSWORD': '1234',      # MySQL 비밀번호
-        'HOST': 'localhost',                    # 로컬에서 실행 중이므로 localhost
-        'PORT': '3306',                         # MySQL 기본 포트 (3306)
+        'PASSWORD': 'pikapikapika1234',      # MySQL 비밀번호
+        'HOST': '43.201.5.129',                    # 로컬에서 실행 중이므로 localhost
+        'PORT': '13306',                         # MySQL 기본 포트 (3306)
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
         }
@@ -35,7 +35,7 @@ DATABASES = {
 }
 
 # Redis 설정
-REDIS_HOST = 'localhost'
+REDIS_HOST = '43.201.5.129'
 REDIS_PORT = 6379
 REDIS_DB = 1  # 사용할 DB 번호
 
@@ -43,7 +43,7 @@ REDIS_DB = 1  # 사용할 DB 번호
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": "redis://43.201.5.129:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -65,7 +65,7 @@ SECRET_KEY = 'django-insecure-)+x!e66#e_-2zp+wwt=&y2(wkq=ncto=l6kd*8os$tn#-(03@@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['peachpitch.site', '127.0.0.1', 'localhost', '172.20.0.1']
 
 
 # Application definition
@@ -169,6 +169,8 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ORIGIN_WHITELIST = (
-    "http://localhost:5173",
-)
+# CORS_ORIGIN_WHITELIST = (
+#     "https://peachpitch.site",
+# )
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
