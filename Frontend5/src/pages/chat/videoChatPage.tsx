@@ -352,9 +352,9 @@ const VideoChatPage: React.FC = () => {
         setUserJwt(userJwtFromStorage || "");
 
         const stompClient = new Client({
-            brokerURL: "ws://localhost:8080/api/ws",
-            heartbeatIncoming: 0,  // 4초마다 서버로부터 heart-beat 수신
-            heartbeatOutgoing: 0,   // 4초마다 서버로 heart-beat 전송
+            brokerURL: "wss://peachpitch.site/api/ws",
+            heartbeatIncoming: 4000,  // 4초마다 서버로부터 heart-beat 수신
+            heartbeatOutgoing: 4000,   // 4초마다 서버로 heart-beat 전송
             connectHeaders: {
                 access: `${userJwt}`,
             },
