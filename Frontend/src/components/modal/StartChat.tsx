@@ -16,13 +16,13 @@ function StartChat({ isOpen, onClose, onStart, isFinger, children }: ModalProps)
     onClose(); // Close modal
   };
 
-  const handleStart = () => {
-    if (!isFinger) {
-      window.alert("이미 무료로 이용한 적이 있습니다. 로그인 후 이용해주세요.");
-      return;
-    }
-    onStart();
-  };  
+  // const handleStart = () => {
+  //   if (!isFinger) {
+  //     window.alert("이미 무료로 이용한 적이 있습니다. 로그인 후 이용해주세요.");
+  //     return;
+  //   }
+  //   onStart();
+  // };  
   
   if (!isOpen) return null;
 
