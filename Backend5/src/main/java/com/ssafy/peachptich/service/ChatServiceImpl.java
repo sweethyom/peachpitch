@@ -122,7 +122,7 @@ public class ChatServiceImpl implements ChatService {
 
     // redis 대화 db에 저장
     @Override
-    public void saveUserChat(ChatRequest chatRequest, Long userId) {
+    public void saveUserChat(ChatRequest chatRequest) {
         try {
             List<Chat> chatsToSave = new ArrayList<>();
             String redisKey = "chat:" + chatRequest.getHistoryId() + ":messages";

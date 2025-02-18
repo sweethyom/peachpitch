@@ -74,19 +74,17 @@ function VoiceChatPage() {
     try {
       const userJwtFromStorage = localStorage.getItem("accessToken");
 
-      // if (!userJwtFromStorage) {
-      //   console.error("No access token found, please log in.");
-      //   return;
-      // }
-
-      console.log(userJwtFromStorage);
-      const config = userJwtFromStorage ? { headers: { access: `${userJwtFromStorage}` } }
+      const config = userJwtFromStorage
+        ? { headers: { access: `${userJwtFromStorage}` } }
         : {}; // 토큰이 없으면 headers 설정 안 함
 
+      console.log("쿠폰 사용 요청 중...");
+      setMessageHistory((prev) => [...prev, { role: "system", message: "쿠폰 사용 중..." }]);
+
       const responseFromSpring = await axios.post(
-        'http://localhost:8080/api/chat/ai/keywords',
-        { keywordId: selectedKeywordId }, // Body 데이터
-        config // 헤더 설정
+        "https://peachpitch.site/api/chat/ai/keywords",
+        { keywordId: selectedKeywordId },
+        config
       );
 
       if (responseFromSpring.status === 401) {
@@ -96,18 +94,14 @@ function VoiceChatPage() {
 
       const hintResponse = responseFromSpring.data;
       const historyIdFromResponse = hintResponse.data.historyId || null;
-      const hints = hintResponse.data.hints; // 힌트 배열
-      setHints(hints)
+      const hints = hintResponse.data.hints;
+      setHints(hints);
+      setHistoryId(historyIdFromResponse);
 
-      console.log("Extracted historyId:", historyIdFromResponse);
-      setHistoryId(historyIdFromResponse); // 대화 내역 id 저장
+      console.log("쿠폰 차감 완료. 대화 시작");
+      setMessageHistory((prev) => [...prev, { role: "system", message: "대화가 시작되었습니다!" }]);
 
-      // if (!historyIdFromResponse) {
-      //   console.error("historyId is null or undefined, check backend response.");
-      //   return;
-      // }
-
-      const response = await axios.post('http://127.0.0.1:8000/ai/start/', {
+      const response = await axios.post("https://peachpitch.site/ai/start/", {
         keyword: selectedKeyword,
         history_id: historyIdFromResponse,
       });
@@ -233,7 +227,7 @@ function VoiceChatPage() {
     if (turnCount > 0) {
       try {
         console.log("📡 AI 서버에 요청 중...");
-        const response = await axios.post("http://127.0.0.1:8000/ai/chat/", {
+        const response = await axios.post("https://peachpitch.site/ai/chat/", {
           message: modifiedMessage,
           history_id: historyId
         });
@@ -305,14 +299,14 @@ function VoiceChatPage() {
   const navigate = useNavigate();
 
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
-  const [turnCount, setTurnCount] = useState(10);
+  const [turnCount, setTurnCount] = useState(3);
   const [isChatEnd, setIsChatEnd] = useState(false);
-  const [isOverlay, setIsOverlay] = useState(false);
+  const [isOverlay, _setIsOverlay] = useState(false);
 
   /* 대화 재시작 */
-  const restartChat = () => {
-    window.location.href = "/chat/ai";
-  };
+  // const restartChat = () => {
+  //   window.location.href = "/chat/ai";
+  // };
 
   /* 대화 종료 후 /report 페이지 이동 */
   const endChat = () => {
@@ -322,7 +316,7 @@ function VoiceChatPage() {
   const videos = [Video_AI_1, Video_AI_2, Video_AI_4, Video_AI_3];
 
   /* 비디오 스택 상태 */
-  const [videoStack, setVideoStack] = useState<string[]>(() => {
+  const [videoStack, _setVideoStack] = useState<string[]>(() => {
     // 초기 비디오 스택을 랜덤하게 채우는 로직
     const initialStack = Array.from({ length: 11 }, () => videos[Math.floor(Math.random() * videos.length)]);
     console.log('Initial Video Stack:', initialStack); // 초기 스택 로그
@@ -349,7 +343,7 @@ function VoiceChatPage() {
   const [aiMessage, setAiMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
-  const [aiResponseBuffer, setAiResponseBuffer] = useState('');
+  const [_aiResponseBuffer, setAiResponseBuffer] = useState('');
   const [lastAiMessage, setLastAiMessage] = useState(''); // 마지막 AI 응답 저장
   const [lastUserMessage, setLastUserMessage] = useState<string>(''); // 마지막 사용자 메시지 저장
 
@@ -418,7 +412,7 @@ function VoiceChatPage() {
             <Video
               videoSrc={videoStack}  // 현재 비디오 소스 전달
               currentIndex={currentVideoIndex} // 다음 비디오는 없음
-              // onVideoLoaded={() => { }} // handleVideoLoaded는 필요 없음
+            // onVideoLoaded={() => { }} // handleVideoLoaded는 필요 없음
             />
           </div>
           <div className={styles.chat__ai__bubble}>
