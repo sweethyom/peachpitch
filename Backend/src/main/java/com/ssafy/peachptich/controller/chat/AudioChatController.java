@@ -6,6 +6,10 @@ import com.ssafy.peachptich.dto.request.TrialRequest;
 import com.ssafy.peachptich.dto.response.ChatRoomResponse;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.service.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/chat/ai")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "AudioChatController", description = "AI 채팅 관련 컨트롤러")
 public class AudioChatController {
     private final AudioChatService audioChatService;
 
@@ -25,6 +30,10 @@ public class AudioChatController {
      * @return
      */
     @PostMapping("/check")
+    @Operation(summary = "AI 채팅 이용 가능 조회", description = "회원이 AI 채팅을 이용할 수 있는지 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 조회함, true:가능/false:불가능")
+    })
     public ResponseEntity<ResponseDto<Boolean>> checkAvailable(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody(required = false) TrialRequest trialRequest
@@ -46,6 +55,10 @@ public class AudioChatController {
      * @return
      */
     @PostMapping("/keywords")
+    @Operation(summary = "AI 대화 키워드 추가", description = "AI 채팅방에 키워드를 추가합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 추가함")
+    })
     public ResponseEntity<ResponseDto<ChatRoomResponse>> createChat(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody AudioChatRequest audioChatRequest) {
