@@ -96,6 +96,7 @@ def refine_and_trigger(request):
     
     # TotalReport 업데이트
     total_report, created = TotalReport.objects.get_or_create(user_id=history.user1_id)
+    print(f'한글한글유저유저:{total_report}')
     total_report.quest_count = (total_report.quest_count or 0) + new_question_count
     total_report.ans_count = (total_report.ans_count or 0) + new_answer_count
     total_report.save()
