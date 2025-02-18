@@ -153,7 +153,7 @@ const VideoChatPage: React.FC = () => {
                         const createdAt: string = formatDateToBackend(new Date()); // Date → string 변환
                         console.log(createdAt)
                         const response = await axios.post(
-                            'http://localhost:8080/api/chat/video/save/temp',
+                            'https://peachpitch.site/api/chat/video/save/temp',
                             {
                                 historyId: historyId,
                                 message: transcript,

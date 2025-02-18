@@ -87,7 +87,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         response.setCharacterEncoding("UTF-8");
         // response.setHeader("access", access);
         response.addCookie(createCookie("refresh", refresh));
-        response.sendRedirect(String.format("http://localhost:5173/login/social/process?access=%s&userId=%d&email=%s", access, userId, userEmail));        // redirect 주소
+        response.sendRedirect(String.format("https://peachpitch.site/login/social/process?access=%s&userId=%d&email=%s", access, userId, userEmail));        // redirect 주소
 
         // ObjectMapper objectMapper = new ObjectMapper();
         // objectMapper.writeValue(response.getWriter(), responseDto);
