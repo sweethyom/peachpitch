@@ -105,16 +105,17 @@ public class ChatController {
             @ApiResponse(responseCode = "401", description = "인증 정보가 없음"),
             @ApiResponse(responseCode = "500", description = "채팅 저장 중 오류 발생")
     })
-    public ResponseEntity<Void> saveChat(@RequestBody UserChatRequest userChatRequest){
-        log.debug("Request received: {}", userChatRequest);
-
-        if (userChatRequest.getUserId() == null) {
+    public ResponseEntity<Void> saveChat(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestBody ChatRequest chatrequest) {
+        log.debug("Request received: {}", chatrequest);
+        if (userDetails.getUserId() == null) {
             log.error("User ID is missing in the request");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
         try {
-            chatService.saveUserChat(userChatRequest);
+            chatService.saveUserChat(chatrequest, userDetails.getUserId());
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error("Failed to save chat content", e);
