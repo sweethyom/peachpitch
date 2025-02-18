@@ -127,7 +127,7 @@ public class ChatServiceImpl implements ChatService {
             List<Chat> chatsToSave = new ArrayList<>();
             String redisKey = "chat:" + chatRequest.getHistoryId() + ":messages";
 
-            String userIdKey = "chat:" + userChatRequest.getHistoryId() + ":userId";
+            String userIdKey = "chat:" + chatRequest.getHistoryId() + ":userId";
             Long userId = Long.parseLong(redisTemplate.opsForValue().get(userIdKey));
 
             ChatHistory chatHistory = chatHistoryRepository.findById(chatRequest.getHistoryId())
