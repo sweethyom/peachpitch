@@ -79,7 +79,7 @@ function VoiceChatPage() {
         : {}; // 토큰이 없으면 headers 설정 안 함
 
       console.log("쿠폰 사용 요청 중...");
-      setMessageHistory((prev) => [...prev, { role: "system", message: "쿠폰 사용 중..." }]);
+      // setMessageHistory((prev) => [...prev, { role: "system", message: "쿠폰 사용 중..." }]);
 
       const responseFromSpring = await axios.post(
         "http://localhost:8080/api/chat/ai/keywords",
@@ -99,7 +99,7 @@ function VoiceChatPage() {
       setHistoryId(historyIdFromResponse);
 
       console.log("쿠폰 차감 완료. 대화 시작");
-      setMessageHistory((prev) => [...prev, { role: "system", message: "대화가 시작되었습니다!" }]);
+      // setMessageHistory((prev) => [...prev, { role: "system", message: "대화가 시작되었습니다!" }]);
 
       const response = await axios.post("http://127.0.0.1:8000/ai/start/", {
         keyword: selectedKeyword,
@@ -301,12 +301,12 @@ function VoiceChatPage() {
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
   const [turnCount, setTurnCount] = useState(3);
   const [isChatEnd, setIsChatEnd] = useState(false);
-  const [isOverlay, setIsOverlay] = useState(false);
+  const [isOverlay, _setIsOverlay] = useState(false);
 
   /* 대화 재시작 */
-  const restartChat = () => {
-    window.location.href = "/chat/ai";
-  };
+  // const restartChat = () => {
+  //   window.location.href = "/chat/ai";
+  // };
 
   /* 대화 종료 후 /report 페이지 이동 */
   const endChat = () => {
@@ -316,7 +316,7 @@ function VoiceChatPage() {
   const videos = [Video_AI_1, Video_AI_2, Video_AI_4, Video_AI_3];
 
   /* 비디오 스택 상태 */
-  const [videoStack, setVideoStack] = useState<string[]>(() => {
+  const [videoStack, _setVideoStack] = useState<string[]>(() => {
     // 초기 비디오 스택을 랜덤하게 채우는 로직
     const initialStack = Array.from({ length: 11 }, () => videos[Math.floor(Math.random() * videos.length)]);
     console.log('Initial Video Stack:', initialStack); // 초기 스택 로그
@@ -343,7 +343,7 @@ function VoiceChatPage() {
   const [aiMessage, setAiMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [isWaiting, setIsWaiting] = useState(false);
-  const [aiResponseBuffer, setAiResponseBuffer] = useState('');
+  const [_aiResponseBuffer, setAiResponseBuffer] = useState('');
   const [lastAiMessage, setLastAiMessage] = useState(''); // 마지막 AI 응답 저장
   const [lastUserMessage, setLastUserMessage] = useState<string>(''); // 마지막 사용자 메시지 저장
 

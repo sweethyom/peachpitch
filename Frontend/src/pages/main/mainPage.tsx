@@ -308,6 +308,10 @@ function MainPage() {
   };
 
   const handleStartChat = () => {
+    if(!fingerprint) {
+      setAlertMessage("이미 무료로 이용한 적이 있습니다. 로그인 후 이용해주세요.")
+      return
+    }
     setIsChatModalOpen(false);
     navigate('/chat/ai');
   };
