@@ -356,6 +356,7 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
     @Override
     public void handleSendVideoChatMessage(UserChatRequest userChatRequest) {
         ChatResponse chatResponse = ChatResponse.builder()
+                .status("chat")
                 .content(userChatRequest.getMessage())
                 .userId(userChatRequest.getUserId())
                 .createdAt(LocalDateTime.parse(userChatRequest.getCreatedAt()))

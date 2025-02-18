@@ -210,7 +210,8 @@ const Drawer = ({ selectedKeywords, hints, chatHistory, historyId, setSelectedMa
                         <div className={styles.drawer__chatting__prompt}>
                         {chatHistory && chatHistory.length > 0 ? ( // ✅ chatHistory가 undefined/null인지 체크
                                 chatHistory.map((msg, index) => (
-                                    <div key={index} className={msg.role === "ai" ? styles.bubble__left : styles.bubble__right}>
+                                    // 다른사람이면 왼쪽 말풍선
+                                    <div key={index} className={msg.role === "other" ? styles.bubble__left : styles.bubble__right}>
                                         {msg.message}
                                     </div>
                                 ))
