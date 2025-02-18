@@ -70,7 +70,7 @@ def refine_and_trigger(request):
         time.sleep(1)
 
     # history_id에 연결된 모든 Chat 메시지 조회
-    chats = Chat.objects.filter(history=history)
+    chats = Chat.objects.filter(history=history, user_id=history.user1_id)
     updated_count = 0   # 디버깅 용으로 만듦
     new_question_count = 0
     new_answer_count = 0

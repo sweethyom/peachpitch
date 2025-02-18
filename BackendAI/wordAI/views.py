@@ -50,7 +50,7 @@ class WordAnalysisView(APIView):
             return Response({"error": "해당 history_id에 해당하는 채팅 내역이 없습니다."}, status=status.HTTP_404_NOT_FOUND)
         
         # history와 연결된 모든 Chat 메시지 조회
-        chats = Chat.objects.filter(history=history)
+        chats = Chat.objects.filter(history=history, user_id=history.user1_id)
         if not chats.exists():
             return Response({"error": "해당 history_id에 채팅 데이터가 없습니다."}, status=status.HTTP_404_NOT_FOUND)
 

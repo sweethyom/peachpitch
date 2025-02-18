@@ -23,7 +23,7 @@ def generate_report(request):
         history = get_object_or_404(ChatHistory, pk=history_id)
         
         # history와 연결된 모든 Chat 메시지 조회
-        chats = Chat.objects.filter(history=history)
+        chats = Chat.objects.filter(history=history, user_id=history.user1_id)
         
         # 여러 개의 대화 내용을 합치기
         conversation_data = "\n".join(chat.content for chat in chats if chat.content)

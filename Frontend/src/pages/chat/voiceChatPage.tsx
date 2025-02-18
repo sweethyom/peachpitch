@@ -319,15 +319,15 @@ function VoiceChatPage() {
   const [videoStack, _setVideoStack] = useState<string[]>(() => {
     // 초기 비디오 스택을 랜덤하게 채우는 로직
     const initialStack = Array.from({ length: 11 }, () => videos[Math.floor(Math.random() * videos.length)]);
-    console.log('Initial Video Stack:', initialStack); // 초기 스택 로그
+    // console.log('Initial Video Stack:', initialStack); // 초기 스택 로그
     return initialStack;
   });
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
   useEffect(() => {
     // videoStack 또는 currentVideoIndex가 변경될 때마다 로그 출력
-    console.log('Video Stack:', videoStack);
-    console.log('Current Video Index:', currentVideoIndex);
+    // console.log('Video Stack:', videoStack);
+    // console.log('Current Video Index:', currentVideoIndex);
   }, [videoStack, currentVideoIndex]);
 
 
