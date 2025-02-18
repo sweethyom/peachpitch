@@ -151,12 +151,12 @@
   <tr>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="" alt="김미경 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/leehanna.jpg?ref_type=heads" alt="김미경 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="" alt="김민주 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/leehanna.jpg?ref_type=heads" alt="김민주 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
@@ -166,17 +166,17 @@
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="" alt="이효미 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/leehanna.jpg?ref_type=heads" alt="이효미 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="" alt="정유선 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/leehanna.jpg?ref_type=heads" alt="정유선 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="" alt="최지원 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/leehanna.jpg?ref_type=heads" alt="최지원 프로필" />
       </a>
     </td>
   </tr>
