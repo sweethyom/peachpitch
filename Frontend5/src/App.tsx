@@ -19,7 +19,7 @@ import '@assets/styles/font.scss'
 function App() {
     return (
         <RecoilRoot>
-            <BrowserRouter>
+            <HashRouter>
                 <ScrollToTop />
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
@@ -32,7 +32,7 @@ function App() {
                     <Route path="/report" element={<TotalReportPage />} />
                     <Route path="/report/detail/:reportId" element={<ChatReportPage />} />
                 </Routes>
-            </BrowserRouter>
+            </HashRouter>
         </RecoilRoot>
     );
 }
