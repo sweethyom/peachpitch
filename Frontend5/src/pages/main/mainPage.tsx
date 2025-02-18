@@ -43,7 +43,7 @@ function MainPage() {
   });
 
   const [rank, setRank] = useState<string[] | null>(null);
-  const [couponNum, setCouponNum] = useState(0)
+  const [_couponNum, setCouponNum] = useState(0)
 
   // ✅ 핑거프린트 생성 함수
   const generateFingerprint = async () => {
@@ -311,7 +311,7 @@ function MainPage() {
     setIsChatModalOpen(false);
     navigate('/chat/ai');
   };
-  const accessToken = localStorage.getItem("accessToken");
+  // const accessToken = localStorage.getItem("accessToken");
   const userId = localStorage.getItem("userId");
 
   // console.log("access" + accessToken)

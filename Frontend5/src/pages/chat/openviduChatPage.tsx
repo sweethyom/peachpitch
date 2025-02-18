@@ -533,12 +533,12 @@ const VideoChatPage: React.FC = () => {
         <div className={styles.page}>
             {/* 설정 메뉴바 */}
             <div className={styles.menu}>
-                <Drawer
+                {/* <Drawer
                     chatHistory={chatHistory}
                     selectedKeywords={selectedKeywords}
                     hints={hints}
                     historyId={historyId ?? 0}
-                />
+                /> */}
             </div>
 
             <div className={styles.chat}>
