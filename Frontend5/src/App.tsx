@@ -6,7 +6,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import LandingPage from '@pages/landing/landingPage';
 import MainPage from '@pages/main/mainPage';
 import LoginPage from '@pages/login/loginPage';
-import VoiceChatPage from '@pages/chast/voiceChatPage';
+import VoiceChatPage from '@pages/chat/voiceChatPage';
 import VideoChatPage from '@/pages/chat/videoChatPage.tsx';
 // import VideoChatPage from '@/pages/chat/openviduChatPage.tsx';
 import JoinPage from '@pages/login/joinPage';
