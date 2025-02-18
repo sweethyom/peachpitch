@@ -345,7 +345,7 @@ const VideoChatPage: React.FC = () => {
         setIsMatching(false);
     };
 
-// STOMP client setup
+    // STOMP client setup
     useEffect(() => {
         setIsConnecting(true);
         const userJwtFromStorage = localStorage.getItem("accessToken");
@@ -573,6 +573,8 @@ const VideoChatPage: React.FC = () => {
                     <>
                         <div className={styles.chat__header}>
                             <p className={styles.chat__header__title}>1:1 매칭 스몰토크(오픈비듀)</p>
+                            <div>
+                            </div>
                             {/* 대화 나가기 아이콘 */}
                             <img
                                 src={leaveBtn}
@@ -582,6 +584,15 @@ const VideoChatPage: React.FC = () => {
                                 alt="leave button"
                             />
                         </div>
+
+                        <div className={styles.keywords__wrap}>
+                            {selectedKeywords && selectedKeywords.map((keyword, index) => (
+                                <span key={index} className={index === 0 ? styles.keywords__keyword1 : styles.keywords__keyword2}>
+                                    {keyword}
+                                </span>
+                            ))}
+                        </div>
+
 
                         <p>🎤 Microphone: {listening ? 'on' : 'off'}</p>
                         <button onClick={() => SpeechRecognition.startListening({ continuous: true, language: "ko-KR" })}>

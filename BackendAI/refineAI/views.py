@@ -13,14 +13,14 @@ import time
 openai.api_key = settings.OPENAI_API_KEY
 logger = logging.getLogger(__name__)
 
-# 문장 복원 및 누락 단어 보완완
+# 문장 복원 및 누락 단어 보완
 def restore_punctuation(text):
-    prompt = f"다음 문장에 올바른 문장 부호와 누락된 단어를 복원해줘:\n{text}"
+    prompt = f"다음 문장을 복원해줘:\n{text}"
     try:
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "너는 문장 복원 전문가야."},
+                {"role": "system", "content": "너는 문장 복원 전문가이다. 입력된 문장을 복원할 때 오직 복원된 문장만을 출력해야 하며, 어떠한 추가 설명, 제목, 서문, 인사말, 또는 부가 문구도 포함하지 말아라."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0

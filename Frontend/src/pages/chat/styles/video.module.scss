@@ -221,4 +221,27 @@
         margin-left: 30px;
     }
 }
+.keywords {
 
+    &__wrap{
+        margin-bottom: 30px;
+    }
+
+    &__keyword1 {
+        background-color: var(--color-yellow-300); // Example: Gold color for the first keyword
+        color: black;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+        margin-right: 5px;
+        margin-left: 20px;
+    }
+
+    &__keyword2 {
+        background-color: var(--color-brown-200); // Example: Dodger blue for the second keyword
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+}
