@@ -5,6 +5,10 @@ import com.ssafy.peachptich.dto.response.RankResponse;
 import com.ssafy.peachptich.dto.response.ResponseDto;
 import com.ssafy.peachptich.entity.User;
 import com.ssafy.peachptich.service.UserKeywordService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,10 +23,15 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
+@Tag(name = "MainController", description = "메인 화면 관련 컨트롤러")
 public class MainController {
     private final UserKeywordService userKeywordService;
 
     @GetMapping("/api/main")
+    @Operation(summary = "메인 페이지", description = "메인 페이지를 로드합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 확인됨")
+    })
     public ResponseEntity<Map<String, Object>> mainP(@AuthenticationPrincipal CustomUserDetails userDetails) {
         Map<String, Object> response = new HashMap<>();
         System.out.println("MainController 입성");
@@ -45,6 +54,10 @@ public class MainController {
     }
 
     @GetMapping("/api/main/rank")
+    @Operation(summary = "메인 페이지 랭킹 확인", description = "메인 페이지 랭킹을 확인합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공적으로 확인됨")
+    })
     public ResponseEntity<ResponseDto<RankResponse>> getRank() {
         List<RankResponse.KeywordRankResponseItem> rank = userKeywordService.rank();
         return ResponseEntity.ok().

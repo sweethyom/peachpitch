@@ -38,6 +38,8 @@ function VoiceChatPage() {
   /* 키워드 상태 */
   const [selectedKeyword, setSelectedKeyword] = useState<string | null>(null);
   const [selectedKeywordId, setSelectedKeywordId] = useState<number | null>(null);
+  const [hints, setHints] = useState<string[] | null>(null);
+
   /* 음성 인식 관련 상태 */
   const [isListening, setIsListening] = useState(false);
   const { transcript, resetTranscript, listening } = useSpeechRecognition();
@@ -47,8 +49,6 @@ function VoiceChatPage() {
   const [currentMessage, setCurrentMessage] = useState<string>('');
 
   const [historyId, setHistoryId] = useState<number | null>(null);
-
-  const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
 
   useEffect(() => {
     if (listening && transcript !== currentMessage) {
@@ -74,19 +74,17 @@ function VoiceChatPage() {
     try {
       const userJwtFromStorage = localStorage.getItem("accessToken");
 
-      // if (!userJwtFromStorage) {
-      //   console.error("No access token found, please log in.");
-      //   return;
-      // }
-
-      console.log(userJwtFromStorage);
-      const config = userJwtFromStorage ? { headers: { access: `${userJwtFromStorage}` } }
+      const config = userJwtFromStorage
+        ? { headers: { access: `${userJwtFromStorage}` } }
         : {}; // 토큰이 없으면 headers 설정 안 함
 
+      console.log("쿠폰 사용 요청 중...");
+      setMessageHistory((prev) => [...prev, { role: "system", message: "쿠폰 사용 중..." }]);
+
       const responseFromSpring = await axios.post(
-        'http://localhost:8080/api/chat/ai/keywords',
-        { keywordId: selectedKeywordId }, // Body 데이터
-        config // 헤더 설정
+        "http://localhost:8080/api/chat/ai/keywords",
+        { keywordId: selectedKeywordId },
+        config
       );
 
       if (responseFromSpring.status === 401) {
@@ -96,16 +94,14 @@ function VoiceChatPage() {
 
       const hintResponse = responseFromSpring.data;
       const historyIdFromResponse = hintResponse.data.historyId || null;
+      const hints = hintResponse.data.hints;
+      setHints(hints);
+      setHistoryId(historyIdFromResponse);
 
-      console.log("Extracted historyId:", historyIdFromResponse);
-      setHistoryId(historyIdFromResponse); // 대화 내역 id 저장
+      console.log("쿠폰 차감 완료. 대화 시작");
+      setMessageHistory((prev) => [...prev, { role: "system", message: "대화가 시작되었습니다!" }]);
 
-      // if (!historyIdFromResponse) {
-      //   console.error("historyId is null or undefined, check backend response.");
-      //   return;
-      // }
-
-      const response = await axios.post('http://127.0.0.1:8000/ai/start/', {
+      const response = await axios.post("http://127.0.0.1:8000/ai/start/", {
         keyword: selectedKeyword,
         history_id: historyIdFromResponse,
       });
@@ -177,20 +173,44 @@ function VoiceChatPage() {
     }
   };
 
+  // /* AI 응답이 발생할 때 새로운 영상으로 전환 */
+  // const handleNewAIResponse = (aiResponse: string) => {
+  //   console.log("🚀 handleNewAIResponse 실행됨!");
+
+  //   let randomVideo;
+  //   do {
+  //     randomVideo = videos[Math.floor(Math.random() * videos.length)];
+  //   } while (randomVideo === currentVideo); // ✅ 같은 비디오 반복 방지
+
+  //   console.log(`🎥 새로운 비디오 설정: ${randomVideo}`);
+
+  //   setNextVideo(randomVideo);
+  // };
+
+  /* AI 응답이 발생할 때 새로운 영상으로 전환 */
+  // const handleNewAIResponse = () => {
+  //   console.log("🚀 handleNewAIResponse 실행됨!");
+
+  //   // 비디오 스택에서 다음 비디오 선택
+  //   setVideoStack((prevStack) => {
+  //     // 스택에 비디오가 있으면 다음 비디오를 선택하고, 없으면 첫 번째 비디오를 선택
+  //     const nextIndex = (prevStack.currentIndex + 1) % videoStack.videos.length;
+  //     return {
+  //       videos: prevStack.videos,
+  //       currentIndex: nextIndex,
+  //     };
+  //   });
+  // };
+
+  // const getNextVideoIndex = () => (currentVideoIndex + 1) % videoStack.length;
+
   /* AI 응답이 발생할 때 새로운 영상으로 전환 */
   const handleNewAIResponse = (aiResponse: string) => {
     console.log("🚀 handleNewAIResponse 실행됨!");
-
-    let randomVideo;
-    do {
-      randomVideo = videos[Math.floor(Math.random() * videos.length)];
-    } while (randomVideo === currentVideo); // ✅ 같은 비디오 반복 방지
-
-    console.log(`🎥 새로운 비디오 설정: ${randomVideo}`);
-
-    setNextVideo(randomVideo);
+    console.log(aiResponse)
+    // 다음 비디오 인덱스 계산
+    setCurrentVideoIndex((prevIndex) => (prevIndex + 1) % videos.length);
   };
-
 
 
   /* 사용자가 메시지를 보낼 때 API 호출 */
@@ -215,6 +235,7 @@ function VoiceChatPage() {
         const aiResponse = response.data.message;
         console.log(`📝 AI 응답 받음: ${aiResponse}`);
 
+        // handleNewAIResponse(aiResponse); // ✅ 비디오 변경 트리거
         handleNewAIResponse(aiResponse); // ✅ 비디오 변경 트리거
 
         setMessageHistory((prev) => [...prev, { role: "ai", message: aiResponse }]);
@@ -278,7 +299,7 @@ function VoiceChatPage() {
   const navigate = useNavigate();
 
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
-  const [turnCount, setTurnCount] = useState(2);
+  const [turnCount, setTurnCount] = useState(3);
   const [isChatEnd, setIsChatEnd] = useState(false);
   const [isOverlay, setIsOverlay] = useState(false);
 
@@ -294,12 +315,29 @@ function VoiceChatPage() {
 
   const videos = [Video_AI_1, Video_AI_2, Video_AI_4, Video_AI_3];
 
-  // 기본 영상
-  const [videoState, setVideoState] = useState<string>(videos[1]);
+  /* 비디오 스택 상태 */
+  const [videoStack, setVideoStack] = useState<string[]>(() => {
+    // 초기 비디오 스택을 랜덤하게 채우는 로직
+    const initialStack = Array.from({ length: 11 }, () => videos[Math.floor(Math.random() * videos.length)]);
+    console.log('Initial Video Stack:', initialStack); // 초기 스택 로그
+    return initialStack;
+  });
+  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
-  // ai 영상 상태 변화
-  const [currentVideo, setCurrentVideo] = useState<string>(videos[1]);
-  const [nextVideo, setNextVideo] = useState<string | null>(null);
+  useEffect(() => {
+    // videoStack 또는 currentVideoIndex가 변경될 때마다 로그 출력
+    console.log('Video Stack:', videoStack);
+    console.log('Current Video Index:', currentVideoIndex);
+  }, [videoStack, currentVideoIndex]);
+
+
+
+  // // 기본 영상
+  // const [videoState, setVideoState] = useState<string>(videos[1]);
+
+  // // ai 영상 상태 변화
+  // const [currentVideo, setCurrentVideo] = useState<string>(videos[1]);
+  // const [nextVideo, setNextVideo] = useState<string | null>(null);
 
   // typing 애니메이션
   const [aiMessage, setAiMessage] = useState('');
@@ -309,14 +347,14 @@ function VoiceChatPage() {
   const [lastAiMessage, setLastAiMessage] = useState(''); // 마지막 AI 응답 저장
   const [lastUserMessage, setLastUserMessage] = useState<string>(''); // 마지막 사용자 메시지 저장
 
-  const handleVideoLoaded = () => {
-    console.log(`비디오 로드 완료: ${currentVideo}`);
+  // const handleVideoLoaded = () => {
+  //   console.log(`비디오 로드 완료: ${currentVideo}`);
 
-    if (nextVideo) {
-      setCurrentVideo(nextVideo);
-      setNextVideo(null);
-    }
-  };
+  //   if (nextVideo) {
+  //     setCurrentVideo(nextVideo);
+  //     setNextVideo(null);
+  //   }
+  // };
 
   /* 페이지 이동 시 TTS 중단 */
   useEffect(() => {
@@ -352,7 +390,7 @@ function VoiceChatPage() {
       <ChatEnd isOpen={isChatEnd} onClose={endChat} historyId={historyId} />
 
       <div className={styles.menu}>
-        <Drawer selectedKeyword={selectedKeyword} hints={hints} chatHistory={messageHistory} turnCount={turnCount} />
+        <Drawer selectedKeyword={selectedKeyword} chatHistory={messageHistory} turnCount={turnCount} hints={hints} />
       </div>
 
       <div className={styles.chat}>
@@ -366,10 +404,15 @@ function VoiceChatPage() {
         <div className={styles.chat__ai}>
           <div className={styles.chat__ai__video}>
             {/* <Video videoSrc={currentVideo} nextVideo={nextVideo} /> */}
-            <Video
+            {/* <Video
               videoSrc={currentVideo}  // 현재 비디오 소스 전달
               nextVideo={nextVideo}
               onVideoLoaded={handleVideoLoaded}
+            /> */}
+            <Video
+              videoSrc={videoStack}  // 현재 비디오 소스 전달
+              currentIndex={currentVideoIndex} // 다음 비디오는 없음
+            // onVideoLoaded={() => { }} // handleVideoLoaded는 필요 없음
             />
           </div>
           <div className={styles.chat__ai__bubble}>
@@ -419,8 +462,6 @@ function VoiceChatPage() {
           <div className={styles.btn} onClick={handleStartClick}>시작하기</div>
         </KeywordModal>
       )}
-
-
 
       {/* 키워드 미선택 시 alert */}
       {showAlert && (
