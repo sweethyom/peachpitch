@@ -13,7 +13,7 @@ import FingerprintJS from '@fingerprintjs/fingerprintjs';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-import CompletePay from '@/components/modal/SuccessPay';
+// import CompletePay from '@/components/modal/SuccessPay';
 
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';

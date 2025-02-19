@@ -142,9 +142,9 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
                                     </div>
                                 )}
                             </div>
+                            {keywords.map((keyword, index) => (
 
-                            <div className={styles.modal__keywords}>
-                                {keywords.map((keyword, index) => (
+                                <div className={styles.modal__keywords}>
                                     <div
                                         key={keyword.id}
                                         className={`${styles.modal__keywords__item} ${selectedKeyword === keyword.name ? styles.selected : ""
@@ -158,22 +158,23 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
                                     >
                                         {keyword.name}
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                        {/* 버튼 영역: 아직 선택하지 않았다면 선택 버튼 보임,
-                            선택 후에는 모달 중앙에 대기 메시지 표시 */}
-                        {!hasSubmitted ? (
-                            <div className={styles.modal__btn}>
-                                <div className={styles.btn} onClick={handleStart}>
-                                    선택하기
                                 </div>
-                            </div>
-                        ) : (
-                            <div>
-                                다른 사용자가 키워드를 고르고 있습니다.
-                            </div>
-                        )}
+                            ))}
+                            {/* 버튼 영역: 아직 선택하지 않았다면 선택 버튼 보임,
+                            선택 후에는 모달 중앙에 대기 메시지 표시 */}
+                            {!hasSubmitted ? (
+                                <div className={styles.modal__btn}>
+                                    <div className={styles.btn} onClick={handleStart}>
+                                        선택하기
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{display:"flex", width:"100%", justifyContent:"center"}}>
+                                    다른 사용자가 키워드를 고르고 있습니다.
+                                </div>
+                            )}
+
+                        </div>
                     </div>
                 </div>
             )

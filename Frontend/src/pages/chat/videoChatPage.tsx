@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './styles/video.module.scss';
 
 import leaveBtn from '@/assets/icons/leave.png';
@@ -388,9 +388,9 @@ const VideoChatPage: React.FC = () => {
                             navigate("/main");
                         }, 1000);
                     }
-                    else if(response.status === "chat") {
+                    else if (response.status === "chat") {
                         // 채팅 저장
-                        if(Number(response.userId) === userIdRef.current) {
+                        if (Number(response.userId) === userIdRef.current) {
                             // 내자신이 말함
                             setChatHistory((prev) => [...prev, { role: "user", message: response.content }]);
                         }
@@ -576,23 +576,6 @@ const VideoChatPage: React.FC = () => {
                             ))}
                         </div>
 
-
-                        <p>🎤 Microphone: {listening ? 'on' : 'off'}</p>
-                        <button onClick={() => SpeechRecognition.startListening({ continuous: true, language: "ko-KR" })}>
-                            Start
-                        </button>
-                        <button onClick={() => SpeechRecognition.stopListening()}>Stop</button>
-                        <button onClick={resetTranscript}>Reset</button>
-                        <h3>📝 실시간 STT</h3>
-                        <p>{transcript}</p>
-
-                        <h3>📜 이전 대화 기록</h3>
-                        <div id="history">
-                            {history.map((item, index) => (
-                                <p key={index}>🗣 {item}</p>
-                            ))}
-                        </div>
-
                         {/* <button >세션 종료</button> */}
                         <div id="video-container">
                             <div className={styles.chat__other}>
@@ -628,9 +611,21 @@ const VideoChatPage: React.FC = () => {
                             </div>
 
                             <div className={styles.chat__input}>
-                                <p className={styles.chat__input__content}>
-                                    여기에 stt
-                                </p>
+                                <p>🎤 Microphone: {listening ? 'on' : 'off'}</p>
+                                <button onClick={() => SpeechRecognition.startListening({ continuous: true, language: "ko-KR" })}>
+                                    Start
+                                </button>
+                                <button onClick={() => SpeechRecognition.stopListening()}>Stop</button>
+                                <button onClick={resetTranscript}>Reset</button>
+                                <h3>📝 실시간 STT</h3>
+                                <p>{transcript}</p>
+
+                                <h3>📜 이전 대화 기록</h3>
+                                <div id="history">
+                                    {history.map((item, index) => (
+                                        <p key={index}>🗣 {item}</p>
+                                    ))}
+                                </div>
 
                                 {/* <img src={sstBtn} className={styles.chat__input__img} alt="sst button" /> */}
                             </div>
