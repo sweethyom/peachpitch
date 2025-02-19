@@ -18,7 +18,7 @@
 1. [**프로젝트 진행**](#6)
 1. [**모니터링 통계**](#7)
 1. [**개발 일정**](#8)
-1. [**기타 산출물물**](#9)
+1. [**기타 산출물**](#9)
 1. [**팀원 소개**](#10)
 
 
@@ -95,32 +95,60 @@ gif 넣고 기술 설명
 
 ### AI 스몰토크
 
+<br /><br />
+
 ### 1대1 스몰토크
+
+<br /><br />
 
 ### 분석 리포트 (전체)
 
+<br /><br />
+
 ### 분석 리포트 (AI 대화)
+
+<br /><br />
 
 ### 분석 리포트 (1대1 대화)
 
+<br /><br />
+
 ### 비회원 핑거프린트
+
+<br /><br />
 
 ### 채팅관리
 
+<br /><br />
+
 ### 로그인(일반)
+
+<br /><br />
 
 ### 로그인(카카오)
 
+<br /><br />
+
 ### 결제 (카카오 api)
+
+<br /><br />
 
 ### 블루그린 배포
 
+<br /><br />
+
 ### 키워드 랭킹
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%ED%82%A4%EC%9B%8C%EB%93%9C%20%EB%9E%AD%ED%82%B9.png?ref_type=heads" width="700" />
+
+<br />
+<br />
 
 ### 랜덤 스크립트
 
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EB%9E%9C%EB%8D%A4%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8.png?ref_type=heads" width="500" />
 
 
+<br /><br />
 <br />
 
 
@@ -180,13 +208,13 @@ gif 넣고 기술 설명
 
 <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C4.png?ref_type=heads" width="700" />
 
-<br />
+<br /><br />
 
 ### 와이어프레임
 
 <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/wireframe.png?ref_type=heads" width="700" />
 
-<br />
+<br /><br />
 
 ### ERD 다이어그램
 
@@ -194,13 +222,13 @@ gif 넣고 기술 설명
 
 추가된 부분 수정해서 다시 올리기
 
-<br />
+<br /><br />
 
 ### 시스템 아키텍처
 
 <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/system_architecture_with_monitoring.png?ref_type=heads" width="700" />
 
-<br />
+<br /><br />
 
 ### API 명세서
 
@@ -211,7 +239,7 @@ gif 넣고 기술 설명
 <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" width="700" />
 
 <br />
-
+<br /><br />
 
 <div id="6"></div>
 
@@ -225,11 +253,13 @@ gif 넣고 기술 설명
 <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/notion2.png?ref_type=heads" width="700" />
 
 <br />
+<br />
 
 ### Jira
 
 그래프 캡쳐
 
+<br />
 <br />
 
 ### Git
@@ -237,7 +267,8 @@ gif 넣고 기술 설명
 끝나고 소스트리 녹화해서 gif
 
 <br />
-
+<br />
+<br />
 
 <div id="7"></div>
 
@@ -267,7 +298,7 @@ gif 넣고 기술 설명
 
 <div id="9"></div>
 
-## 👷 기타 산출물물
+## 👷 기타 산출물
 
 
 [포팅 메뉴얼 보러가기](exec/PortingManual.md)
@@ -277,7 +308,7 @@ gif 넣고 기술 설명
 [시연 시나리오 보러가기](exec/시연시나리오)
 
 <br />
-
+<br />
 
 
 <div id="10"></div>
