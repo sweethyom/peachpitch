@@ -148,7 +148,7 @@ function Coupon({ isOpen, onClose }: ModalProps) {
                 throw new Error("무료 쿠폰 요청 실패");
             }
 
-            const data = await response.json();
+            // const data = await response.json();
 
             // ✅ 모달 닫기 및 메인 페이지 이동
             onClose();
