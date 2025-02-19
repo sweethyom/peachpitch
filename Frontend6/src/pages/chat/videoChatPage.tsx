@@ -305,7 +305,7 @@ const VideoChatPage: React.FC = () => {
                                     //SpeechRecognition.stopListening();
                                     SpeechRecognition.startListening({
                                         stream: audioStream,  // 전체 스트림 사용
-                                        //continuous: true // true 하면 로컬에서는 충돌
+                                        continuous: true // true 하면 로컬에서는 충돌
 
                                     } as any);
                                     console.log("speech recognition")
