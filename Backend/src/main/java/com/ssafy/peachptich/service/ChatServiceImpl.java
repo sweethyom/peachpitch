@@ -121,7 +121,6 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
-    @Override
     public void saveUserChat(ChatRequest chatRequest) {
         try {
             List<Chat> chatsToSave = new ArrayList<>();
