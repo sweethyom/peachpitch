@@ -13,12 +13,14 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.UUID;
 
 /**
@@ -77,72 +79,18 @@ public class PurchaseController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "결제를 성공적으로 완료함")
     })
-    public ResponseEntity<String> payCompleted(@RequestParam("pg_token") String pgToken) {
-
-        // 카카오 결제 요청
-        ApproveResponse approveResponse = purchaseService.payApprove(pgToken);
-        purchaseService.savePaymentInfo(approveResponse);
-
-        // 쿠폰 구매인 경우 쿠폰 발급
-        Purchase purchase = purchaseService.getPaymentInfo(approveResponse.getPartner_order_id());
-        if (purchase.getItem().getType() == Item.ItemType.PAID) {
-            couponService.handlePaidCoupon(purchase.getUser().getUserId(), purchase.getEa());
+    public void payCompleted(@RequestParam("pg_token") String pgToken, HttpServletResponse response) {
+        try {
+            // 결제 승인 처리 로직 (예: 카카오페이 API 호출)
+            ApproveResponse approveResponse = purchaseService.payApprove(pgToken);
+            purchaseService.savePaymentInfo(approveResponse);
+            // 팝업 닫기 스크립트 반환
+            String script = "<html><body><script>window.close();</script></body></html>";
+            response.setContentType("text/html");
+            response.getWriter().write(script);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        String htmlResponse = """
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>결제 완료</title>
-                <script>
-                    window.onload = function() {
-                        if (window.opener) {
-                            window.opener.postMessage("paymentSuccess", "*");
-                            window.close();
-                        }
-                    };
-                </script>
-            </head>
-            <body>
-                <h1>결제가 완료되었습니다.</h1>
-            </body>
-            </html>
-        """;
-
-            log.info("payCompleted : 마지막 로그");
-            return ResponseEntity.ok().body(htmlResponse);
     }
-
-
-    // Controller 수정
-//    @GetMapping("/datacompleted")
-//    public String orderCompleted(Model model) {
-//        try {
-//            String orderId = SessionUtils.getStringAttributeValue("orderId");
-//            Purchase paymentInfo = purchaseService.getPaymentInfo(orderId);
-//
-//            model.addAttribute("itemName", paymentInfo.getItem().getName());
-//            model.addAttribute("orderId", paymentInfo.getOrderId());
-//            model.addAttribute("paymentMethod", paymentInfo.getMethod());
-//            model.addAttribute("quantity", paymentInfo.getEa());
-//            model.addAttribute("paymentTime", paymentInfo.getPaymentTime());  // approved_at을 paymentTime으로
-//            model.addAttribute("totalPrice", paymentInfo.getTotalPrice());
-//
-//            return "completed";
-//        } catch (Exception e) {
-//            log.error("결제 정보 조회 중 오류 발생", e);
-//            return "redirect:/order/fail";
-//        }
-//    }
-
-//    @GetMapping("/cancel")
-//    public void cancel() {
-//        throw new BusinessLogicException(ExceptionCode.PAY_CANCEL);
-//    }
-//
-//    @GetMapping("/fail")
-//    public void fail() {
-//        throw new BusinessLogicException(ExceptionCode.PAY_FAILED);
-//    }
 
 }
