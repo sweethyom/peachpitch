@@ -2,6 +2,8 @@ package com.ssafy.peachptich.controller.chat;
 
 import com.ssafy.peachptich.dto.request.AudioChatRequest;
 import com.ssafy.peachptich.dto.request.CloseRequest;
+import com.ssafy.peachptich.dto.request.UserChatRequest;
+import com.ssafy.peachptich.service.UserService;
 import com.ssafy.peachptich.service.VideoChatWebSocketService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
@@ -30,6 +32,7 @@ import java.security.Principal;
 @Tag(name = "VideoChatWebSocketController", description = "화상 채팅 대화 기록 관련 컨트롤러")
 public class VideoChatWebSocketController {
     private final VideoChatWebSocketService videoChatService;
+    private final UserService userService;
 
     /* userId로 웹소켓
     @MessageMapping("/request") // 클라이언트가 /pub/request로 header에 userId 담아서 보냄
@@ -125,5 +128,11 @@ public class VideoChatWebSocketController {
         Principal principal = accessor.getUser();
         if(principal!=null)
             videoChatService.handleVideoChatWebSocketDisconnect(principal.getName());
+    }
+
+    // redis에 채팅 저장 이벤트 발생시 호출됨
+    @EventListener
+    public void handleChatMessageEvent(UserChatRequest userChatRequest) {
+        videoChatService.handleSendVideoChatMessage(userChatRequest);
     }
 }
