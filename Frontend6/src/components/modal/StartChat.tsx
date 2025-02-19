@@ -34,7 +34,7 @@ function StartChat({ isOpen, onClose, onStart, isFinger, children }: ModalProps)
         // ✅ 핑거프린트 사용 기록을 서버에 저장
         const fingerprint = localStorage.getItem("fingerprint");
         if (fingerprint) {
-          await axios.post('http://localhost:8080/api/chat/ai/use', {
+          await axios.post('https://peachpitch.site/api/chat/ai/use', {
             fingerprint: fingerprint,
           });
           console.log("핑거프린트 사용 기록 저장 완료");

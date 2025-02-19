@@ -146,7 +146,7 @@ const VideoChatPage: React.FC = () => {
                         const createdAt: string = formatDateToBackend(new Date()); // Date → string 변환
                         console.log(createdAt)
                         const response = await axios.post(
-                            'http://localhost:8080/api/chat/video/save/temp',
+                            'https://peachpitch.site/api/chat/video/save/temp',
                             {
                                 historyId: historyId,
                                 message: transcript,
@@ -346,7 +346,7 @@ const VideoChatPage: React.FC = () => {
         setUserJwt(userJwtFromStorage || "");
 
         const stompClient = new Client({
-            brokerURL: "ws://localhost:8080/api/ws",
+            brokerURL: "wss://peachpitch.site/api/ws",
             heartbeatIncoming: 0,  // 4초마다 서버로부터 heart-beat 수신
             heartbeatOutgoing: 0,   // 4초마다 서버로 heart-beat 전송
             connectHeaders: {

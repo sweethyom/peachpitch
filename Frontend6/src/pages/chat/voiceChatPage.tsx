@@ -82,7 +82,7 @@ function VoiceChatPage() {
       // setMessageHistory((prev) => [...prev, { role: "system", message: "쿠폰 사용 중..." }]);
 
       const responseFromSpring = await axios.post(
-        "http://localhost:8080/api/chat/ai/keywords",
+        "https://peachpitch.site/api/chat/ai/keywords",
         { keywordId: selectedKeywordId },
         config
       );
@@ -101,7 +101,7 @@ function VoiceChatPage() {
       console.log("쿠폰 차감 완료. 대화 시작");
       // setMessageHistory((prev) => [...prev, { role: "system", message: "대화가 시작되었습니다!" }]);
 
-      const response = await axios.post("http://127.0.0.1:8000/ai/start/", {
+      const response = await axios.post("https://peachpitch.site/ai/start/", {
         keyword: selectedKeyword,
         history_id: historyIdFromResponse,
       });
@@ -227,7 +227,7 @@ function VoiceChatPage() {
     if (turnCount > 0) {
       try {
         console.log("📡 AI 서버에 요청 중...");
-        const response = await axios.post("http://127.0.0.1:8000/ai/chat/", {
+        const response = await axios.post("https://peachpitch.site/ai/chat/", {
           message: modifiedMessage,
           history_id: historyId
         });

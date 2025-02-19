@@ -35,7 +35,7 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
     useEffect(() => {
         const fetchKeywords = async () => {
             try {
-                const response = await fetch("http://localhost:8080/api/chat/ai/keywords/add");
+                const response = await fetch("https://peachpitch.site/api/chat/ai/keywords/add");
                 const responseJson = await response.json();
                 const data = responseJson.data;
                 console.log(data);
@@ -61,7 +61,7 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
         const userJwtFromStorage = localStorage.getItem("accessToken");
         if (isOpen && historyId) {
             const client = new Client({
-                brokerURL: "ws://localhost:8080/api/ws",
+                brokerURL: "wss://peachpitch.site/api/ws",
                 connectHeaders: {
                     access: `${userJwtFromStorage}`,
                 },

@@ -114,7 +114,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         response.getWriter().println("</body>");
         response.getWriter().println("</html>");
 
-        response.sendRedirect("http://localhost:5173/main");
+        response.sendRedirect("https://peachpitch.site/main");
          */
     }
 
