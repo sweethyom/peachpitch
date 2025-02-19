@@ -96,12 +96,6 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
-    //
-//    @Override
-//    public Chat getChatDetail(Long chatId) {
-//        return null;
-//    }
-//
     // 랜덤 스크립트
     @Override
     public Chat getRandomChat() {
@@ -126,7 +120,7 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
-    // redis 대화 db에 저장
+    @Override
     @Override
     public void saveUserChat(ChatRequest chatRequest) {
         try {
@@ -190,18 +184,38 @@ public class ChatServiceImpl implements ChatService {
         }
     }
 
+
     @Override
     public List<Chat> getChatsByHistoryId(Long historyId) {
         return chatRepository.findByChatHistory_HistoryIdOrderByCreatedAtAsc(historyId);
     }
 
-    // 대화 리포트 데이터 띄우기
     @Override
     public ChatReport getReport(@RequestBody ReportRequest reportRequest) {
-        return reportRepository.findByUserIdAndReportId(reportRequest.getUserId(), reportRequest.getReportId())
-                .orElseThrow(() -> new EntityNotFoundException("Chat Report not found"));
-    }
+        log.info("리포트 조회 시작 - userId: {}, reportId: {}",
+                reportRequest.getUserId(), reportRequest.getReportId());
 
+        try {
+            ChatReport chatReport = reportRepository
+                    .findByUserIdAndReportId(reportRequest.getUserId(), reportRequest.getReportId())
+                    .orElseThrow(() -> {
+                        log.error("리포트를 찾을 수 없습니다 - userId: {}, reportId: {}",
+                                reportRequest.getUserId(), reportRequest.getReportId());
+                        return new EntityNotFoundException("Chat Report not found");
+                    });
+
+            log.info("리포트 조회 완료 - reportId: {}, historyId: {}",
+                    chatReport.getReportId(),
+                    chatReport.getChatHistory() != null ? chatReport.getChatHistory().getHistoryId() : "null");
+
+            return chatReport;
+
+        } catch (Exception e) {
+            log.error("리포트 조회 중 예외 발생 - userId: {}, reportId: {}",
+                    reportRequest.getUserId(), reportRequest.getReportId(), e);
+            throw e;
+        }
+    }
 
     @Override
     public TotalReportResponse getTotalReport(Long userId) {
@@ -293,14 +307,5 @@ public class ChatServiceImpl implements ChatService {
     }
     */
 
-//
-//    @Override
-//    public List<Chat> getChatsByUserId(Long userId) {
-//        return null;
-//    }
-//
-//    @Override
-//    public List<Chat> getChatsByHistory(ChatHistory chatHistory) {
-//        return null;
-//    }
+
 }

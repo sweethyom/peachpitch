@@ -258,7 +258,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                     )}
                 </div>
             </div>
-
+            {/*쿠폰 페이지로 변경 필요*/}
             <CouponModal isOpen={isCouponOpen} onClose={() => setIsCouponOpen(false)} />
         </div>
     );
