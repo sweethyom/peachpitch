@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles/Coupon.module.scss";
 // import closeBtn from "@/assets/icons/modal__close.png";
 import couponImg from "@/assets/images/coupon_img.png";
 import RedAlert from '@/components/alert/redAlert';
 
-type ModalProps = {
-    onUpdateCoupon: () => void;
-};
+// type ModalProps = {
+//     onUpdateCoupon: () => void;
+// };
 
 function CouponPage() {
     const [counts, setCounts] = useState([0, 0, 0]);
@@ -93,7 +93,7 @@ function CouponPage() {
 
             console.log(response);
 
-            const data = await response.json();
+            // const data = await response.json();
             alert("무료 쿠폰이 발급되었습니다!");
             // onUpdateCoupon(); // 쿠폰 개수 갱신
         } catch (error) {
