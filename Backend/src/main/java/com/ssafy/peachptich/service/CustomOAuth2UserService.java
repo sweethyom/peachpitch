@@ -81,12 +81,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             List< Item > items = itemRepository.findAll();
 
             for (Item item : items) {
-                HaveCoupon haveCoupon = HaveCoupon.builder()
-                    .user(savedUser)
-                    .item(item)
-                    .ea(0)
-                    .build();
-                haveCouponRepository.save(haveCoupon);
+                // FREE 타입 쿠폰은 제외하고 초기화
+                if (item.getType() != Item.ItemType.FREE) {
+                    HaveCoupon haveCoupon = HaveCoupon.builder()
+                            .user(savedUser)
+                            .item(item)
+                            .ea(0)
+                            .build();
+                    haveCouponRepository.save(haveCoupon);
+                }
             }
 
             return new CustomUserDetails(user);
