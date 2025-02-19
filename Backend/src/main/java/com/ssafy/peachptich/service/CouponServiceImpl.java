@@ -52,13 +52,6 @@ public class CouponServiceImpl implements CouponService {
         }
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public boolean hasReceivedFreeCouponToday(Long userId) {
-        String loginKey = getLoginKey(userId);
-        return redisTemplate.hasKey(loginKey);
-    }
-
     private void setLoginRecord(Long userId) {
         String loginKey = getLoginKey(userId);
         redisTemplate.opsForValue().set(loginKey, "1");
@@ -76,17 +69,9 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional
     public void issueFreeCoupon(Long userId) {
-        // 기존 유효한 쿠폰이 있는지 확인
+        // 기존 FREE 타입 쿠폰 조회 (만료 여부 상관없이)
         Optional<HaveCoupon> existingCoupon = haveCouponRepository
-                .findByUserIdAndItemTypeAndExpirationDateAfter(
-                        userId,
-                        Item.ItemType.FREE,
-                        LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
-                );
-
-        if (existingCoupon.isPresent()) {
-            throw new IllegalStateException("이미 유효한 무료 쿠폰이 있습니다.");
-        }
+                .findByUserIdAndItemType(userId, Item.ItemType.FREE);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -94,16 +79,34 @@ public class CouponServiceImpl implements CouponService {
         Item freeCouponItem = itemRepository.findByType(Item.ItemType.FREE)
                 .orElseThrow(() -> new IllegalStateException("무료 쿠폰 아이템이 설정되지 않았습니다."));
 
-        HaveCoupon newCoupon = HaveCoupon.builder()
-                .user(user)
-                .item(freeCouponItem)
-                .ea(1)
-                .expirationDate(LocalDateTime.now()
-                        .withHour(23).withMinute(59).withSecond(59))
-                .build();
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime todayEnd = now.withHour(23).withMinute(59).withSecond(59);
 
-        haveCouponRepository.save(newCoupon);
+        if (existingCoupon.isPresent()) {
+            HaveCoupon coupon = existingCoupon.get();
+            LocalDateTime expirationDate = coupon.getExpirationDate();
+
+            // 유효한 쿠폰인 경우
+            if (expirationDate != null && expirationDate.isAfter(now)) {
+                throw new IllegalStateException("이미 유효한 무료 쿠폰이 있습니다.");
+            }
+
+            // 만료된 쿠폰이거나 만료일이 없는 경우 업데이트
+            coupon.setEa(1);
+            coupon.setExpirationDate(todayEnd);
+            haveCouponRepository.save(coupon);
+        } else {
+            // 쿠폰이 없는 경우 새로 생성
+            HaveCoupon newCoupon = HaveCoupon.builder()
+                    .user(user)
+                    .item(freeCouponItem)
+                    .ea(1)
+                    .expirationDate(todayEnd)
+                    .build();
+            haveCouponRepository.save(newCoupon);
+        }
     }
+
 
 
     @Transactional(readOnly = true)
@@ -143,6 +146,13 @@ public class CouponServiceImpl implements CouponService {
             log.error("Error while getting available coupons: ", e);
             throw e;
         }
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasReceivedFreeCouponToday(Long userId) {
+        String loginKey = getLoginKey(userId);
+        return redisTemplate.hasKey(loginKey);
     }
 
 

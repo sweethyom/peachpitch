@@ -93,36 +93,4 @@ public class PurchaseController {
         }
     }
 
-
-    // Controller 수정
-//    @GetMapping("/datacompleted")
-//    public String orderCompleted(Model model) {
-//        try {
-//            String orderId = SessionUtils.getStringAttributeValue("orderId");
-//            Purchase paymentInfo = purchaseService.getPaymentInfo(orderId);
-//
-//            model.addAttribute("itemName", paymentInfo.getItem().getName());
-//            model.addAttribute("orderId", paymentInfo.getOrderId());
-//            model.addAttribute("paymentMethod", paymentInfo.getMethod());
-//            model.addAttribute("quantity", paymentInfo.getEa());
-//            model.addAttribute("paymentTime", paymentInfo.getPaymentTime());  // approved_at을 paymentTime으로
-//            model.addAttribute("totalPrice", paymentInfo.getTotalPrice());
-//
-//            return "completed";
-//        } catch (Exception e) {
-//            log.error("결제 정보 조회 중 오류 발생", e);
-//            return "redirect:/order/fail";
-//        }
-//    }
-
-//    @GetMapping("/cancel")
-//    public void cancel() {
-//        throw new BusinessLogicException(ExceptionCode.PAY_CANCEL);
-//    }
-//
-//    @GetMapping("/fail")
-//    public void fail() {
-//        throw new BusinessLogicException(ExceptionCode.PAY_FAILED);
-//    }
-
 }
