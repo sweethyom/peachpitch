@@ -142,9 +142,10 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
                                     </div>
                                 )}
                             </div>
-                            {keywords.map((keyword, index) => (
+                            
 
                                 <div className={styles.modal__keywords}>
+                                {keywords.map((keyword, index) => (
                                     <div
                                         key={keyword.id}
                                         className={`${styles.modal__keywords__item} ${selectedKeyword === keyword.name ? styles.selected : ""
@@ -156,8 +157,9 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
                                             transition: "opacity 0.3s ease-in-out",
                                         }}
                                     >
-                                        {keyword.name}
                                     </div>
+                                        {keyword.name}
+                                    
                                 </div>
                             ))}
                             {/* 버튼 영역: 아직 선택하지 않았다면 선택 버튼 보임,
