@@ -1,0 +1,74 @@
+.page {
+  display: flex;
+  flex-direction: column; // 🟢 세로 정렬
+  align-items: center;
+  width: 100%;
+  min-height: 100vh; // 🟢 화면 전체 높이 유지
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.contents {
+  display: flex;
+  justify-content: center; // 아이템들을 중앙 정렬
+  align-items: flex-start; // 세로 정렬 기준 설정
+  gap: 20px; // 아이템 간격
+  flex-wrap: wrap; // 화면 크기에 따라 줄바꿈 허용
+  padding: 20px;
+
+  &__item {
+    display: flex;
+    flex-direction: column; // 아이템 내부 요소를 세로 정렬
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    width: 250px; // 각 아이템의 고정 너비
+    height: auto;
+
+    img {
+      width: 210px; // 모달에서 사용한 이미지 크기
+      height: auto; // 비율 유지
+      margin-bottom: 10px;
+    }
+
+    &__label {
+      font-size: 18px;
+      font-weight: normal;
+      margin-bottom: 5px;
+
+      &--price {
+        font-weight: bold;
+        color: #555;
+      }
+    }
+
+    &__count {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      &__btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: transparent;
+        border: solid var(--color-white-700) 1px;
+        font-size: 18px;
+        font-weight: bold;
+
+        &:hover {
+          background-color: var(--color-white-200);
+        }
+      }
+
+      &__label {
+        font-size: 16px;
+        font-weight: bold;
+        color: #333;
+      }
+    }
+  }
+}

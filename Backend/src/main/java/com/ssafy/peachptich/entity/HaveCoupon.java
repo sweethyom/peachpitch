@@ -29,26 +29,27 @@ public class HaveCoupon {
     @Setter
     private Item item;
 
+    @Setter
     // 무료 쿠폰의 경우 만료 시간 관리
     private LocalDateTime expirationDate;
 
-   @Builder
+    @Builder
     public HaveCoupon(Integer ea, User user, Item item, LocalDateTime expirationDate) {
-       this.ea = ea;
-       this.user = user;
-       this.item = item;
-       this.expirationDate = expirationDate;
+        this.ea = ea;
+        this.user = user;
+        this.item = item;
+        this.expirationDate = expirationDate;
 
-       // 무료 쿠폰인 경우 만료시간 설정
-       if (item.getType() == Item.ItemType.FREE) {
-           this.expirationDate = LocalDateTime.now()
-                   .plusDays(1)
-                   .withHour(0)
-                   .withMinute(0)
-                   .withSecond(0);
-       }
+        // 무료 쿠폰인 경우 만료시간 설정
+        if (item.getType() == Item.ItemType.FREE) {
+            this.expirationDate = LocalDateTime.now()
+                    .plusDays(1)
+                    .withHour(0)
+                    .withMinute(0)
+                    .withSecond(0);
+        }
 
-   }
+    }
     // 쿠폰 사용 메서드
     public void useCoupon() {
         if (this.ea <= 0) {
@@ -68,8 +69,5 @@ public class HaveCoupon {
             return ea > 0 && LocalDateTime.now().isBefore(expirationDate);
         }
         return ea > 0;
-    }
-
-    public void setExpirationDate(LocalDateTime localDateTime) {
     }
 }
