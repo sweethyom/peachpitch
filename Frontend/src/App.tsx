@@ -15,6 +15,8 @@ import ChatReportPage from '@pages/report/chatReportPage';
 import SocialLoginProccessPage from '@pages/login/socialLoginProcessPage';
 
 import '@assets/styles/font.scss'
+import CouponPage from "./pages/coupon/couponPage.tsx";
+import SuccessPayPage from "./pages/coupon/paySuccessPage.tsx";
 
 function App() {
     return (
@@ -31,6 +33,9 @@ function App() {
                     <Route path="/chat/video" element={<VideoChatPage />} />
                     <Route path="/report" element={<TotalReportPage />} />
                     <Route path="/report/detail/:reportId" element={<ChatReportPage />} />
+                    <Route path="/coupon" element={<CouponPage />} />
+                    <Route path="/payment/success" element={<SuccessPayPage />} />
+
                 </Routes>
             </BrowserRouter>
         </RecoilRoot>
