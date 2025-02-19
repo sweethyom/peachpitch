@@ -115,7 +115,7 @@ public class ChatController {
         }
 
         try {
-            chatService.saveUserChat(chatrequest, userDetails.getUserId());
+            chatService.saveUserChat(chatrequest);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
             log.error("Failed to save chat content", e);

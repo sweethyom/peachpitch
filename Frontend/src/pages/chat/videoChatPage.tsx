@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styles from './styles/video.module.scss';
 
 import leaveBtn from '@/assets/icons/leave.png';
@@ -49,7 +49,6 @@ const VideoChatPage: React.FC = () => {
     // ✅ 문장이 완성되었는지 확인하는 정규식
     const sentenceEndRegex = /.*(했다|어요|습니다)[.!?]?$/;
 
-
     /* 대화 나가기 모달창 */
     const [isLeaveOpen, setIsLeaveOpen] = useState<boolean>(false);
     //const toggleLeave = () => setIsLeaveOpen((prev) => !prev);
@@ -65,16 +64,17 @@ const VideoChatPage: React.FC = () => {
     const [showAlert, setShowAlert] = useState<boolean>(false);
     const [alertMessage, setAlertMessage] = useState<string>(""); //alert 재사용을 위한 메세지
 
-    //const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
-    const [chatHistory] = useState<{ role: string; message: string }[]>([]);
+    /* 지금까지의 대화 내역 */
+    const [chatHistory, setChatHistory] = useState<{ role: string; message: string }[]>([]);
+
+    /* 힌트 */
     const [selectedKeywords, setSelectedKeywords] = useState<string[] | null>(null); // 사용자들이 고른 키워드
-    // const [hints, setHints] = useState<string[] | null>([]); // 키워드에 따른 힌트
     const [hints, setHints] = useState<{ hint: string }[][]>([]);
 
-    const [isConnecting, setIsConnecting] = useState(true); // 웹소켓 연결 시도 중
+    /* 웹소켓 연결 시도 */
+    const [isConnecting, setIsConnecting] = useState(true);
 
     /* stomp client */
-    // const [client, setClient] = useState<Client | null>(null);
     const [stompClient, setStompClient] = useState<Client | null>(null);
 
     /* openvidu session */
@@ -92,7 +92,6 @@ const VideoChatPage: React.FC = () => {
 
     /* matching 상태 */
     const [isMatching, setIsMatching] = useState<boolean>(false);
-    // const [isClose, setIsClose] = useState<boolean>(false);
 
     const [userJwt, setUserJwt] = useState<string>("");
     const [historyId, setHistoryId] = useState<number | null>(null);
@@ -108,6 +107,11 @@ const VideoChatPage: React.FC = () => {
     const [userId, setUserId] = useState<number | null>(null);
 
     const [selectedMask, setSelectedMask] = useState<string | null>("mask1")
+    const userIdRef = useRef<number | null>(null);
+    useEffect(() => {
+        // userId가 바뀔 때마다 ref 업데이트
+        userIdRef.current = userId;
+    }, [userId]);
 
     // 음성인식 있을 때만 자동 재시작
     useEffect(() => {
@@ -138,11 +142,12 @@ const VideoChatPage: React.FC = () => {
         }
     }, [listening, isRestarting, session, publisher]);
 
+    /* 채팅 보내기 전 createdAt 변환 */
     const formatDateToBackend = (date: Date): string => {
         return date.toISOString().replace('Z', '').padEnd(26, '0');
     };
 
-    // 📜 STT 기록 저장 (문장이 완성되었을 때만)
+    // STT 기록 저장 및 redis 전송(문장이 완성되었을 때만)
     useEffect(() => {
         if (transcript && transcript !== previousTranscript) {
             // ✅ 문장이 완성된 경우 저장 (길이 60자 이상 OR 종결어미 OR 마침표 포함)
@@ -164,7 +169,6 @@ const VideoChatPage: React.FC = () => {
                                 headers: {
                                     access: userJwt
                                 },
-
                             }
                         );
                         console.log(response);
@@ -182,8 +186,6 @@ const VideoChatPage: React.FC = () => {
     useEffect(() => {
         if (selectedKeyword) {  // null이 아닐 때만 추가
             setSelectedKeywords(prev => prev ? [...prev, selectedKeyword] : [selectedKeyword]);
-            // 힌트 배열도 새 참조로 만들어 리렌더 유도 (필요 시 로직 추가)
-            // setHints(prev => [...prev]); // 새로운 배열 참조 생성
             setHints((prev) => [...(prev || [])]);
         }
     }, [selectedKeyword]);
@@ -223,22 +225,6 @@ const VideoChatPage: React.FC = () => {
             if (!isSessionClosed) {
                 setSessionEndType(SessionEndType.MANUAL);
                 setIsSessionClosed(true);
-
-                // 세션 종료 처리
-                /*newSession.disconnect();
-                closeSession(sessionId)
-                    .then(() => {
-                        setAlertMessage("상대방이 대화방을 나갔습니다.");
-                        setShowAlert(true);
-                        // 3초 후 메인으로 이동
-                        setTimeout(() => {
-                            navigate("/main");
-                        }, 1000);
-                    })
-                    .catch((error) => {
-                        console.error("세션 종료 처리 중 오류:", error);
-                    });
-                 */
             }
         });
 
@@ -364,7 +350,7 @@ const VideoChatPage: React.FC = () => {
                 console.log("✅ STOMP 연결됨");
                 // 매칭 메시지 구독
                 stompClient.subscribe("/user/sub/call", (message) => {
-                    console.log("📩 받은 메시지:", message.body);
+                    //console.log("📩 받은 메시지:", message.body);
                     const response = JSON.parse(message.body);
 
                     if (response.status === "waiting") {
@@ -401,6 +387,17 @@ const VideoChatPage: React.FC = () => {
                         setTimeout(() => {
                             navigate("/main");
                         }, 1000);
+                    }
+                    else if(response.status === "chat") {
+                        // 채팅 저장
+                        if(Number(response.userId) === userIdRef.current) {
+                            // 내자신이 말함
+                            setChatHistory((prev) => [...prev, { role: "user", message: response.content }]);
+                        }
+                        else {
+                            //다른 사람이 말함
+                            setChatHistory((prev) => [...prev, { role: "other", message: response.content }]);
+                        }
                     }
                 });
                 if (!isMatching) {
@@ -500,7 +497,7 @@ const VideoChatPage: React.FC = () => {
                     console.error("STOMP client가 연결되어 있지 않습니다 (자동 종료).");
                 }
             }
-        }, 30000);
+        }, 50000);
 
         return () => clearTimeout(autoEndTimeout);
     }, [session, token, isSessionClosed, sessionId]);
@@ -533,20 +530,6 @@ const VideoChatPage: React.FC = () => {
             // }
         };
     }, [publisher]);
-
-    // const closeSession = async (sessionId: string) => {
-    //     try {
-    //         const response = await axios.post('/api/chat/video/close', {
-    //             historyId: historyId,
-    //             sessionId: sessionId
-    //         });
-    //         console.log('세션이 성공적으로 종료되었습니다.');
-    //         return response.data;
-    //     } catch (error) {
-    //         console.error('세션 종료 중 오류 발생:', error);
-    //         throw error;
-    //     }
-    // }
 
     return (
         <div className={styles.page}>
