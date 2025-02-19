@@ -307,7 +307,8 @@ public class VideoChatWebSocketServiceImpl implements VideoChatWebSocketService 
             RoomInfo roomInfo = roomMap.get(roomKey);
             String sessionId = roomInfo.getSessionId();
             if(roomInfo.getSessionType().equals(SessionType.MATCHING)
-                    || roomInfo.getSessionType().equals(SessionType.KEYWORD)) {
+                    || roomInfo.getSessionType().equals(SessionType.KEYWORD)
+                    || roomInfo.getSessionType().equals(SessionType.OPENVIDU)) {
                 System.out.println("강제 종료 요청 "+roomInfo.getSessionType()+" "+roomInfo.getSessionId());
                 if(sessionId != null) {
                     Session session = openvidu.getActiveSession(sessionId);
