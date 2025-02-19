@@ -36,7 +36,7 @@ function CouponPage() {
 
         try {
             // 카카오페이 결제 준비 요청
-            const response = await fetch("http://localhost:8080/api/pay/ready", {
+            const response = await fetch("https://peachpitch.site/api/pay/ready", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -76,7 +76,7 @@ function CouponPage() {
     const handleFreeCoupon = async () => {
         try {
             // const response = await fetch("https://peachpitch.site/api/users/coupon/login/free", {
-            const response = await fetch("http://localhost:8080/api/users/coupon/login/free", {
+            const response = await fetch("https://peachpitch.site/api/users/coupon/login/free", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"

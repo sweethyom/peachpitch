@@ -87,7 +87,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         response.setCharacterEncoding("UTF-8");
         response.setHeader("access", access);
         response.addCookie(createCookie("refresh", refresh));
-        //response.sendRedirect("http://localhost:5173/main");        // redirect 주소
+        //response.sendRedirect("https://peachpitch.site/main");        // redirect 주소
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.writeValue(response.getWriter(), responseDto);
@@ -114,7 +114,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         response.getWriter().println("</body>");
         response.getWriter().println("</html>");
 
-        response.sendRedirect("http://localhost:5173/main");
+        response.sendRedirect("https://peachpitch.site/main");
          */
     }
 

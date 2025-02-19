@@ -64,7 +64,7 @@ function Feedback({isOpen, historyId}: ModalProps) {
 
             // 피드백 제출 요청
             try {
-                const response = await axios.post('http://localhost:8080/api/chat/video/feedback', feedbackData, {
+                const response = await axios.post('https://peachpitch.site/api/chat/video/feedback', feedbackData, {
                     headers: { access: userJwtFromStorage }
                 });
                 console.log('피드백 제출 성공:', response.data);
@@ -75,7 +75,7 @@ function Feedback({isOpen, historyId}: ModalProps) {
 
             // 대화 기록 저장 요청
             try {
-                const saveResponse = await axios.post('http://localhost:8080/api/chat/video/save',
+                const saveResponse = await axios.post('https://peachpitch.site/api/chat/video/save',
                     { historyId },
                     { headers: { access: userJwtFromStorage } }
                 );
@@ -92,7 +92,7 @@ function Feedback({isOpen, historyId}: ModalProps) {
             // 3초 후 리포트 생성 요청
             setTimeout(async () => {
                 try {
-                    const reportResponse = await axios.post("http://127.0.0.1:8000/ai/users/reports/refine/", { history_id: historyId });
+                    const reportResponse = await axios.post("https://peachpitch.site/ai/users/reports/refine/", { history_id: historyId });
                     console.log("리포트 생성 완료:", reportResponse.data);
                 } catch (error) {
                     console.error("리포트 생성 실패:", error);
