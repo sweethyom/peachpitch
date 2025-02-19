@@ -12,7 +12,7 @@ import { RiKakaoTalkFill } from "react-icons/ri";
 
 import GreenAlert from '@/components/alert/greenAlert';
 import RedAlert from '@/components/alert/redAlert';
-import { color } from 'echarts';
+// import { color } from 'echarts';
 
 function loginPage() {
   const navigate = useNavigate();
@@ -96,51 +96,51 @@ function loginPage() {
   };
 
   // 소셜 로그인 핸들러
-  const handleSocialLogin = (provider: string) => {
-    localStorage.setItem('socialLoginAttempt', 'true');
-    console.log("provider: ", provider);
+  // const handleSocialLogin = (provider: string) => {
+  //   localStorage.setItem('socialLoginAttempt', 'true');
+  //   console.log("provider: ", provider);
 
-    const popupUrl = `https://peachpitch.site/api/users/login/social/${provider}`;
-    // const popup = window.open(
-    //   popupUrl,
-    //   "Social Login",
-    //   "width=500,height=600,scrollbars=yes,resizable=no"
-    // );
+  //   const popupUrl = `https://peachpitch.site/api/users/login/social/${provider}`;
+  //   // const popup = window.open(
+  //   //   popupUrl,
+  //   //   "Social Login",
+  //   //   "width=500,height=600,scrollbars=yes,resizable=no"
+  //   // );
 
-    // if (!popup || popup.closed || typeof popup.closed === "undefined") {
-    //   alert("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
-    //   return;
-    // }
+  //   // if (!popup || popup.closed || typeof popup.closed === "undefined") {
+  //   //   alert("팝업이 차단되었습니다. 팝업 차단을 해제해주세요.");
+  //   //   return;
+  //   // }
 
-    // const timer = setInterval(() => {
-    //   if (popup.closed) {
-    //     clearInterval(timer);
-    //     console.log("팝업이 닫혔습니다.");
-    //     handlePopupClose();
-    //   }
-    // }, 500);
-  };
+  //   // const timer = setInterval(() => {
+  //   //   if (popup.closed) {
+  //   //     clearInterval(timer);
+  //   //     console.log("팝업이 닫혔습니다.");
+  //   //     handlePopupClose();
+  //   //   }
+  //   // }, 500);
+  // };
 
-  // 팝업 닫힘 핸들러
-  const handlePopupClose = () => {
-    console.log("소셜 로그인 완료 후 처리 로직 실행");
-    checkSocialLogin();
-  };
+  // // 팝업 닫힘 핸들러
+  // const handlePopupClose = () => {
+  //   console.log("소셜 로그인 완료 후 처리 로직 실행");
+  //   checkSocialLogin();
+  // };
 
    // 소셜 로그인 확인 함수
-const checkSocialLogin = () => {
-  const socialLoginAttempt = localStorage.getItem('socialLoginAttempt');
-  if (socialLoginAttempt === 'true') {
-      const tokenData = localStorage.getItem('jwtToken');
-      if (tokenData) {
-          // 토큰 처리 로직 (예: 저장, 리다이렉트 등)
-          console.log("토큰 데이터:", tokenData);
-          localStorage.removeItem('socialLoginAttempt'); // 플래그 초기화
-          window.location.href = 'https://peachpitch.site/main'; // 리다이렉트
+// const checkSocialLogin = () => {
+//   const socialLoginAttempt = localStorage.getItem('socialLoginAttempt');
+//   if (socialLoginAttempt === 'true') {
+//       const tokenData = localStorage.getItem('jwtToken');
+//       if (tokenData) {
+//           // 토큰 처리 로직 (예: 저장, 리다이렉트 등)
+//           console.log("토큰 데이터:", tokenData);
+//           localStorage.removeItem('socialLoginAttempt'); // 플래그 초기화
+//           window.location.href = 'https://peachpitch.site/main'; // 리다이렉트
 
-      }
-    }
-  };
+//       }
+//     }
+//   };
 
 
   return (
