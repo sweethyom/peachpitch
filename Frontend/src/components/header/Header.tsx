@@ -217,11 +217,13 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                                 <span className={styles.header__navi__item}>report</span>
                             </Link>
 
-                            <div className={styles.header__navi__coupon} onClick={() => setIsCouponOpen(true)}>
-                                <img src={couponIcon} width={"30px"} />
-                                <p className={styles.header__navi__item}>{couponCount}개</p>
-                            </div>
-
+                            {/* <div className={styles.header__navi__coupon} onClick={() => setIsCouponOpen(true)}> */}
+                            <Link to="/coupon">
+                                <div className={styles.header__navi__coupon}>
+                                    <img src={couponIcon} width={"30px"} />
+                                    <p className={styles.header__navi__item}>{couponCount}개</p>
+                                </div>
+                            </Link>
                             {/* ✅ 아이디 클릭 시 드롭다운 모달 열기 */}
                             <div className={styles.header__user}>
                                 <span
@@ -259,7 +261,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 </div>
             </div>
             {/*쿠폰 페이지로 변경 필요*/}
-            <CouponModal isOpen={isCouponOpen} onClose={() => setIsCouponOpen(false)} />
+            {/* <CouponModal isOpen={isCouponOpen} onClose={() => setIsCouponOpen(false)} /> */}
         </div>
     );
 }
