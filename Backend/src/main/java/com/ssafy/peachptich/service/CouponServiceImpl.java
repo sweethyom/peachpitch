@@ -69,7 +69,22 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional
     public void issueFreeCoupon(Long userId) {
-        // 기존 FREE 타입 쿠폰 조회 (만료 여부 상관없이)
+        log.info("무료쿠폰 발급 시작");
+
+        // 현재 시간 기준으로 유효한 쿠폰 확인
+        Optional<HaveCoupon> validCoupon = haveCouponRepository
+                .findByUserIdAndItemTypeAndExpirationDateAfter(
+                        userId,
+                        Item.ItemType.FREE,
+                        LocalDateTime.now()
+                );
+
+        if (validCoupon.isPresent()) {
+            log.info("이미 유효한 쿠폰이 있습니다");
+            throw new IllegalStateException("이미 유효한 무료 쿠폰이 있습니다.");
+        }
+
+        // 만료된 쿠폰을 포함한 FREE 타입 쿠폰 조회
         Optional<HaveCoupon> existingCoupon = haveCouponRepository
                 .findByUserIdAndItemType(userId, Item.ItemType.FREE);
 
@@ -79,31 +94,25 @@ public class CouponServiceImpl implements CouponService {
         Item freeCouponItem = itemRepository.findByType(Item.ItemType.FREE)
                 .orElseThrow(() -> new IllegalStateException("무료 쿠폰 아이템이 설정되지 않았습니다."));
 
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime todayEnd = now.withHour(23).withMinute(59).withSecond(59);
-
         if (existingCoupon.isPresent()) {
+            // 기존 쿠폰이 있으면 업데이트
             HaveCoupon coupon = existingCoupon.get();
-            LocalDateTime expirationDate = coupon.getExpirationDate();
-
-            // 유효한 쿠폰인 경우
-            if (expirationDate != null && expirationDate.isAfter(now)) {
-                throw new IllegalStateException("이미 유효한 무료 쿠폰이 있습니다.");
-            }
-
-            // 만료된 쿠폰이거나 만료일이 없는 경우 업데이트
             coupon.setEa(1);
-            coupon.setExpirationDate(todayEnd);
+            coupon.setExpirationDate(LocalDateTime.now()
+                    .withHour(23).withMinute(59).withSecond(59));
             haveCouponRepository.save(coupon);
+            log.info("기존 쿠폰 업데이트 완료");
         } else {
-            // 쿠폰이 없는 경우 새로 생성
+            // 기존 쿠폰이 없으면 새로 생성
             HaveCoupon newCoupon = HaveCoupon.builder()
                     .user(user)
                     .item(freeCouponItem)
                     .ea(1)
-                    .expirationDate(todayEnd)
+                    .expirationDate(LocalDateTime.now()
+                            .withHour(23).withMinute(59).withSecond(59))
                     .build();
             haveCouponRepository.save(newCoupon);
+            log.info("새 쿠폰 생성 완료");
         }
     }
 
