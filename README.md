@@ -1,7 +1,7 @@
 # PeachPitch
 ### SSAFY 12기 공통 프로젝트 - D201 Team 노 피카 킵고잉
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/landingpage.gif?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/landingpage.gif?ref_type=heads" />
 
 > 스몰톡을 연습하고 싶지만, 사람과의 직접적인 대화는 아직 부담스러운 사용자들을 위한 스피킹 연습 서비스를 제공합니다.
 
@@ -18,7 +18,7 @@
 1. [**프로젝트 진행**](#6)
 1. [**모니터링 통계**](#7)
 1. [**개발 일정**](#8)
-1. [**포팅 메뉴얼**](#9)
+1. [**기타 산출물물**](#9)
 1. [**팀원 소개**](#10)
 
 
@@ -267,10 +267,14 @@ gif 넣고 기술 설명
 
 <div id="9"></div>
 
-## 👷 포팅 메뉴얼
+## 👷 기타 산출물물
 
 
-[포팅 메뉴얼 보러가기](PortingManual.md)
+[포팅 메뉴얼 보러가기](exec/PortingManual.md)
+
+[덤프 파일 최신본 보러가기](exec/덤프파일최신본)
+
+[시연 시나리오 보러가기](exec/시연시나리오)
 
 <br />
 
