@@ -36,12 +36,16 @@ def generate_report(request):
             
             # 사용자별 대화 내용에 대해 프롬프트 작성
             prompt = (
-                "다음 대화를 분석하고 강점 3가지, 약점 3가지, 총평 3문장으로 작성해 주세요. 각 항목은 번호를 붙여주세요.\n"
+                "다음 대화를 분석하고, 강점 3가지, 약점 3가지, 총평 3문장을 도출해 주세요.\n"
+                "출력은 반드시 아래 JSON 형식으로만 응답해야 합니다:\n\n"
+                "{\n"
+                '  "strengths": ["", "", ""],\n'
+                '  "weaknesses": ["", "", ""],\n'
+                '  "summary": ["", "", ""]\n'
+                "}\n\n"
                 f"대화 내용:\n{conversation_data}\n"
-                "1. 강점 (3가지):\n1)\n2)\n3)\n"
-                "2. 약점 (3가지):\n1)\n2)\n3)\n"
-                "3. 총평 (3문장):\n1)\n2)\n3)"
             )
+
             
             response = openai.ChatCompletion.create(
                 model="gpt-4o",
@@ -52,21 +56,21 @@ def generate_report(request):
             )
 
             report_content = response.choices[0].message['content']
-            lines = report_content.split('\n')
-            strength_lines = lines[:3]
-            improvement_lines = lines[3:6]
-            summary_lines = lines[6:9]
-            strengths = [line.split(")", 1)[1].strip() if ")" in line else line.strip() for line in strength_lines]
-            improvements = [line.split(")", 1)[1].strip() if ")" in line else line.strip() for line in improvement_lines]
-            summary = [line.split(")", 1)[1].strip() if ")" in line else line.strip() for line in summary_lines]
-            
+            try:
+                parsed_report = json.loads(report_content)
+                strengths = parsed_report.get("strengths", [])
+                weaknesses = parsed_report.get("weaknesses", [])
+                summary = parsed_report.get("summary", [])
+            except json.JSONDecodeError:
+                strengths, weaknesses, summary = ['대화를 잘 합니다'], ['질문을 잘 못합니다'], ['훌륭한 대화였어요.']
+
             chat_report, created = ChatReport.objects.get_or_create(
                 history=history,
                 user=user_obj,
                 defaults={
                     "chat_time": 0,
-                    "cons": ' '.join(improvements),
                     "pros": ' '.join(strengths),
+                    "cons": ' '.join(weaknesses),
                     "summary": ' '.join(summary)
                 }
             )
@@ -75,7 +79,7 @@ def generate_report(request):
                 "report_id": chat_report.report_id,
                 "user_id": user_id,
                 "pros": strengths,
-                "cons": improvements,
+                "cons": weaknesses,
                 "summary": summary
             })
         
