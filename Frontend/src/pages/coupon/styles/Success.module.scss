@@ -1,66 +1,30 @@
 .page {
   display: flex;
+  height: 100vh;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  min-height: 100vh; // 화면 전체 높이
-  background-color: #f9f9f9; // 페이지 배경색
-  padding: 20px;
-}
-
-.header {
-  display: flex;
-  flex-direction: column;
   align-items: center;
 
-  &__logo {
-    font-weight: 700;
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 10px;
-  }
+  background-image: url('@/assets/images/modal_coupon_bg.png');
+  // justify-content: center;
+
+  background-position: right bottom;
+  background-size: 90%;
+  background-repeat: no-repeat;
+
 
   &__title {
-    font-weight: bold;
-    font-size: 32px;
-    color: #555;
-    margin-bottom: 30px;
-    text-align: center;
+    font-weight: 700;
+    font-size: 40px;
   }
-}
-
-.contents {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  &__sub {
-    font-weight: bold;
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 40px; // 아래 버튼과 간격
-    text-align: center;
-  }
-}
-
-.footer {
-  display: flex;
-  justify-content: center;
 
   &__btn {
-    width: 150px; // 버튼 너비
-    height: 50px; // 버튼 높이
-    background-color: var(--color-white-600);
+    font-weight: 500;
+    margin-top: 50px;
     color: var(--color-white-000);
-    font-weight: bold;
-    font-size: 18px;
-    border-radius: 12px;
-
+    background-color: var(--color-white-600);
+    padding: 13px;
+    border-radius: 5px;
     cursor: pointer;
-
-    &:hover {
-      background-color: var(--color-white-500); // 호버 시 색상 변경
-      transition: all 0.3s ease-in-out; // 부드러운 애니메이션 효과
-    }
   }
 }

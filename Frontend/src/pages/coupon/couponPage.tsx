@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./styles/Coupon.module.scss";
-import closeBtn from "@/assets/icons/modal__close.png";
+// import closeBtn from "@/assets/icons/modal__close.png";
 import couponImg from "@/assets/images/coupon_img.png";
 import RedAlert from '@/components/alert/redAlert';
 
@@ -103,42 +103,66 @@ function CouponPage() {
     };
     return (
         <>
+
             {alertMessage && <RedAlert message={alertMessage} onClose={() => setAlertMessage(null)} />}
             <div className={styles.page}>
-            {alertMessage && <div className="alert">{alertMessage}</div>}
-
-            <header>
-                <h1>이용권 구매</h1>
-            </header>
-
-            <main>
-                <div onClick={handleFreeCoupon}>
-                    AI 무료 쿠폰 받기
-                </div>
-                <div className={styles.contents}>
-                    {[...Array(3)].map((_, index) => (
-                        <div key={index}>
-                            <img src={couponImg} width={"210px"}/>
-                            <p>AI와 스몰토킹 {(index * 2) + 1}회권</p>
-                            <p>{(index * 2) + 1},000원</p>
-                            <button onClick={() => increment(index)}>
-                                +
-                            </button>
-                            <span>{counts[index]}</span>
-                            <button
-                                onClick={() => decrement(index)}>
-                                -
-                            </button>
+                <div className={styles.close}>
+                    <Link to="/main">
+                        <div className={styles.close__wrap}>
+                            뒤로가기
                         </div>
-                    ))}
+                    </Link>
                 </div>
-            </main>
+                <div className={styles.modal}>
 
-            <footer>
-                <div>총 금액: {totalPrice.toLocaleString()}원</div>
-                <button onClick={handlePayment}>구매하기</button>
-            </footer>
-        </div>
+                    <div className={styles.modal__header}>
+                        {/* <img src={closeBtn} className={styles.modal__header__close} onClick={onClose} /> */}
+                        {/* <p className={styles.modal__header__logo}>PeachPitch</p> */}
+                    </div>
+                    <p className={styles.modal__header__title}>이용권 구매</p>
+                    {/* {!hasReceivedCoupon && (
+                    <div className={styles.free} onClick={handleFreeCoupon}>
+                        AI 무료 쿠폰 받기
+                    </div>
+                )} */}
+
+                    <div onClick={handleFreeCoupon} className={styles.free}>
+                        AI 무료 쿠폰 받기
+                    </div>
+                    <div className={styles.modal__contents}>
+                        {[...Array(3)].map((_, index) => (
+                            <div key={index} className={styles.modal__contents__item}>
+                                <img src={couponImg} width={"210px"} />
+                                <p className={styles.modal__contents__label}>
+                                    AI와 스몰토킹 {(index * 2) + 1}회권
+                                </p>
+                                <p className={styles.modal__contents__label}>{(index * 2) + 1},000원</p>
+                                <div className={styles.modal__count}>
+                                    <button className={styles.modal__count__btn} onClick={() => increment(index)}>
+                                        +
+                                    </button>
+                                    <p id={`count_item${index + 1}`} className={styles.modal__count__label}>
+                                        {counts[index]}
+                                    </p>
+                                    <button className={styles.modal__count__btn} onClick={() => decrement(index)}>
+                                        -
+                                    </button>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className={styles.modal__price}>
+                        <div className={styles.modal__price__wrapper}>
+                            <p className={styles.modal__price__label}>총</p>
+                            <p className={styles.modal__price__total}>{totalPrice.toLocaleString()}</p>
+                            <p className={styles.modal__price__label}>원</p>
+                        </div>
+                        <button className={styles.modal__price__btn} onClick={handlePayment}>
+                            구매하기
+                        </button>
+                    </div>
+                </div>
+            </div>
         </>
     );
 }
