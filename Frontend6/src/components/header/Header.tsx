@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import styles from "./Header.module.scss";
 
 import logoIcon from "@/assets/icons/logo.png";
-import CouponModal from "@/components/modal/Coupon";
+// import CouponModal from "@/components/modal/Coupon";
 import couponIcon from "@/assets/icons/coupon_icon.png";
 import axios from "axios";
 
@@ -24,7 +24,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
         [styles.headerYellow]: isYellow,
     });
 
-    const [isCouponOpen, setIsCouponOpen] = useState(false);
+    // const [isCouponOpen, setIsCouponOpen] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userId, setUserId] = useState<string | null>(null);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -115,11 +115,11 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
     const handleLogout = async () => {
         try {
             // ✅ 브라우저에서 refreshToken 가져오기
-            const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
-                const [name, value] = cookie.split("=");
-                acc[name] = value;
-                return acc;
-            }, {} as Record<string, string>);
+            // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+            //     const [name, value] = cookie.split("=");
+            //     acc[name] = value;
+            //     return acc;
+            // }, {} as Record<string, string>);
 
             // const refreshToken = cookies["refresh"];
 

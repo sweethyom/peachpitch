@@ -18,7 +18,7 @@ function ChatEnd({ isOpen, historyId }: ModalProps) {
         window.location.href = "/chat/ai";
     };
 
-    const userId = localStorage.getItem("userId")
+    // const userId = localStorage.getItem("userId")
 
     /* ✅ 종료 버튼 클릭 시 데이터 저장 후 /report 페이지로 이동 */
     const endChat = async () => {

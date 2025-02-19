@@ -28,7 +28,7 @@ function MainPage() {
   const [nextTalk, setNextTalk] = useState(defaultMessage);
   const [rotate, setRotate] = useState(false);
 
-  const [showCompletePay, setShowCompletePay] = useState(false);
+  const [_showCompletePay, setShowCompletePay] = useState(false);
   const [fingerprint, setFingerprint] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -144,11 +144,11 @@ function MainPage() {
     };
   }, []);
 
-  const handleCloseSuccessModal = () => {
-    // stopCameraStream();
-    setShowCompletePay(false);
-    reloadPage()
-  };
+  // const handleCloseSuccessModal = () => {
+  //   // stopCameraStream();
+  //   setShowCompletePay(false);
+  //   reloadPage()
+  // };
 
   //   const stopCameraStream = () => {
   //   navigator.mediaDevices.getUserMedia({ video: true, audio: true })
@@ -160,10 +160,10 @@ function MainPage() {
   //     });
   // };
 
-  const reloadPage = () => {
-    console.log("🔄 페이지 새로고침 실행됨");
-    window.location.reload();
-  };
+  // const reloadPage = () => {
+  //   console.log("🔄 페이지 새로고침 실행됨");
+  //   window.location.reload();
+  // };
 
 
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
@@ -414,7 +414,7 @@ function MainPage() {
 
 
       {/* ✅ 결제 완료 모달 */}
-      {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />}
+      {/* {showCompletePay && <CompletePay isOpen={showCompletePay} onClose={handleCloseSuccessModal} />} */}
 
       {/* ✅ 로그인 성공 후 GreenAlert 유지 */}
       {showWelcomeAlert && (
