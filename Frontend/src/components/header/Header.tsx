@@ -121,12 +121,12 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 return acc;
             }, {} as Record<string, string>);
 
-            const refreshToken = cookies["refresh"];
+            // const refreshToken = cookies["refresh"];
 
-            if (!refreshToken) {
-                console.error("🚨 Refresh token이 없습니다. 로그아웃 불가능.");
-                return;
-            }
+            // if (!refreshToken) {
+            //     console.error("🚨 Refresh token이 없습니다. 로그아웃 불가능.");
+            //     return;
+            // }
 
             // ✅ 로그아웃 요청 (refreshToken을 헤더에 포함)
             await axios.post(
@@ -136,7 +136,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                     withCredentials: true, // ✅ 쿠키 자동 포함
                     headers: {
                         access: `${localStorage.getItem("accessToken")}`,
-                        "refresh": refreshToken, // ✅ refreshToken을 명시적으로 추가
+                        // "refresh": refreshToken, // ✅ refreshToken을 명시적으로 추가
                     },
                 }
             );
@@ -147,6 +147,8 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
             localStorage.removeItem("accessToken");
             localStorage.removeItem("userEmail");
             localStorage.removeItem("userId");
+            localStorage.removeItem("couponNum");
+            // localStorage.removeItem("refreshToken");
 
             // ✅ 쿠키 삭제 (refresh 토큰 제거)
             document.cookie = "refresh=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; Secure;";

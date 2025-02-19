@@ -49,12 +49,12 @@ function Tutorial({ isOpen, onClose }: ModalProps) {
         {
             title: "AI와 진행하는 스몰토크 연습 (3)",
             description: "실제 AI와 진행한 스몰토크 예시",
-            content: "어머! 코를 자꾸 만지는 습관이 있군요",
+            content: "3. 어머! 코를 자꾸 만지는 습관이 있군요",
         },
         {
             title: "AI와 진행하는 스몰토크 연습 (4)",
             description: "대화가 힘들다면 힌트를를 활용해 해결해 보세요!",
-            content: "3. AI와 주어진 총 10번의 문답을 주고 받을 수 있습니다.",
+            content: "4. AI와 주어진 총 10번의 문답을 주고 받을 수 있습니다.",
         },
         {
             title: "익명의 사용자와 1:1 매칭 (1)",

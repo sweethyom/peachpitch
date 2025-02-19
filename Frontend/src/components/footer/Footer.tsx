@@ -53,7 +53,7 @@ function Footer({ isDark, isGreen, isPink, isYellow }: FooterProps) {
             <div className={styles.footer__logo}>
               <span className={styles.footer__logo__name}>PeachPitch</span>
               <p className={styles.footer__logo__description}>
-                스몰톡을 연습하고 싶지만, 사람과의 직접적인 대화는 아직 부담스러운 사용자들을 위한 스피킹 티칭 서비스를 제공합니다.
+                스몰톡을 연습하고 싶지만, 사람과의 직접적인 대화는 아직 부담스러운 사용자들을 위한 스피킹 연습 서비스를 제공합니다.
               </p>
             </div>
             {/* {isLoggedIn && (
