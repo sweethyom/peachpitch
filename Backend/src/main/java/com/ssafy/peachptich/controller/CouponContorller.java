@@ -27,13 +27,22 @@ public class CouponContorller {
             @ApiResponse(responseCode = "200", description = "무료 쿠폰을 성공적으로 추가함")
     })
     public ResponseEntity<ResponseDto<Void>> handleLoginCoupon(@RequestBody CouponRequest request) {
-        couponService.handleLoginCoupon(request.getUserId());
-        return ResponseEntity.ok().body(
-                ResponseDto.<Void>builder()
-                        .message("Successfully received coupon")
-                        .build()
-        );
+        try {
+            couponService.handleLoginCoupon(request.getUserId());
+            return ResponseEntity.ok().body(
+                    ResponseDto.<Void>builder()
+                            .message("Successfully received coupon")
+                            .build()
+            );
+            } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(
+                    ResponseDto.<Void>builder()
+                            .message(e.getMessage())
+                            .build()
+            );
+        }
     }
+
 
     // 무료 쿠폰 수령 여부 확인
     @GetMapping("/status")
