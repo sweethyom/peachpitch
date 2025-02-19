@@ -2,11 +2,11 @@
 
 # 0. 이미지 갱신
 echo "새로운 이미지를 가져옵니다..."
-docker-compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/Backend6/docker-compose.bluegreen8081.yml pull
-docker-compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/Backend6/docker-compose.bluegreen8082.yml pull
-docker-compose -p bluegreen-8083 -f /home/ubuntu/S12P11D201/BackendAI6/docker-compose.bluegreen8083.yml pull
-docker-compose -p bluegreen-8084 -f /home/ubuntu/S12P11D201/BackendAI6/docker-compose.bluegreen8084.yml pull
-docker-compose -p my-react -f /home/ubuntu/S12P11D201/Frontend6/docker-compose.yml pull
+docker-compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/Backend5/docker-compose.bluegreen8081.yml pull
+docker-compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/Backend5/docker-compose.bluegreen8082.yml pull
+docker-compose -p bluegreen-8083 -f /home/ubuntu/S12P11D201/BackendAI5/docker-compose.bluegreen8083.yml pull
+docker-compose -p bluegreen-8084 -f /home/ubuntu/S12P11D201/BackendAI5/docker-compose.bluegreen8084.yml pull
+docker-compose -p my-react -f /home/ubuntu/S12P11D201/Frontend5/docker-compose.yml pull
 
 # 1. 실행 중인 컨테이너 확인 및 중복 제거
 remove_existing_container() {
@@ -28,14 +28,14 @@ BLUE_D_CONTAINER="bluegreen-8083"
 GREEN_D_CONTAINER="bluegreen-8084"
 
 # Blue-Green 배포 환경 전환
-EXIST_GITCHAN=$(docker-compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/Backend6/docker-compose.bluegreen8081.yml ps | grep Up)
+EXIST_GITCHAN=$(docker-compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/Backend5/docker-compose.bluegreen8081.yml ps | grep Up)
 
 if [ -z "$EXIST_GITCHAN" ]; then
     echo "8081(블루) 환경이 실행되지 않음. 8081 환경 실행..."
     remove_existing_container $BLUE_S_CONTAINER
     remove_existing_container $BLUE_D_CONTAINER
-    docker-compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/Backend6/docker-compose.bluegreen8081.yml up -d --build
-    docker-compose -p bluegreen-8083 -f /home/ubuntu/S12P11D201/BackendAI6/docker-compose.bluegreen8083.yml up -d --build
+    docker-compose -p bluegreen-8081 -f /home/ubuntu/S12P11D201/Backend5/docker-compose.bluegreen8081.yml up -d --build
+    docker-compose -p bluegreen-8083 -f /home/ubuntu/S12P11D201/BackendAI5/docker-compose.bluegreen8083.yml up -d --build
     BEFORE_S_COLOR="8082"
     AFTER_S_COLOR="8081"
     BEFORE_S_PORT=8082
@@ -48,8 +48,8 @@ else
     echo "8082(그린) 환경이 실행되지 않음. 8082 환경 실행..."
     remove_existing_container $GREEN_S_CONTAINER
     remove_existing_container $GREEN_D_CONTAINER
-    docker-compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/Backend6/docker-compose.bluegreen8082.yml up -d --build
-    docker-compose -p bluegreen-8084 -f /home/ubuntu/S12P11D201/BackendAI6/docker-compose.bluegreen8084.yml up -d --build
+    docker-compose -p bluegreen-8082 -f /home/ubuntu/S12P11D201/Backend5/docker-compose.bluegreen8082.yml up -d --build
+    docker-compose -p bluegreen-8084 -f /home/ubuntu/S12P11D201/BackendAI5/docker-compose.bluegreen8084.yml up -d --build
     BEFORE_S_COLOR="8081"
     AFTER_S_COLOR="8082"
     BEFORE_S_PORT=8081
@@ -64,7 +64,7 @@ fi
 REACT_CONTAINER="my-react"
 echo "React 서버 실행..."
 remove_existing_container $REACT_CONTAINER
-docker-compose -p my-react -f /home/ubuntu/S12P11D201/Frontend6/docker-compose.yml up -d --build
+docker-compose -p my-react -f /home/ubuntu/S12P11D201/Frontend5/docker-compose.yml up -d --build
 
 echo "${AFTER_S_COLOR} springboot 서버가 실행되었습니다 (포트: ${AFTER_S_PORT})"
 echo "${AFTER_D_COLOR} django 서버가 실행되었습니다 (포트: ${AFTER_D_PORT})"
@@ -118,8 +118,8 @@ docker exec my-nginx nginx -s reload
 # 4. 이전 환경(블루 서버) 중지 및 정리 (중복 방지)
 echo "${BEFORE_S_COLOR} springboot 서버 중지 (포트: ${BEFORE_S_PORT})"
 echo "${BEFORE_D_COLOR} django 서버 중지 (포트: ${BEFORE_D_PORT})"
-docker-compose -p bluegreen-${BEFORE_S_COLOR} -f /home/ubuntu/S12P11D201/Backend6/docker-compose.bluegreen${BEFORE_S_COLOR}.yml down
-docker-compose -p bluegreen-${BEFORE_D_COLOR} -f /home/ubuntu/S12P11D201/BackendAI6/docker-compose.bluegreen${BEFORE_D_COLOR}.yml down
+docker-compose -p bluegreen-${BEFORE_S_COLOR} -f /home/ubuntu/S12P11D201/Backend5/docker-compose.bluegreen${BEFORE_S_COLOR}.yml down
+docker-compose -p bluegreen-${BEFORE_D_COLOR} -f /home/ubuntu/S12P11D201/BackendAI5/docker-compose.bluegreen${BEFORE_D_COLOR}.yml down
 
 # 5. 사용되지 않는 Docker 이미지 정리
 echo "사용되지 않는 Docker 이미지 삭제 중..."
