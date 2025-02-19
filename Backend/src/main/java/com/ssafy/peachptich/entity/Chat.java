@@ -31,7 +31,6 @@ public class Chat {
     @JoinColumn(name="history_id")
     private ChatHistory chatHistory;
 
-
     @Builder
     public Chat(LocalDateTime createdAt, String content, Long userId, ChatHistory chatHistory) {
         this.createdAt=createdAt;

@@ -36,7 +36,7 @@ public class ChatReport {
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "history_id")
     private ChatHistory chatHistory;
 
