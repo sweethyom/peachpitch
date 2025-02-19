@@ -22,6 +22,13 @@ def generate_report(request):
         for user_id in [history.user1_id, history.user2_id]:
             if user_id is None:
                 continue
+
+            # 해당 사용자의 객체를 가져오거나 생성합니다.
+            user_obj, _ = User.objects.get_or_create(user_id=user_id)
+
+            # 동일한 history와 user에 대해 이미 ChatReport가 존재하면 새로 생성하지 않습니다.
+            if ChatReport.objects.filter(history=history, user=user_obj).exists():
+                continue
             
             # 해당 사용자의 채팅만 필터링
             chats = Chat.objects.filter(history=history, user_id=user_id)
@@ -43,9 +50,9 @@ def generate_report(request):
                     {"role": "user", "content": prompt}
                 ]
             )
+
             report_content = response.choices[0].message['content']
             lines = report_content.split('\n')
-            # 간단한 파싱
             strength_lines = lines[:3]
             improvement_lines = lines[3:6]
             summary_lines = lines[6:9]
@@ -53,15 +60,17 @@ def generate_report(request):
             improvements = [line.split(")", 1)[1].strip() if ")" in line else line.strip() for line in improvement_lines]
             summary = [line.split(")", 1)[1].strip() if ")" in line else line.strip() for line in summary_lines]
             
-            user_obj, _ = User.objects.get_or_create(user_id=user_id)
-            chat_report = ChatReport.objects.create(
+            chat_report, created = ChatReport.objects.get_or_create(
                 history=history,
                 user=user_obj,
-                chat_time=0,  # 필요에 따라 채팅 시간을 업데이트
-                cons=' '.join(improvements),
-                pros=' '.join(strengths),
-                summary=' '.join(summary)
+                defaults={
+                    "chat_time": 0,
+                    "cons": ' '.join(improvements),
+                    "pros": ' '.join(strengths),
+                    "summary": ' '.join(summary)
+                }
             )
+
             reports.append({
                 "report_id": chat_report.report_id,
                 "user_id": user_id,
