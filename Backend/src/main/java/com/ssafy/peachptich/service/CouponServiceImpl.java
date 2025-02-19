@@ -52,6 +52,13 @@ public class CouponServiceImpl implements CouponService {
         }
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public boolean hasReceivedFreeCouponToday(Long userId) {
+        String loginKey = getLoginKey(userId);
+        return redisTemplate.hasKey(loginKey);
+    }
+
     private void setLoginRecord(Long userId) {
         String loginKey = getLoginKey(userId);
         redisTemplate.opsForValue().set(loginKey, "1");
