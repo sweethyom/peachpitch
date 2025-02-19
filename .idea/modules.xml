@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/only_master.iml" filepath="$PROJECT_DIR$/.idea/only_master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/peachptich.main.iml" filepath="$PROJECT_DIR$/.idea/modules/peachptich.main.iml" />
     </modules>
   </component>
 </project>
