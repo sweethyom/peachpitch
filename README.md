@@ -53,7 +53,9 @@ npm run preview
 
 ## Checklist
 
-
+<video width="100%" autoplay loop muted>
+  <source src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/onlyMaster/assets/final-1.mp4" type="video/mp4">
+</video>
 
 <br>
 <br>
