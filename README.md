@@ -272,15 +272,14 @@ gif 넣고 기술 설명
 <br />
 
 ### Jira
-
-그래프 캡쳐
+### Git
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/jira.gif" width="700" />
 
 <br />
 <br />
 
 ### Git
-
-끝나고 소스트리 녹화해서 gif
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/sourceTree.gif" width="700" />
 
 <br />
 <br />
