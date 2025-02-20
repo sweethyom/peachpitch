@@ -124,9 +124,9 @@ def continue_conversation(request):
                 redis_client.expire(redis_key, 60*60*24)
 
 
-            # 10턴 이상이면 종료 프롬프트 적용. 이것도 최적화 할까..
-            if conversation_turn >= 10:
-                recent_conversation = conversation_history[7:]
+            # 10턴 이상이면 종료 프롬프트 적용.
+            if conversation_turn >= 4:  # 10이 원래 버전
+                recent_conversation = conversation_history[2:]  # 7:이 원래 버전
 
                 final_prompt = {
                     "role": "system",
