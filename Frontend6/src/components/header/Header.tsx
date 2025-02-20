@@ -70,7 +70,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
     // ✅ Refresh Token 재발급 함수
     const refreshAccessToken = async () => {
         try {
-            console.log("🔄 refreshAccessToken 함수 실행됨");
+            // console.log("🔄 refreshAccessToken 함수 실행됨");
             let accessToken = localStorage.getItem("accessToken");
             if (!accessToken) {
                 console.warn("⚠️ accessToken이 존재하지 않음, 로그인 상태 확인 필요");
@@ -78,7 +78,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 return;
             }
 
-            console.log("📡 Access Token 재발급 요청 중...");
+            // console.log("📡 Access Token 재발급 요청 중...");
             const response = await axios.post("https://peachpitch.site/api/users/reissue", {}, {
                 headers: {
                     access: accessToken,
@@ -89,16 +89,16 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
 
             if (response.headers?.access) {
                 localStorage.setItem("accessToken", response.headers.access);
-                console.log("✅ Access Token 재발급 성공: ");
+                // console.log("✅ Access Token 재발급 성공: ");
 
                 // setTimeout(() => {
                 //     console.log("📌 localStorage 최신 accessToken:", localStorage.getItem("accessToken"));
                 // }, 500);
             } else {
-                console.warn("⚠️ 응답에 accessToken 없음", response.data);
+                // console.warn("⚠️ 응답에 accessToken 없음", response.data);
             }
         } catch (error) {
-            console.error("❌ Access Token 재발급 실패: ");
+            // console.error("❌ Access Token 재발급 실패: ");
             handleLogout();
         }
     };
@@ -141,7 +141,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 }
             );
 
-            console.log("✅ 로그아웃 성공");
+            // console.log("✅ 로그아웃 성공");
 
             // ✅ 로컬 스토리지 삭제
             localStorage.removeItem("accessToken");
@@ -156,7 +156,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
             // ✅ 로그인 페이지로 이동
             window.location.href = "/login";
         } catch (error) {
-            console.error("❌ 로그아웃 실패:", error);
+            // console.error("❌ 로그아웃 실패:", error);
         }
     };
 
@@ -182,9 +182,9 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
                 if (prevCouponNum !== String(couponEa)) {
 
                     localStorage.setItem("couponNum", String(couponEa));
-                    console.log("✅ 쿠폰 개수 업데이트:", couponEa);
+                    // console.log("✅ 쿠폰 개수 업데이트:", couponEa);
                 } else {
-                    console.log("🔹 기존과 동일한 쿠폰 개수, 업데이트 안 함");
+                    // console.log("🔹 기존과 동일한 쿠폰 개수, 업데이트 안 함");
                 }
 
             } catch (error) {

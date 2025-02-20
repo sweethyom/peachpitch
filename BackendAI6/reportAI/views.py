@@ -62,7 +62,7 @@ def generate_report(request):
                 weaknesses = parsed_report.get("weaknesses", [])
                 summary = parsed_report.get("summary", [])
             except json.JSONDecodeError:
-                strengths, weaknesses, summary = ['대화를 잘 합니다'], ['질문을 잘 못합니다'], ['훌륭한 대화였어요.']
+                strengths, weaknesses, summary = ['상대와의 대화를 이어가려는 노력이 돋보입니다. 말을 잘하지 못한다고 생각할 수도 있지만, 중요한 것은 상대방에게 다가가고자 하는 의지입니다. 당신은 그 노력을 충분히 보여주고 있습니다.'], ['자신의 의견을 표현하는 데 어려움을 느끼는 듯합니다. 생각이 많아 망설이다 보면 대화의 흐름을 놓칠 수도 있습니다.'], ['대화란 단순히 말을 많이 하는 것이 아니라, 서로의 생각과 감정을 주고받는 과정입니다. 당신은 이미 상대의 이야기를 귀 기울여 듣고 있으며, 대화에 대한 노력이 느껴집니다. 작은 변화들이 쌓이면 점점 더 자연스러운 대화를 할 수 있을 것입니다.']
 
             chat_report, created = ChatReport.objects.get_or_create(
                 history=history,
