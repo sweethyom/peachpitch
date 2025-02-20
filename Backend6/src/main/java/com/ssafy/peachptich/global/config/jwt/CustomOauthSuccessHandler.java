@@ -61,13 +61,13 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
 
         // 새로운 토큰 발행
-        String access = tokenProvider.createJwt("access", userEmail, role, 60*60*60L);
-        String refresh = tokenProvider.createJwt("refresh", userEmail, role, 24*60*60L);
+        String access = tokenProvider.createJwt("access", userEmail, role, 24*60*60*1000L);
+        String refresh = tokenProvider.createJwt("refresh", userEmail, role, 60*60*60*1000L);
         
         // redis에 access token과 refresh token 저장
         try{
-            addToken("RT:AT:" + userEmail, access, 60*60*60L);
-            addToken("RT:RT:" + userEmail, refresh, 86400000L);
+            addToken("RT:AT:" + userEmail, access, 24L);
+            addToken("RT:RT:" + userEmail, refresh, 60L);
         } catch (Exception e){
             throw new CustomLoginFilter.TokenStorageException("Faied to store refresh token: " + e.getMessage());
         }
@@ -133,7 +133,7 @@ public class CustomOauthSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             key,                    // key 값
             value,                // value
             System.currentTimeMillis() + expiredMs,     // 만료 시간
-            TimeUnit.MICROSECONDS
+            TimeUnit.HOURS
         );
     }
 }

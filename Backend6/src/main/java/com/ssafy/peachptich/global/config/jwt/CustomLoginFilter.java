@@ -142,13 +142,13 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             String role = auth.getAuthority();
 
             // 토큰 생성 만료 기간 7일
-            String access = tokenProvider.createJwt("access", userEmail, role, 604800000L);
-            String refresh = tokenProvider.createJwt("refresh", userEmail, role, 86400000L);
+            String access = tokenProvider.createJwt("access", userEmail, role, 24*60*60*1000L);
+            String refresh = tokenProvider.createJwt("refresh", userEmail, role, 60*60*60*1000L);
 
             try {
                 // access token과 refresh Token Redis 저장
-                addToken("RT:AT:" + userEmail, access, 604800000L);
-                addToken("RT:RT:" + userEmail, refresh, 86400000L);
+                addToken("RT:AT:" + userEmail, access, 24L);
+                addToken("RT:RT:" + userEmail, refresh, 60L);
             } catch (Exception e) {
                 throw new TokenStorageException("Failed to store refresh token: " + e.getMessage());
             }
@@ -179,7 +179,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private Cookie createCookie(String key, String value){
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24*60*60);     // 쿠키 생명 주기
+        cookie.setMaxAge(60*60*60);     // 쿠키 생명 주기
         cookie.setSecure(true);        // https 통신을 진행해야 하는 경우
         cookie.setPath("/");         // 쿠키가 적용될 범위
         cookie.setHttpOnly(false);       // true: 클라이언트단에서 javascript로 해당 쿠키에 접근하지 못하게 막아줌
@@ -192,7 +192,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
             key,       // key 값
             value,                // value
             expiredMs,     // 만료 시간
-            TimeUnit.MILLISECONDS
+            TimeUnit.HOURS
         );
     }
 
