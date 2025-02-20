@@ -19,7 +19,7 @@ def restore_punctuation(text):
         response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "너는 문장 복원 전문가다. 입력된 문장을 복원할 때 오직 복원된 문장만을 출력해야 하며, 어떠한 추가 설명, 제목, 서문, 인사말, 또는 부가 문구도 포함하지 말아라."},
+                {"role": "system", "content": "너는 문장 복원 전문가다. 입력된 문장을 복원할 때 오직 복원된 문장만을 출력해야 하며, 어떠한 추가 설명, 제목, 서문, 인사말, 또는 부가 문구도 포함하지 말아라. 문장이 매우 짧아 복원이 불가능 하다면 반드시 입력된 문장을 그대로 반환해라."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0
