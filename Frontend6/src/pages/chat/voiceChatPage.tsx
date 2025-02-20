@@ -301,7 +301,7 @@ function VoiceChatPage() {
   const navigate = useNavigate();
 
   /* turn 카운트 숫자를 10에서 적은 수로 줄이면 빠르게 다음 단계를 테스트 해 볼 수 있음 */
-  const [turnCount, setTurnCount] = useState(4);
+  const [turnCount, setTurnCount] = useState(3);
   const [isChatEnd, setIsChatEnd] = useState(false);
   const [isOverlay, _setIsOverlay] = useState(false);
 
