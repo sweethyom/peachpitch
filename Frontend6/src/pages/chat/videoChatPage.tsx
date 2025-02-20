@@ -47,7 +47,7 @@ const VideoChatPage: React.FC = () => {
     } = useSpeechRecognition();
 
     // ✅ 문장이 완성되었는지 확인하는 정규식
-    const sentenceEndRegex = /.*(했다|어요|습니다)[.!?]?$/;
+    const sentenceEndRegex = /.*(습니다|입니다|습니까|입니까|해요|예요|이에요|어요|했다|게요|네요|라고요|군요|지요|아요|니까요|다고요|대요|든요|더라|더군|었어|았어|했어|됐어|겠어|할래|한거야|는거야|듯해|할까|세요|시오|해봐|하자|시다|까요|라고|데요|라니까|는걸|는데|던걸|던데|더라|고요|답니다|하자고|까요|봐요|잖아|자나|자나요|아요|나요|않아|않아요|겠다|을까|놔요|봐요|뭐요|거든요)[.!?]?$/;
 
     /* 대화 나가기 모달창 */
     const [isLeaveOpen, setIsLeaveOpen] = useState<boolean>(false);
