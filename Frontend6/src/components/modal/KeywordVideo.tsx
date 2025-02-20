@@ -59,6 +59,8 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
     // 모달 열릴 때 STOMP 클라이언트 생성 및 구독 설정
     useEffect(() => {
         const userJwtFromStorage = localStorage.getItem("accessToken");
+        let subscription: any = null; // 구독 ID 저장용 변수
+         
         if (isOpen && historyId) {
             const client = new Client({
                 brokerURL: "wss://peachpitch.site/api/ws",
@@ -82,8 +84,9 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
                             setHints(prev => prev ? [...prev, response.hints] : [response.hints]);
                             // 힌트 전달 필요
                             setIsCompleted(true);
-                            // 키워드 웹소켓 종료
-                            client.deactivate();
+                            //  키워드 웹소켓 종료
+                            // client.deactivate();
+                            client.unsubscribe(subscription.id); // 구독 해제
                         }
                     });
                 },
@@ -94,7 +97,10 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
             client.activate();
             setClient(client);
             return () => {
-                client.deactivate();
+                // client.deactivate();
+                if (subscription) {
+                    client.unsubscribe(subscription.id); // 구독 해제
+                }
                 setClient(null);
             };
         }

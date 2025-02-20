@@ -37,7 +37,7 @@ const VideoChatPage: React.FC = () => {
     const navigate = useNavigate();
 
     // stt
-    const [history, setHistory] = useState<string[]>([]);
+    const [_history, setHistory] = useState<string[]>([]);
     const [previousTranscript, setPreviousTranscript] = useState<string>(""); // 이전 문장 저장
     const [isRestarting, setIsRestarting] = useState(false); // 자동 재시작 여부
     const {
@@ -611,21 +611,21 @@ const VideoChatPage: React.FC = () => {
                             </div>
 
                             <div className={styles.chat__input}>
-                                <p>🎤 Microphone: {listening ? 'on' : 'off'}</p>
+                                {/* <p>🎤 Microphone: {listening ? 'on' : 'off'}</p>
                                 <button onClick={() => SpeechRecognition.startListening({ continuous: true, language: "ko-KR" })}>
                                     Start
                                 </button>
                                 <button onClick={() => SpeechRecognition.stopListening()}>Stop</button>
                                 <button onClick={resetTranscript}>Reset</button>
-                                <h3>📝 실시간 STT</h3>
+                                <h3>📝 실시간 STT</h3> */}
                                 <p>{transcript}</p>
-
+{/* 
                                 <h3>📜 이전 대화 기록</h3>
                                 <div id="history">
                                     {history.map((item, index) => (
                                         <p key={index}>🗣 {item}</p>
                                     ))}
-                                </div>
+                                </div> */}
 
                                 {/* <img src={sstBtn} className={styles.chat__input__img} alt="sst button" /> */}
                             </div>
