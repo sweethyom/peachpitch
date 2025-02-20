@@ -87,8 +87,8 @@ function UserVideoComponent({ streamManager, selectedMask, isLocalUser }: UserVi
                 if (width <= 0 || height <= 0) return null;
 
                 return {
-                    x: originX + width / 7,
-                    y: originY + height / 8,
+                    x: originX + width / 10,
+                    y: originY + height / 3,
                     width: Math.max(width * 2.1, 50), // 최소 크기 50px 이상
                     height: Math.max(height * 2.1, 50),
                 };
@@ -105,8 +105,8 @@ function UserVideoComponent({ streamManager, selectedMask, isLocalUser }: UserVi
             <div
                 className="streamcomponent"
                 style={{
-                    width: "500px",
-                    height: "460px",
+                    width: "530px",
+                    height: "500px",
                     borderRadius: "10px",
                     border: "2px solid #ccc",
                     overflow: "hidden",

@@ -46,8 +46,8 @@ const VideoComponent: React.FC<VideoProps> = ({ videoSrc, currentIndex }) => {
   return (
     <div
       style={{
-        width: "470px",
-        height: "400px",
+        width: "530px",
+        height: "500px",
         overflow: "hidden",
         position: "relative",
         margin: "0 auto",
