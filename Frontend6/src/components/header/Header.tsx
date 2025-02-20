@@ -73,7 +73,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
             // console.log("🔄 refreshAccessToken 함수 실행됨");
             let accessToken = localStorage.getItem("accessToken");
             if (!accessToken) {
-                console.warn("⚠️ accessToken이 존재하지 않음, 로그인 상태 확인 필요");
+                // console.warn("⚠️ accessToken이 존재하지 않음, 로그인 상태 확인 필요");
                 checkLoginStatus(); // 다시 한 번 localStorage 확인
                 return;
             }
@@ -107,7 +107,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
     useEffect(() => {
         const interval = setInterval(() => {
             refreshAccessToken();
-        }, 0 * 60 * 1000);
+        }, 10 * 60 * 1000);
         return () => clearInterval(interval);
     }, []);
 
