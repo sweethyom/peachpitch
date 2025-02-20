@@ -38,7 +38,7 @@ const VideoChatPage: React.FC = () => {
 
     // stt
     const [history, setHistory] = useState<string[]>([]);
-    const [previousTranscript, setPreviousTranscript] = useState<string>(""); // 이전 문장 저장
+    //const [previousTranscript, setPreviousTranscript] = useState<string>(""); // 이전 문장 저장
     const [isRestarting, setIsRestarting] = useState(false); // 자동 재시작 여부
     const {
         //transcript,
