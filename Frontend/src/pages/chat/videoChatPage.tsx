@@ -38,16 +38,17 @@ const VideoChatPage: React.FC = () => {
 
     // stt
     const [history, setHistory] = useState<string[]>([]);
-    const [previousTranscript, setPreviousTranscript] = useState<string>(""); // 이전 문장 저장
+    //const [previousTranscript, setPreviousTranscript] = useState<string>(""); // 이전 문장 저장
     const [isRestarting, setIsRestarting] = useState(false); // 자동 재시작 여부
     const {
-        transcript,
+        finalTranscript,
+        //transcript,
         listening,
         resetTranscript,
     } = useSpeechRecognition();
 
     // ✅ 문장이 완성되었는지 확인하는 정규식
-    const sentenceEndRegex = /.*(했다|어요|습니다)[.!?]?$/;
+    //const sentenceEndRegex = /.*(했다|어요|습니다)[.!?]?$/;
 
     /* 대화 나가기 모달창 */
     const [isLeaveOpen, setIsLeaveOpen] = useState<boolean>(false);
@@ -148,7 +149,7 @@ const VideoChatPage: React.FC = () => {
     };
 
     // STT 기록 저장 및 redis 전송(문장이 완성되었을 때만)
-    useEffect(() => {
+    /*useEffect(() => {
         if (transcript && transcript !== previousTranscript) {
             // ✅ 문장이 완성된 경우 저장 (길이 60자 이상 OR 종결어미 OR 마침표 포함)
             if (transcript.length > 100 || sentenceEndRegex.test(transcript)) {
@@ -181,7 +182,34 @@ const VideoChatPage: React.FC = () => {
                 resetTranscript(); // 저장 후 초기화
             }
         }
-    }, [transcript, previousTranscript]);
+    }, [transcript, previousTranscript]);*/
+    useEffect(() => {
+        if (finalTranscript) {
+            // 전송할 데이터를 finalTranscript로 처리
+            setHistory(prev => [...prev, finalTranscript]);
+            const saveTranscript = async () => {
+                try {
+                    const createdAt = formatDateToBackend(new Date());
+                    await axios.post(
+                        'http://localhost:8080/api/chat/video/save/temp',
+                        {
+                            historyId,
+                            message: finalTranscript,
+                            userId,
+                            createdAt
+                        },
+                        {
+                            headers: { access: userJwt }
+                        }
+                    );
+                } catch (error) {
+                    console.error("Error saving transcript:", error);
+                }
+            };
+            saveTranscript();
+            resetTranscript();  // finalTranscript가 리셋되어 다음 문장은 따로 인식됨
+        }
+    }, [finalTranscript]);
 
     useEffect(() => {
         if (selectedKeyword) {  // null이 아닐 때만 추가
@@ -618,7 +646,7 @@ const VideoChatPage: React.FC = () => {
                                 <button onClick={() => SpeechRecognition.stopListening()}>Stop</button>
                                 <button onClick={resetTranscript}>Reset</button>
                                 <h3>📝 실시간 STT</h3>
-                                <p>{transcript}</p>
+                                <p>{finalTranscript}</p>
 
                                 <h3>📜 이전 대화 기록</h3>
                                 <div id="history">
