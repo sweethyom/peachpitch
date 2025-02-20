@@ -138,6 +138,29 @@ def continue_conversation(request):
                 conversation_history.append({"role": "assistant", "content": final_message})
 
                 return JsonResponse({'message': final_message})
+
+                # 일단 마무리 대화 이후로도 redis에 저장하도록 넣어뒀음 코드 확실히 맞는지는 봐야됨.
+                # history_id가 있을 때 Redis 저장
+                if history_id:
+                    # Redis에 저장
+                    redis_client = get_redis_connection("default")
+                    chat_data = {
+                        "role": "user",
+                        "content": user_message,
+                        "timestamp": str(datetime.now())
+                    }  
+
+                    print('사용자 응답 redis 객체만들기 완료')
+
+                    # 세션별로 대화 저장
+                    redis_key = f"chat:{history_id}:messages"
+                    redis_client.rpush(redis_key, json.dumps(chat_data))
+                    
+                    print('redis에 사용자 응답 세션별 저장 완료')
+                    
+                    # 24시간 후 만료되도록 설정(후에 변경)
+                    redis_client.expire(redis_key, 60*60*24)
+                    
             
             else:
                 # GPT로부터 응답 생성
