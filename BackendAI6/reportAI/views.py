@@ -16,6 +16,8 @@ def generate_report(request):
         if not history_id:
             return JsonResponse({"error": "history_id가 필요합니다."}, status=400)
         history = get_object_or_404(ChatHistory, pk=history_id)
+        print(history)
+        
         
         reports = []
         # 각 사용자(user1_id, user2_id) 별로 별도의 리포트 생성
@@ -25,6 +27,7 @@ def generate_report(request):
 
             # 해당 사용자의 객체를 가져오거나 생성합니다.
             user_obj, _ = User.objects.get_or_create(user_id=user_id)
+            print(user_id)
 
             # 동일한 history와 user에 대해 이미 ChatReport가 존재하면 새로 생성하지 않습니다.
             if ChatReport.objects.filter(history=history, user=user_obj).exists():
