@@ -41,13 +41,14 @@ const VideoChatPage: React.FC = () => {
     const [previousTranscript, setPreviousTranscript] = useState<string>(""); // 이전 문장 저장
     const [isRestarting, setIsRestarting] = useState(false); // 자동 재시작 여부
     const {
-        transcript,
+        //transcript,
         listening,
         resetTranscript,
+        finalTranscript
     } = useSpeechRecognition();
 
     // ✅ 문장이 완성되었는지 확인하는 정규식
-    const sentenceEndRegex = /.*(습니다|입니다|습니까|입니까|해요|예요|이에요|어요|했다|게요|네요|라고요|군요|지요|아요|니까요|다고요|대요|든요|더라|더군|었어|았어|했어|됐어|겠어|할래|한거야|는거야|듯해|할까|세요|시오|해봐|하자|시다|까요|라고|데요|라니까|는걸|는데|던걸|던데|더라|고요|답니다|하자고|까요|봐요|잖아|자나|자나요|아요|나요|않아|않아요|겠다|을까|놔요|봐요|뭐요|거든요)[.!?]?$/;
+    //const sentenceEndRegex = /.*(습니다|입니다|습니까|입니까|해요|예요|이에요|어요|했다|게요|네요|라고요|군요|지요|아요|니까요|다고요|대요|든요|더라|더군|었어|았어|했어|됐어|겠어|할래|한거야|는거야|듯해|할까|세요|시오|해봐|하자|시다|까요|라고|데요|라니까|는걸|는데|던걸|던데|더라|고요|답니다|하자고|까요|봐요|잖아|자나|자나요|아요|나요|않아|않아요|겠다|을까|놔요|봐요|뭐요|거든요)[.!?]?$/;
 
     /* 대화 나가기 모달창 */
     const [isLeaveOpen, setIsLeaveOpen] = useState<boolean>(false);
@@ -148,7 +149,7 @@ const VideoChatPage: React.FC = () => {
     };
 
     // STT 기록 저장 및 redis 전송(문장이 완성되었을 때만)
-    useEffect(() => {
+    /*useEffect(() => {
         if (transcript && transcript !== previousTranscript) {
             // ✅ 문장이 완성된 경우 저장 (길이 60자 이상 OR 종결어미 OR 마침표 포함)
             if (transcript.length > 100 || sentenceEndRegex.test(transcript)) {
@@ -181,7 +182,36 @@ const VideoChatPage: React.FC = () => {
                 resetTranscript(); // 저장 후 초기화
             }
         }
-    }, [transcript, previousTranscript]);
+    }, [transcript, previousTranscript]);*/
+
+    useEffect(() => {
+        if (finalTranscript) {
+            // 전송할 데이터를 finalTranscript로 처리
+            setHistory(prev => [...prev, finalTranscript]);
+            const saveTranscript = async () => {
+                try {
+                    const createdAt = formatDateToBackend(new Date());
+                    await axios.post(
+                        'https://peachpitch.site/api/chat/video/save/temp',
+                        {
+                            historyId,
+                            message: finalTranscript,
+                            userId,
+                            createdAt
+                        },
+                        {
+                            headers: { access: userJwt }
+                        }
+                    );
+                } catch (error) {
+                    console.error("Error saving transcript:", error);
+                }
+            };
+            saveTranscript();
+            resetTranscript();  // finalTranscript가 리셋되어 다음 문장은 따로 인식됨
+        }
+    }, [finalTranscript]);
+
 
     useEffect(() => {
         if (selectedKeyword) {  // null이 아닐 때만 추가
@@ -618,7 +648,7 @@ const VideoChatPage: React.FC = () => {
                                 <button onClick={() => SpeechRecognition.stopListening()}>Stop</button>
                                 <button onClick={resetTranscript}>Reset</button>
                                 <h3>📝 실시간 STT</h3> */}
-                                <p>{transcript}</p>
+                                <p>{finalTranscript}</p>
 
                                 {/* <h3>📜 이전 대화 기록</h3> */}
                                 <div id="history" style={{display:"none"}}>
