@@ -607,7 +607,7 @@ const VideoChatPage: React.FC = () => {
                         </div>
 
                         {/* <button >세션 종료</button> */}
-                        <div id="video-container">
+                        <div id="video-container" className={styles.chat__container}>
                             <div className={styles.chat__other}>
                                 {/* 상대방 캠 */}
                                 {subscribers.map((sub) => (
@@ -618,19 +618,19 @@ const VideoChatPage: React.FC = () => {
                                         <UserVideoComponent streamManager={sub} selectedMask={selectedMask} isLocalUser={false} />
                                     </div>
                                 ))}
-                                <div className={styles.chat__other__bubble}>
+                                {/* <div className={styles.chat__other__bubble}>
                                     <div className={styles.bubble__left}>
                                         이거는 상대방 말 풍선
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
 
                             <div className={styles.chat__user}>
-                                <div className={styles.chat__user__bubble}>
+                                {/* <div className={styles.chat__user__bubble}>
                                     <div className={styles.bubble__right}>
                                         이거는 상대방 말 풍선
                                     </div>
-                                </div>
+                                </div> */}
                                 {/* 사용자 캠 */}
                                 {publisher && (
                                     <div className={styles.chat__user__video}>
@@ -639,26 +639,25 @@ const VideoChatPage: React.FC = () => {
                                 )}
 
                             </div>
-
-                            <div className={styles.chat__input}>
-                                {/* <p>🎤 Microphone: {listening ? 'on' : 'off'}</p>
+                        </div>
+                        <div className={styles.chat__input}>
+                            {/* <p>🎤 Microphone: {listening ? 'on' : 'off'}</p>
                                 <button onClick={() => SpeechRecognition.startListening({ continuous: true, language: "ko-KR" })}>
                                     Start
                                 </button>
                                 <button onClick={() => SpeechRecognition.stopListening()}>Stop</button>
                                 <button onClick={resetTranscript}>Reset</button>
                                 <h3>📝 실시간 STT</h3> */}
-                                <p>{finalTranscript}</p>
+                            <p>{finalTranscript}</p>
 
-                                {/* <h3>📜 이전 대화 기록</h3> */}
-                                <div id="history" style={{display:"none"}}>
-                                    {history.map((item, index) => (
-                                        <p key={index}>🗣 {item}</p>
-                                    ))}
-                                </div>
-
-                                {/* <img src={sstBtn} className={styles.chat__input__img} alt="sst button" /> */}
+                            {/* <h3>📜 이전 대화 기록</h3> */}
+                            <div id="history" style={{ display: "none" }}>
+                                {history.map((item, index) => (
+                                    <p key={index}>🗣 {item}</p>
+                                ))}
                             </div>
+
+                            {/* <img src={sstBtn} className={styles.chat__input__img} alt="sst button" /> */}
                         </div>
                     </>
                 ) : (
