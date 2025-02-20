@@ -29,6 +29,8 @@ import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognitio
 
 import { useNavigate } from "react-router-dom";
 
+import ChatStop from "@/assets/icons/chat_stop_btn.png"
+
 function VoiceChatPage() {
   /* 모달 관련 상태 */
   const [isLeaveOpen, setIsLeaveOpen] = useState(false);
@@ -446,11 +448,27 @@ function VoiceChatPage() {
           <p className={styles.chat__input__content}>
             {isListening ? transcript || '음성을 입력하세요...' : ''}
           </p>
-          <img
+          {/* <img
             src={isListening ? sttBtnActive : sttBtn}
             className={styles.chat__input__img}
             onClick={toggleListening}
-          />
+          /> */}
+          {turnCount > 0 && (
+            <img
+              src={isListening ? sttBtnActive : sttBtn}
+              className={styles.chat__input__img}
+              onClick={toggleListening}
+            />
+          )}
+
+          {/* ChatStop 버튼 (turnCount가 0일 때만 표시) */}
+          {turnCount === 0 && (
+            <img
+              src={ChatStop}
+              className={styles.chat__input__img}
+              onClick={() => setIsChatEnd(true)}
+            />
+          )}
         </div>
       </div>
 
