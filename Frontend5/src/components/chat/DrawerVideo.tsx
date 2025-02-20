@@ -4,7 +4,7 @@ import styles from "./styles/Drawer.module.scss";
 import openBtn from "@/assets/icons/drawer_open.png";
 import closeBtn from "@/assets/icons/drawer_close.png";
 import settingBtn from "@/assets/icons/drawer_setting.png";
-import timerIcon from "@/assets/icons/drawer_timer.png";
+// import timerIcon from "@/assets/icons/drawer_timer.png";
 import hintIcon from "@/assets/icons/drawer_hint.png";
 import chatBtn from "@/assets/icons/drawer_chatting.png";
 
@@ -31,13 +31,13 @@ const Drawer = ({ selectedKeywords, hints, chatHistory, historyId, setSelectedMa
     };
 
     // 스위치 토글
-    const [limitOn, setLimitOn] = useState(false);
+    const [limitOn, _setLimitOn] = useState(false);
     const [hintOn, setHintOn] = useState(false);
-    const [timeLeft, setTimeLeft] = useState(180);
+    const [_timeLeft, setTimeLeft] = useState(180);
 
-    const limitSwitch = () => {
-        setLimitOn(!limitOn);
-    };
+    // const limitSwitch = () => {
+    //     setLimitOn(!limitOn);
+    // };
 
     // 채팅 토글
     const [chatOpen, setChatOpen] = useState(false);
@@ -101,11 +101,11 @@ const Drawer = ({ selectedKeywords, hints, chatHistory, historyId, setSelectedMa
         }
     }, [limitOn]);
 
-    const formatTime = (seconds: number) => {
-        const minutes = Math.floor(seconds / 60);
-        const secs = seconds % 60;
-        return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
-    };
+    // const formatTime = (seconds: number) => {
+    //     const minutes = Math.floor(seconds / 60);
+    //     const secs = seconds % 60;
+    //     return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+    // };
 
     // 피드백 토글
     const [isFeedbackOpen, _setIsFeedbackOpen] = useState(false);
@@ -129,30 +129,28 @@ const Drawer = ({ selectedKeywords, hints, chatHistory, historyId, setSelectedMa
                     <p className={styles.drawer__tag__1}>{keyword1}</p>
                     <p className={styles.drawer__tag__2}>{keyword2}</p>
 
-                    {limitOn && (
+                    {/* {limitOn && (
                         <p className={styles.drawer__tag__limit}>
                             <strong style={{ color: timeLeft === 0 ? "red" : "black" }}>
                                 {formatTime(timeLeft)}
                             </strong>
                         </p>
-                    )}
+                    )} */}
 
                 </div>
 
                 {/* 남은 턴수 */}
-                <div className={styles.drawer__wrapper}>
-                    <img src={timerIcon} width={"30px"} />
-                    <p className={styles.drawer__sub}>타이머</p>
+                {/* <div className={sㄴㄴ{styles.drawer__sub}>타이머</p> */}
 
                     {/* 스위치 */}
-                    <div className={styles.drawer__wrapper__switch}>
+                    {/* <div className={styles.drawer__wrapper__switch}>
                         <p className={styles.switch__label}>OFF</p>
                         <div className={`${styles.switch} ${limitOn ? styles.on : ""}`} onClick={limitSwitch}>
                             <div className={`${styles.toggle} ${limitOn ? styles.on : styles.off}`} />
                         </div>
                         <p className={styles.switch__label}>ON</p>
                     </div>
-                </div>
+                </div> */}
 
                 {/* 힌트 */}
                 <div className={styles.drawer__wrapper}>
