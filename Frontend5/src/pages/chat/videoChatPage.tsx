@@ -687,7 +687,7 @@ const VideoChatPage: React.FC = () => {
             {showTimeAlert && (
                 <div style={{ zIndex: 9999 }}>
                     <RedAlert
-                        message="10초가 경과되었습니다!"
+                        message="30초가 경과되었습니다!"
                         onClose={() => setShowTimeAlert(false)}
                     />
                 </div>

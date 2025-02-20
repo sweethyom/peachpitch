@@ -17,6 +17,7 @@ public class ChatReport {
     private Long reportId;
 
     @Column(name = "chat_time", nullable = false)
+    @ColumnDefault("3")
     private Integer chatTime;
 
     //    @Column(name = "silence_time", nullable = false)
