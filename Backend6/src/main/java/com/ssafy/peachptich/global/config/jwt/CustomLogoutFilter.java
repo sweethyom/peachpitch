@@ -130,22 +130,22 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // redis에 access 토큰이 있는지 확인 - 이걸 주석 처리 해야 할 것 같은ㄷ..
         String userEmail = tokenProvider.getUserEmail(refresh);
-        boolean isExist = tokenListService.isContainToken("RT:AT:" + userEmail);
-        if(!isExist){           // 재로그인 필요
-            // response status code
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-
-            ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
-                    .message("invalid access token.")
-                    .data(null)
-                    .build();
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.writeValue(response.getWriter(), responseDto);
-            return;
-        }
+//        boolean isExist = tokenListService.isContainToken("RT:AT:" + userEmail);
+//        if(!isExist){           // 재로그인 필요
+//            // response status code
+//            response.setContentType("application/json");
+//            response.setCharacterEncoding("UTF-8");
+//            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+//
+//            ResponseDto<Void> responseDto = ResponseDto.<Void>builder()
+//                    .message("invalid access token.")
+//                    .data(null)
+//                    .build();
+//
+//            ObjectMapper objectMapper = new ObjectMapper();
+//            objectMapper.writeValue(response.getWriter(), responseDto);
+//            return;
+//        }
         
         // 로그아웃 진행
         // refresh token을 redis에서 제거
