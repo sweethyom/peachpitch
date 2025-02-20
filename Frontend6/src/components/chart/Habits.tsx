@@ -49,17 +49,26 @@ const Habits: React.FC<HabitsProps> = ({ speakingHabits }) => {
         const sortedHabits = [...habits].sort((a, b) => b.count - a.count);
 
         // 상위 3개 추출
-        const top3 = sortedHabits.slice(0, 3);
-        const otherTotal = sortedHabits.slice(3).reduce((sum, item) => sum + item.count, 0);
+        const top4 = sortedHabits.slice(0, 4);
+        const otherTotal = sortedHabits.slice(4).reduce((sum, item) => sum + item.count, 0);
+
+        const totalTop4 = top4.reduce((sum, item) => sum + item.count, 0);
+        const adjustedTotal = totalTop4 + otherTotal;
+
+        const scaleFactor = adjustedTotal > 0 ? 0.9 / (totalTop4 / adjustedTotal) : 1;
+        const adjustedData = top4.map(item => Math.round(item.count * scaleFactor));
+        const remainingPercentage = 1 - adjustedData.reduce((sum, value) => sum + value / adjustedTotal, 0);
+        const otherData = Math.round(remainingPercentage * adjustedTotal);
 
         // 차트용 데이터 생성
-        const labels = top3.map(item => item.word);
-        const data = top3.map(item => item.count);
+        const labels = top4.map(item => item.word);
+        const data = [...adjustedData, otherData];
+        labels.push("기타")
 
-        if (otherTotal > 0) {
-            labels.push("기타");
-            data.push(otherTotal);
-        }
+        // if (otherTotal > 0) {
+        //     labels.push("기타");
+        //     data.push(otherTotal);
+        // }
 
         return { labels, data };
     };
@@ -77,8 +86,8 @@ const Habits: React.FC<HabitsProps> = ({ speakingHabits }) => {
             datasets: [
                 {
                     data: finalData,
-                    backgroundColor: ["#7C4D00", "#B57D30", "#FAC10B", "#FFDB6E"],
-                    hoverBackgroundColor: ["#6F4826", "#B17E36", "#D9B067", "#F2C266"],
+                    backgroundColor: ["#7C4D00", "#B57D30", "#FAC10B", "#FFDB6E", "#FFE699"],
+                    hoverBackgroundColor: ["#6F4826", "#B17E36", "#D9B067", "#F2C266", "#AAAAAA"],
                     borderWidth: 3,
                 },
             ],
