@@ -93,42 +93,57 @@ WebRTC 기술을 활용하여 안정적인 화상 채팅을 제공하며, NLP �
 gif 넣고 기술 설명
 
 ### AI 스몰토크
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_1.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 1대1 스몰토크
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_2.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 분석 리포트 (전체)
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_3.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 분석 리포트 (AI 대화)
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_4.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 분석 리포트 (1대1 대화)
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_5.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 비회원 핑거프린트
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_6.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 채팅관리
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_7.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 로그인(일반)
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_8.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 로그인(카카오)
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_9.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 결제 (카카오 api)
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_10.gif?ref_type=heads" />
+
+<br /><br />
+
+### 24시간 이후 무료 쿠폰 받기
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/readme_video_11.gif?ref_type=heads" />
 
 <br /><br />
 

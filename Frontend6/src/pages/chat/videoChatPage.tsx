@@ -640,7 +640,7 @@ const VideoChatPage: React.FC = () => {
 
                             </div>
                         </div>
-                        <div className={styles.chat__input}>
+                        {/* <div className={styles.chat__input}> */}
                             {/* <p>🎤 Microphone: {listening ? 'on' : 'off'}</p>
                                 <button onClick={() => SpeechRecognition.startListening({ continuous: true, language: "ko-KR" })}>
                                     Start
@@ -648,17 +648,17 @@ const VideoChatPage: React.FC = () => {
                                 <button onClick={() => SpeechRecognition.stopListening()}>Stop</button>
                                 <button onClick={resetTranscript}>Reset</button>
                                 <h3>📝 실시간 STT</h3> */}
-                            <p>{finalTranscript}</p>
+                            {/* <p>{finalTranscript}</p> */}
 
                             {/* <h3>📜 이전 대화 기록</h3> */}
-                            <div id="history" style={{ display: "none" }}>
+                            {/* <div id="history" style={{ display: "none" }}>
                                 {history.map((item, index) => (
                                     <p key={index}>🗣 {item}</p>
                                 ))}
-                            </div>
+                            </div> */}
 
                             {/* <img src={sstBtn} className={styles.chat__input__img} alt="sst button" /> */}
-                        </div>
+                        {/* </div> */}
                     </>
                 ) : (
                     <>
