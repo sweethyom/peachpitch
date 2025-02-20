@@ -527,7 +527,7 @@ const VideoChatPage: React.FC = () => {
                     console.error("STOMP client가 연결되어 있지 않습니다 (자동 종료).");
                 }
             }
-        }, 50000);
+        }, 80000);
 
         return () => clearTimeout(autoEndTimeout);
     }, [session, token, isSessionClosed, sessionId]);
@@ -706,7 +706,7 @@ const VideoChatPage: React.FC = () => {
             {showTimeAlert && (
                 <div style={{ zIndex: 9999 }}>
                     <RedAlert
-                        message="10초가 경과되었습니다!"
+                        message="30초가 경과되었습니다!"
                         onClose={() => setShowTimeAlert(false)}
                     />
                 </div>
