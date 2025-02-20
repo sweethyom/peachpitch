@@ -42,7 +42,7 @@ Typescript - 5.6.2
 java - jdk17
 Spring Boot - 3.4.1
 
-[Backend(springboot)]
+[Backend(Django)]
 python - 3.9.13
 Django - 4.2.19
 
@@ -56,6 +56,10 @@ ubuntu - 24.04
 jenkins - 2.492.1
 nginx - 1.27.4
 kurento - 7.1.1
+
+[IDE]
+IntelliJ IDEA 버전 - 2023.3.8 (Ultimate Edition)
+VS Code 버전 - 1.97.2
 ```
 <br /><br />
 
