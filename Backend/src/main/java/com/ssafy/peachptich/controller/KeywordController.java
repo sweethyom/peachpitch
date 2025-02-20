@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class KeywordController {
      * 랜덤 키워드 15개 반환
      * @return
      */
-    @GetMapping(value = {"/api/chat/video/keywords/add", "/api/chat/ai/keywords/add"})
+    /*@GetMapping(value = {"/api/chat/video/keywords/add", "/api/chat/ai/keywords/add"})
     @Operation(summary = "키워드 추가", description = "AI/1:1 대화 키워드를 추가합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "키워드 성공적으로 추가됨")
@@ -38,5 +39,26 @@ public class KeywordController {
                 .keywords(keywords)
                 .build();
         return ResponseEntity.ok().body(ResponseDto.<KeywordListResponse>builder().message("Keyword added successfully").data(responseDto).build());
+    }*/
+
+    @GetMapping(value = "/api/chat/ai/keywords/add")
+    public ResponseEntity<ResponseDto<KeywordListResponse>> addAIKeyword() {
+        List<KeywordResponse> keywords = keywordService.getFirstKeywords();
+        KeywordListResponse responseDto = KeywordListResponse.builder()
+                .keywords(keywords)
+                .build();
+        return ResponseEntity.ok().body(ResponseDto.<KeywordListResponse>builder().message("Keyword added successfully").data(responseDto).build());
     }
+
+    @GetMapping(value = "/api/chat/video/keywords/add")
+    public ResponseEntity<ResponseDto<KeywordListResponse>> addKeywordVideo() {
+        List<KeywordResponse> keywords = keywordService.getLastKeywords();
+        KeywordListResponse responseDto = KeywordListResponse.builder()
+                .keywords(keywords)
+                .build();
+        return ResponseEntity.ok().body(ResponseDto.<KeywordListResponse>builder().message("Keyword added successfully").data(responseDto).build());
+
+    }
+
+
 }
