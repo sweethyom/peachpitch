@@ -35,7 +35,7 @@ function Keyword({ isOpen, setSelectedKeyword, historyId, setHints, setIsComplet
     useEffect(() => {
         const fetchKeywords = async () => {
             try {
-                const response = await fetch("http://localhost:8080/api/chat/ai/keywords/add");
+                const response = await fetch("http://localhost:8080/api/chat/video/keywords/add");
                 const responseJson = await response.json();
                 const data = responseJson.data;
                 console.log(data);
