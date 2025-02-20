@@ -67,7 +67,6 @@ WebRTC 기술을 활용하여 안정적인 화상 채팅을 제공하며, NLP �
 
 <br />
 
-설문했던 구글 통계자료 포함시키기?
 
 <br />
 
@@ -227,6 +226,8 @@ gif 넣고 기술 설명
 ### 시스템 아키텍처
 
 <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/system_architecture_with_monitoring.png?ref_type=heads" width="700" />
+
+노션에 올라간걸로 다시 올리기기
 
 <br /><br />
 
