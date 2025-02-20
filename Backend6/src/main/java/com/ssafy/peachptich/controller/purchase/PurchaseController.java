@@ -84,6 +84,10 @@ public class PurchaseController {
             // 결제 승인 처리 로직 (예: 카카오페이 API 호출)
             ApproveResponse approveResponse = purchaseService.payApprove(pgToken);
             purchaseService.savePaymentInfo(approveResponse);
+            // 유료 쿠폰 지급 로직 추가
+            Long userId = Long.valueOf(approveResponse.getPartner_user_id()); // ApproveResponse에서 userId를 가져오는 메서드
+            Integer couponQuantity = approveResponse.getQuantity(); // ApproveResponse에서 쿠폰 수량을 가져오는 메서드
+            couponService.handlePaidCoupon(userId, couponQuantity);
             // 팝업 닫기 스크립트 반환
             String script = "<html><body><script>window.close();</script></body></html>";
             response.setContentType("text/html");

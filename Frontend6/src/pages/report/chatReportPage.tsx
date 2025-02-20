@@ -243,10 +243,6 @@ function chatReportPage(_id : any) {
                   <hr className={styles.report__divider}/>
                   <div className={styles.report__feedback}>
                     <p id="feedback" className={styles.report__sub}>상대방의 평가</p>
-                    <p className={styles.report__feedback__comment}>
-                      전반적으로, 이 대화는 자연스러운 흐름과 상호 관심사를 잘 반영하고 있어 성공적인 스몰톡의 사례라고 볼 수 있습니다.<br/>
-                      참여자들이 서로의 경험과 관심사에 대해 더 깊이 있게 탐구하고, 대화 속도를 조금 더 높인다면 더욱 활기찬 대화가 될 것입니다.
-                    </p>
 
                     {/* 상대방이 체크한 평가 */}
                     {/*<div className={styles.report__feedback__check}>*/}
