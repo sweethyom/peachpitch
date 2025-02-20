@@ -21,11 +21,11 @@ import StartChat from '@/components/modal/StartChat'
 // import { access } from 'fs';
 
 function MainPage() {
-  const defaultMessage = "포시랍네요. 광수님 좀 포시랍네요."
+  const defaultMessage = `"안녕하세요. 최종 발표를 진행하게 되어 너무 떨리네요."`
 
   const [randomTalks, setRandomTalks] = useState<string[]>([]);
   const [currentTalk, setCurrentTalk] = useState(defaultMessage);
-  const [nextTalk, setNextTalk] = useState(defaultMessage);
+  // const [nextTalk, setNextTalk] = useState(defaultMessage);
   const [rotate, setRotate] = useState(false);
 
   const [_showCompletePay, setShowCompletePay] = useState(false);
@@ -72,32 +72,51 @@ function MainPage() {
   }, []);
 
   // ✅ "오늘의 토킹" 데이터를 불러오기
+  // useEffect(() => {
+  //   axios.post("http://localhost:8080/api/main/randomscript")
+  //     .then(response => {
+  //       const content = response.data.data.content;
+  //       setRandomTalks(prev => [...prev, content]);
+  //       setCurrentTalk(content);
+  //     })
+  //     .catch(error => console.error('Error fetching random script:', error));
+  // }, []);
+
+  // ✅ 5초마다 새로운 "오늘의 토킹" 불러오기
   useEffect(() => {
-    axios.post("https://peachpitch.site/api/main/randomscript")
-      .then(response => {
-        const content = response.data.data.content;
-        setRandomTalks(prev => [...prev, content]);
-        setCurrentTalk(content);
-      })
-      .catch(error => console.error('Error fetching random script:', error));
+    const fetchRandomScript = () => {
+      axios.post("https://peachpitch.site/api/main/randomscript")
+        .then(response => {
+          const content = response.data.data.content;
+          setRandomTalks(prev => [...prev, content]);
+        })
+        .catch(error => console.error('Error fetching random script:', error));
+    };
+
+    fetchRandomScript(); // 최초 실행
+    const interval = setInterval(fetchRandomScript, 5000); // 5초마다 실행
+
+    return () => clearInterval(interval);
   }, []);
+
 
   // ✅ 5초마다 "오늘의 토킹" 변경
   useEffect(() => {
-    const interval = setInterval(() => {
-      if (randomTalks.length > 0) {
-        setNextTalk(randomTalks[Math.floor(Math.random() * randomTalks.length)] || defaultMessage);
-        setRotate(true);
+    if (randomTalks.length === 0) return;
 
-        setTimeout(() => {
-          setCurrentTalk(nextTalk);
-          setRotate(false);
-        }, 600);
-      }
-    }, 5000);
+    const changeTalk = () => {
+      setRotate(true); // 애니메이션 시작
 
+      setTimeout(() => {
+        const newTalk = randomTalks[Math.floor(Math.random() * randomTalks.length)] || defaultMessage;
+        setCurrentTalk(newTalk);
+        setRotate(false); // 애니메이션 종료
+      }, 600); // 애니메이션 지속 시간과 맞추기
+    };
+
+    const interval = setInterval(changeTalk, 5000);
     return () => clearInterval(interval);
-  }, [randomTalks, nextTalk]);
+  }, [randomTalks]);
 
   // ✅ 최초 실행 시 핑거프린트 생성 및 결제 성공 메시지 감지
   useEffect(() => {

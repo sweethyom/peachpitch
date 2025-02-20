@@ -107,7 +107,7 @@ function Header({ isDark, isGreen, isPink, isYellow }: HeaderProps) {
     useEffect(() => {
         const interval = setInterval(() => {
             refreshAccessToken();
-        }, 60 * 60 * 1000);
+        }, 0 * 60 * 1000);
         return () => clearInterval(interval);
     }, []);
 

@@ -76,17 +76,24 @@ public class CouponServiceImpl implements CouponService {
     @Override
     @Transactional
     public void issueFreeCoupon(Long userId) {
-        // 기존 유효한 쿠폰이 있는지 확인
-        Optional<HaveCoupon> existingCoupon = haveCouponRepository
+        log.info("무료쿠폰 발급 시작");
+
+        // 현재 시간 기준으로 유효한 쿠폰 확인
+        Optional<HaveCoupon> validCoupon = haveCouponRepository
                 .findByUserIdAndItemTypeAndExpirationDateAfter(
                         userId,
                         Item.ItemType.FREE,
-                        LocalDateTime.now().withHour(0).withMinute(0).withSecond(0)
+                        LocalDateTime.now()
                 );
 
-        if (existingCoupon.isPresent()) {
+        if (validCoupon.isPresent()) {
+            log.info("이미 유효한 쿠폰이 있습니다");
             throw new IllegalStateException("이미 유효한 무료 쿠폰이 있습니다.");
         }
+
+        // 만료된 쿠폰을 포함한 FREE 타입 쿠폰 조회
+        Optional<HaveCoupon> existingCoupon = haveCouponRepository
+                .findByUserIdAndItemType(userId, Item.ItemType.FREE);
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
@@ -94,15 +101,26 @@ public class CouponServiceImpl implements CouponService {
         Item freeCouponItem = itemRepository.findByType(Item.ItemType.FREE)
                 .orElseThrow(() -> new IllegalStateException("무료 쿠폰 아이템이 설정되지 않았습니다."));
 
-        HaveCoupon newCoupon = HaveCoupon.builder()
-                .user(user)
-                .item(freeCouponItem)
-                .ea(1)
-                .expirationDate(LocalDateTime.now()
-                        .withHour(23).withMinute(59).withSecond(59))
-                .build();
-
-        haveCouponRepository.save(newCoupon);
+        if (existingCoupon.isPresent()) {
+            // 기존 쿠폰이 있으면 업데이트
+            HaveCoupon coupon = existingCoupon.get();
+            coupon.setEa(1);
+            coupon.setExpirationDate(LocalDateTime.now()
+                    .withHour(23).withMinute(59).withSecond(59));
+            haveCouponRepository.save(coupon);
+            log.info("기존 쿠폰 업데이트 완료");
+        } else {
+            // 기존 쿠폰이 없으면 새로 생성
+            HaveCoupon newCoupon = HaveCoupon.builder()
+                    .user(user)
+                    .item(freeCouponItem)
+                    .ea(1)
+                    .expirationDate(LocalDateTime.now()
+                            .withHour(23).withMinute(59).withSecond(59))
+                    .build();
+            haveCouponRepository.save(newCoupon);
+            log.info("새 쿠폰 생성 완료");
+        }
     }
 
 
