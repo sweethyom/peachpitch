@@ -22,7 +22,7 @@
     padding-right: 10px;
 
     flex-direction: row;
-    gap: 50px;
+    gap: 40px;
     margin: 50px auto 100px auto;
 }
 
@@ -81,11 +81,11 @@
         // margin-bottom: 35px;
     }
 
-    // &__habits {}
+    &__habits {}
 
-    // &__lead {}
+    &__lead {}
 
-    // &__keyword {}
+    &__keyword {}
 
     &__list {
 
@@ -93,13 +93,13 @@
             position: relative;
 
             width: 855px;
-            height: 550px;
+            height: 590px;
             background-color: var(--color-white-100);
 
             display: flex;
             flex-direction: column;
             // justify-content: center;
-            gap: 25px;
+            gap: 15px;
 
             border-radius: 10px;
             // justify-content: center;
@@ -112,8 +112,11 @@
         gap: 16px;
 
         &__drop {
-            padding: 5px 20px;
+            padding: 10px 20px;
             background-color: var(--color-white-000);
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 400;
         }
     }
 
@@ -121,6 +124,7 @@
         display: flex;
         margin-top: auto;
         justify-content: center;
+        align-items: center;
 
         &__number {
             font-weight: 500;
