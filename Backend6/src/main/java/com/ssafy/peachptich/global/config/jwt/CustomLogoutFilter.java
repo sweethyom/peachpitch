@@ -128,7 +128,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
-        // redis에 access 토큰이 있는지 확인
+        // redis에 access 토큰이 있는지 확인 - 이걸 주석 처리 해야 할 것 같은ㄷ..
         String userEmail = tokenProvider.getUserEmail(refresh);
         boolean isExist = tokenListService.isContainToken("RT:AT:" + userEmail);
         if(!isExist){           // 재로그인 필요

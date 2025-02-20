@@ -30,4 +30,8 @@ public interface HaveCouponRepository extends JpaRepository<HaveCoupon, Long> {
             @Param("userId") Long userId,
             @Param("item") Item item
     );
+
+    @Query("SELECT hc FROM HaveCoupon hc WHERE hc.user.userId = :userId AND hc.item.type = :itemType")
+    Optional<HaveCoupon> findByUserIdAndItemType(@Param("userId") Long userId, @Param("itemType") Item.ItemType itemType);
+
 }
