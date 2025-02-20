@@ -219,15 +219,15 @@ gif 넣고 기술 설명
 
 <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/erd.png?ref_type=heads" width="700" />
 
-추가된 부분 수정해서 다시 올리기
 
 <br /><br />
 
 ### 시스템 아키텍처
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/system_architecture_with_monitoring.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%8B%9C%EC%8A%A4%ED%85%9C%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
 
-노션에 올라간걸로 다시 올리기기
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%8B%9C%EC%8A%A4%ED%85%9C2D%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
+
 
 <br /><br />
 
