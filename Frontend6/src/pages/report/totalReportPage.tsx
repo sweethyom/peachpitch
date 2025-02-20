@@ -21,17 +21,9 @@ interface SpeakingHabit {
   count: number;
 }
 
-// ✅ 대화 리스트 더미 데이터 (20개)
-const conversationList = Array.from({ length: 20 }, (_, i) => ({
-  id: i + 1,
-  name: `대화 ${i + 1}`,
-  keywords: i % 2 === 0 ? ["보드 게임", "겨울 스포츠"] : ["AI", "블록체인"],
-  date: new Date(2024, 1, i + 1).toISOString().split("T")[0], // 2024-02-01 형식 날짜
-}));
-
 function totalReportPage() {
   const [keywordFilter, _setKeywordFilter] = useState<string>("전체");
-  const [sortOrder, _setSortOrder] = useState<string>("최신순");
+  const [sortOrder, setSortOrder] = useState<string>("최신순");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectReportId, setSelectReportId] = useState<number | null>(null);
   const navigate = useNavigate();
@@ -161,7 +153,7 @@ function totalReportPage() {
   };
 
   // 필터링된 대화 리스트 계산
-  const filteredConversations = conversationList
+  const filteredConversations = chatReports
     .filter((conv) => keywordFilter === "전체" || conv.keywords.includes(keywordFilter))
     .sort((a, b) => {
       if (sortOrder === "최신순") {
@@ -181,16 +173,31 @@ function totalReportPage() {
     }
   }, [currentPage, filteredConversations.length]);
 
+  // 정렬된 chatReports 저장을 위한 새로운 상태 추가
+  const [sortedChatReports, setSortedChatReports] = useState<any[]>([]);
+
+  // chatReports가 변경되거나 sortOrder가 변경될 때 정렬 수행
+  useEffect(() => {
+    if (chatReports.length > 0) {
+      const sortedReports = [...chatReports].sort((a, b) => {
+        return sortOrder === "최신순" ? b.reportId - a.reportId : a.reportId - b.reportId;
+      });
+
+      setSortedChatReports(sortedReports);
+    }
+  }, [chatReports, sortOrder]);
+
+
   return (
     <>
       <Header />
       <div className={styles.wrap}>
 
-        {reportData ===null || chatReports === null && (
+        {reportData === null || chatReports === null && (
           <img src={loading} className={styles.loading} />
         )}
 
-        {reportData !==null ? (
+        {reportData !== null ? (
           <>
             <div className={styles.page}>
 
@@ -273,10 +280,18 @@ function totalReportPage() {
 
                   <div className={styles.report__list__items}>
 
-                    {/* ✅ 대화 리스트 필터 */}
-                    {/* <div className={styles.report__filter}> */}
-                    {/* 키워드 필터 */}
-                    {/* <select
+                    {selectReportId ? (
+                      <>
+                        <button onClick={() => setSelectReportId(null)} className={styles.backButton}>🔙 뒤로가기</button>
+                        <ChatReportPage reportId={selectReportId} /> {/* ✅ reportId 전달 */}
+                      </>
+                    ) : (
+                      <>
+                        <p className={styles.report__title}>전체 리포트</p>
+                        {/* ✅ 대화 리스트 필터 */}
+                        <div className={styles.report__filter}>
+                          {/* 키워드 필터 */}
+                          {/* <select
                     className={styles.report__filter__drop}
                     value={keywordFilter}
                     onChange={(e) => {
@@ -291,62 +306,40 @@ function totalReportPage() {
                     <option value="블록체인">블록체인</option>
                   </select> */}
 
-                    {/* 정렬 필터 */}
-                    {/* <select
-                    className={styles.report__filter__drop}
-                    value={sortOrder}
-                    onChange={(e) => {
-                      setSortOrder(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  >
-                    <option value="최신순">최신순</option>
-                    <option value="오래된순">오래된순</option>
-                  </select>
-                </div> */}
+                          {/* 정렬 필터 */}
+                          <select
+                            className={styles.report__filter__drop}
+                            value={sortOrder}
+                            onChange={(e) => {
+                              console.log("📌 정렬 변경됨:", e.target.value);
+                              setSortOrder(e.target.value);
+                              setCurrentPage(1);
+                            }}
+                          >
+                            <option value="최신순">최신순</option>
+                            <option value="오래된순">오래된순</option>
+                          </select>
 
-                    {/* ✅ 필터링된 대화 리스트 (2x3 레이아웃 적용)
-                <div className={styles.report__grid}>
-                  {chatReports.map((report) => (
-                    <div key={report.reportId} className={styles.item}>
-                      <div onClick={() => handleReportClick(report.reportId)} className={styles.item__link}>
-                        <p className={styles.item__name}>{`${report.partnerName}와의 대화`}</p>
-                        <div className={styles.item__keyword}>
-                          <p className={styles.item__keyword__title}>대화 키워드</p>
-                          <div className={styles.item__tag}>
-                            <p className={styles.item__tag__1}>{report.keyword1}</p>
-                            {report.keyword2 && <p className={styles.item__tag__2}>{report.keyword2}</p>}
-                          </div>
                         </div>
-                      </div>
-                    </div>
-                  ))}
-                </div> */}
 
-                    {selectReportId ? (
-                      <>
-                        <button onClick={() => setSelectReportId(null)} className={styles.backButton}>🔙 뒤로가기</button>
-                        <ChatReportPage reportId={selectReportId} /> {/* ✅ reportId 전달 */}
-                      </>
-                    ) : (
-                      <>
-                        <p className={styles.report__title}>전체 리포트</p>
                         <div className={styles.report__list}>
                           <div className={styles.report__grid}>
-                            {chatReports.map((report) => (
-                              <div key={report.reportId} className={styles.item}>
-                                <div onClick={() => handleReportClick(report.reportId)} className={styles.item__link}>
-                                  <p className={styles.item__name}>{`${report.partnerName}와의 대화`}</p>
-                                  <div className={styles.item__keyword}>
-                                    <p className={styles.item__keyword__title}>대화 키워드</p>
-                                    <div className={styles.item__tag}>
-                                      <p className={styles.item__tag__1}>{report.keyword1}</p>
-                                      {report.keyword2 && <p className={styles.item__tag__2}>{report.keyword2}</p>}
+                            {sortedChatReports
+                              .slice((currentPage - 1) * 6, currentPage * 6) // ✅ 현재 페이지의 6개만 보여줌
+                              .map((report) => (
+                                <div key={report.reportId} className={styles.item}>
+                                  <div onClick={() => handleReportClick(report.reportId)} className={styles.item__link}>
+                                    <p className={styles.item__name}>{`${report.partnerName}와의 대화`}</p>
+                                    <div className={styles.item__keyword}>
+                                      <p className={styles.item__keyword__title}>대화 키워드</p>
+                                      <div className={styles.item__tag}>
+                                        <p className={styles.item__tag__1}>{report.keyword1}</p>
+                                        {report.keyword2 && <p className={styles.item__tag__2}>{report.keyword2}</p>}
+                                      </div>
                                     </div>
                                   </div>
                                 </div>
-                              </div>
-                            ))}
+                              ))}
                           </div>
                         </div>
                       </>
@@ -361,7 +354,8 @@ function totalReportPage() {
                       >
                         ◁
                       </button>
-                      {[...Array(totalPages)].map((_, i) => (
+
+                      {[...Array(Math.ceil(chatReports.length / 6))].map((_, i) => (
                         <button
                           key={i}
                           className={`${styles.report__paging__number} ${currentPage === i + 1 ? styles.active : ""}`}
@@ -370,24 +364,23 @@ function totalReportPage() {
                           {i + 1}
                         </button>
                       ))}
+
                       <button
                         onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
+                        disabled={currentPage === Math.ceil(chatReports.length / 6)}
                         className={styles.report__paging__button}
                       >
                         ▷
                       </button>
                     </div>
-
                   </div>
-
                 </div>
               </div>
             </div>
           </>
         ) : (
           <>
-          <img src={loading} className={styles.loading} />
+            <img src={loading} className={styles.loading} />
           </>
         )}
         <Footer />
