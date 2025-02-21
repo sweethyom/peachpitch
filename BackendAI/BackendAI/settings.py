@@ -25,8 +25,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',   # MySQL 엔진 사용
         'NAME': 'peachpitch',           # 데이터베이스 이름
         'USER': 'root',              # MySQL 사용자 이름
-        'PASSWORD': 'pikapikapika1234',      # MySQL 비밀번호
-        'HOST': '43.201.5.129',                    # 로컬에서 실행 중이므로 localhost
+        'PASSWORD': '[password]',      # MySQL 비밀번호
+        'HOST': '[aws]',                    # 로컬에서 실행 중이므로 localhost
         'PORT': '13306',                         # MySQL 기본 포트 (3306)
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
@@ -43,7 +43,7 @@ REDIS_DB = 1  # 사용할 DB 번호
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://43.201.5.129:6379/1",
+        "LOCATION": "redis://[aws]:6379/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
