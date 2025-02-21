@@ -76,12 +76,9 @@ WebRTC 기술을 활용하여 안정적인 화상 채팅을 제공하며, NLP �
 ## 🎥 데모 영상
 
 
-전체 영상 포트폴리오
-(링크)
+[영상 포트폴리오](https://youtu.be/SPx0m9INxpE)
 
-시연 영상
-(링크)
-
+<br />
 <br />
 
 
@@ -347,32 +344,32 @@ gif 넣고 기술 설명
   <tr>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/migyeong.jpg?ref_type=heads" alt="김미경 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/migyeong.jpg?ref_type=heads" alt="김미경 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/minju.jpg?ref_type=heads" alt="김민주 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/minju.jpg?ref_type=heads" alt="김민주 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/hanna.jpg?ref_type=heads" alt="이한나 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/hanna.jpg?ref_type=heads" alt="이한나 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/hyomy.jpg?ref_type=heads" alt="이효미 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/hyomy.jpg?ref_type=heads" alt="이효미 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/yuseon.jpg?ref_type=heads" alt="정유선 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/yuseon.png?ref_type=heads" alt="정유선 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/jiwon.jpg?ref_type=heads" alt="최지원 프로필" />
+        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/jiwon.jpg?ref_type=heads" alt="최지원 프로필" />
       </a>
     </td>
   </tr>
