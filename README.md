@@ -1,7 +1,7 @@
 # PeachPitch
 ### SSAFY 12기 공통 프로젝트 - D201 Team 노 피카 킵고잉
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/landingpage.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/landingpage.gif?ref_type=heads" />
 
 > 스몰톡을 연습하고 싶지만, 사람과의 직접적인 대화는 아직 부담스러운 사용자들을 위한 스피킹 연습 서비스를 제공합니다.
 
@@ -78,8 +78,7 @@ WebRTC 기술을 활용하여 안정적인 화상 채팅을 제공하며, NLP �
 
 [영상 포트폴리오 보러가기](https://youtu.be/SPx0m9INxpE)
 
-<br />
-<br />
+<br /><br />
 
 
 <div id="3"></div>
@@ -90,57 +89,57 @@ WebRTC 기술을 활용하여 안정적인 화상 채팅을 제공하며, NLP �
 gif 넣고 기술 설명
 
 ### AI 스몰토크
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_1.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_1.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 1대1 스몰토크
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_2.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_2.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 분석 리포트 (전체)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_3.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_3.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 분석 리포트 (AI 대화)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_4.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_4.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 분석 리포트 (1대1 대화)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_5.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_5.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 비회원 핑거프린트
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_6.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_6.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 채팅관리
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_7.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_7.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 로그인(일반)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_8.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_8.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 로그인(카카오)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_9.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_9.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 결제 (카카오 api)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_10.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_10.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 24시간 이후 무료 쿠폰 받기
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/func_video_11.gif?ref_type=heads" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_11.gif?ref_type=heads" />
 
 <br /><br />
 
@@ -149,14 +148,14 @@ gif 넣고 기술 설명
 <br /><br />
 
 ### 키워드 랭킹
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%ED%82%A4%EC%9B%8C%EB%93%9C%20%EB%9E%AD%ED%82%B9.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%ED%82%A4%EC%9B%8C%EB%93%9C%20%EB%9E%AD%ED%82%B9.png?ref_type=heads" width="700" />
 
 <br />
 <br />
 
 ### 랜덤 스크립트
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EB%9E%9C%EB%8D%A4%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8.png?ref_type=heads" width="500" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EB%9E%9C%EB%8D%A4%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8.png?ref_type=heads" width="500" />
 
 
 <br /><br />
@@ -197,7 +196,7 @@ gif 넣고 기술 설명
 ### 모니터링
 ![Grafana Badge](https://img.shields.io/badge/grafana-F46800?style=flat-square&logo=grafana&logoColor=fff)
 ![Prometheus Badge](https://img.shields.io/badge/prometheus-E6522C?style=flat-square&logo=prometheus&logoColor=fff)
-![Google Analytics Badge](https://img.shields.io/badge/googleanalytics-E37400?style=flat-square&logo=googleanalytics&logoColor=fff)
+
 
 
 
@@ -211,45 +210,45 @@ gif 넣고 기술 설명
 
 ### 요구사항 정의서
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C4.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C4.png?ref_type=heads" width="700" />
 
 <br /><br />
 
 ### 와이어프레임
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/wireframe.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/wireframe.png?ref_type=heads" width="700" />
 
 <br /><br />
 
 ### ERD 다이어그램
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/erd.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/erd.png?ref_type=heads" width="700" />
 
 
 <br /><br />
 
 ### 시스템 아키텍처
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%8B%9C%EC%8A%A4%ED%85%9C%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%8B%9C%EC%8A%A4%ED%85%9C%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/%EC%8B%9C%EC%8A%A4%ED%85%9C2D%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%8B%9C%EC%8A%A4%ED%85%9C2D%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
 
 
 <br /><br />
 
 ### API 명세서
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/api%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/api%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/api%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" width="700" />
 
 <br />
 <br /><br />
@@ -261,21 +260,22 @@ gif 넣고 기술 설명
 
 ### Notion
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/notion1.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/notion1.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/notion2.png?ref_type=heads" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/notion2.png?ref_type=heads" width="700" />
 
 <br />
 <br />
 
 ### Jira
+### Git
 <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/jira.gif" width="700" />
 
 <br />
 <br />
 
 ### Git
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/release/img/sourceTree.gif" width="700" />
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/sourceTree.gif" width="700" />
 
 <br />
 <br />
@@ -286,9 +286,90 @@ gif 넣고 기술 설명
 ## 📊 모니터링 통계
 
 
-프로매테우스, 그라파나, 구글 애널리틱스
+prometheus, grafana, locust 사용
 
-구축은 했는데 연결은 기능 개발 끝나고
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/grafana.png?ref_type=heads" width="700" />
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/locust1.png?ref_type=heads" width="700" />
+
+<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/locust2.png?ref_type=heads" width="700" />
+
+<br />
+
+<details>
+<summary>부하테스트 분석 결과</summary>
+<div markdown="1">
+
+### **웹사이트 동시 수용 가능 사용자 수 분석**
+
+테스트 데이터를 기반으로 웹사이트가 **몇 명의 동시 사용자를 수용할 수 있는지** 계산해볼게.
+
+* * *
+
+### **1\. 테스트 결과 요약**
+
+*   **평균 응답 시간**: 16.84ms (0.01684초)
+*   **최대 응답 시간**: 1,100ms (1.1초)
+*   **초당 처리 요청 수 (RPS, Requests Per Second)**: **약 494건**
+*   **502 오류율**: **10.7% (부하 증가 시 서버 과부하 발생 가능)**
+
+* * *
+
+### **2\. 동시 접속 가능 인원 계산**
+
+동시 접속 가능 인원(Concurrent Users)은 다음 공식을 사용해서 계산할 수 있어.
+
+동시 사용자 수\=RPS×평균 응답 시간(초)\\text{동시 사용자 수} = \\text{RPS} \\times \\text{평균 응답 시간(초)}
+
+즉, 한 사용자가 요청을 보내고 응답을 받을 때까지 걸리는 시간 동안 몇 명의 사용자가 동시에 요청을 보낼 수 있는지를 계산하는 방식이야.
+
+#### **1) 평균 응답 시간을 기준으로 계산**
+
+494×0.01684\=8.32≈8명494 \\times 0.01684 = \\mathbf{8.32} \\approx 8명
+
+✅ **8명 정도가 동시에 요청을 보내는 경우 안정적으로 서비스 가능**
+
+#### **2) 최대 응답 시간을 기준으로 계산 (서버 부하 상황)**
+
+494×1.1\=543.4≈543명494 \\times 1.1 = \\mathbf{543.4} \\approx 543명
+
+⚠️ **최대 543명까지 동시 접속 가능하지만, 이 경우 일부 요청이 1초 이상 지연될 가능성이 있음.**
+
+* * *
+
+### **3\. 502 오류를 감안한 실제 수용 인원**
+
+502 오류율(10.7%)을 고려하면 실제로 안정적으로 서비스할 수 있는 인원은 줄어들어.
+
+안정적인 동시 사용자 수\=이론적 동시 사용자 수×(1−오류율)\\text{안정적인 동시 사용자 수} = \\text{이론적 동시 사용자 수} \\times (1 - \\text{오류율})
+
+*   **평균 응답 시간 기준**:  
+    8×(1−0.107)\=8×0.893\=7.148 \\times (1 - 0.107) = 8 \\times 0.893 = \\mathbf{7.14} → **약 7명**
+*   **최대 응답 시간 기준**:  
+    543×0.893\=485명543 \\times 0.893 = \\mathbf{485명} → **최대 485명까지 가능하지만 성능 저하 가능성 있음**
+
+* * *
+
+### **4\. 결론**
+
+✅ **안정적인 동시 접속 가능 인원:** **약 7명**  
+✅ **최대 동시 접속 가능 인원 (최적화 필요):** **약 485명**  
+⚠️ **현재 설정으로는 500명 이상 동시 접속 시 502 오류 발생 가능**
+
+* * *
+
+### **5\. 개선 방안 (더 많은 사용자 수용을 원할 경우)**
+
+*   **로드 밸런서 추가**: 여러 서버에 트래픽을 분산하여 처리량 증가
+*   **DB 캐싱 적용**: Redis, Memcached 사용해 로그인 요청 처리 속도 개선
+*   **서버 증설 (Auto Scaling 적용)**: 트래픽이 많아질 때 자동으로 서버 수 늘리기
+*   **비동기 처리 적용**: 로그인 요청을 비동기 처리하여 성능 개선
+
+이렇게 하면 **최대 1,000~2,000명까지도 동시 접속 가능하도록 확장 가능**해.  
+추가로 서버 자원(CPU, RAM) 모니터링하면서 부하 분산 전략을 적용하는 게 중요해! 🚀
+
+</div>
+</details>
 
 
 <br />
@@ -301,7 +382,7 @@ gif 넣고 기술 설명
 
 개발 기간: 2025.01.13 ~ 2025.02.21
 
-모니터링 기간: 2025.02.21 ~ 2025.02.28
+모니터링 기간: 2025.02.21 ~ 2025.02.25
 
 <br />
 
@@ -332,7 +413,7 @@ gif 넣고 기술 설명
 | :--: |  :--: |:--: |:--: | :-- | :--: |
 | 김미경 |  제주 | 👭 | INFP | 팀장, 프론트엔드, 디자인 |   사장님   |
 | 김민주 |  대구 | 🍶 | ISTP | 팀원, 백엔드 |   히트맨   |
-| 이한나 |  서울 | 🐂 | INFJ | 팀원, AI, 백엔드 |   여주   |
+| 이한나 |  서울 | 🐂 | ENFJ | 팀원, AI, 백엔드 |   여주   |
 | 이효미 |  대구 | 👩 | INFJ | 팀원, 백엔드 |   래퍼   |
 | 정유선 |  상주 | 👭 | ENTJ | 팀원, DevOps, 영상편집 |   휴먼리소스   |
 | 최지원 |  창원 | 🐂 | ENTJ | 팀원, 백엔드 |   칼단발   |
