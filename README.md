@@ -1,7 +1,7 @@
 # PeachPitch
 ### SSAFY 12기 공통 프로젝트 - D201 Team 노 피카 킵고잉
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/landingpage.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/landingpage.gif?ref_type=heads" />
 
 > 스몰톡을 연습하고 싶지만, 사람과의 직접적인 대화는 아직 부담스러운 사용자들을 위한 스피킹 연습 서비스를 제공합니다.
 
@@ -89,57 +89,57 @@ WebRTC 기술을 활용하여 안정적인 화상 채팅을 제공하며, NLP �
 gif 넣고 기술 설명
 
 ### AI 스몰토크
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_1.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_1.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 1대1 스몰토크
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_2.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_2.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 분석 리포트 (전체)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_3.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_3.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 분석 리포트 (AI 대화)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_4.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_4.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 분석 리포트 (1대1 대화)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_5.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_5.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 비회원 핑거프린트
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_6.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_6.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 채팅관리
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_7.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_7.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 로그인(일반)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_8.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_8.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 로그인(카카오)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_9.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_9.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 결제 (카카오 api)
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_10.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_10.gif?ref_type=heads" />
 
 <br /><br />
 
 ### 24시간 이후 무료 쿠폰 받기
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/func_video_11.gif?ref_type=heads" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/func_video_11.gif?ref_type=heads" />
 
 <br /><br />
 
@@ -148,14 +148,14 @@ gif 넣고 기술 설명
 <br /><br />
 
 ### 키워드 랭킹
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%ED%82%A4%EC%9B%8C%EB%93%9C%20%EB%9E%AD%ED%82%B9.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/%ED%82%A4%EC%9B%8C%EB%93%9C%20%EB%9E%AD%ED%82%B9.png?ref_type=heads" width="700" />
 
 <br />
 <br />
 
 ### 랜덤 스크립트
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EB%9E%9C%EB%8D%A4%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8.png?ref_type=heads" width="500" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/%EB%9E%9C%EB%8D%A4%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8.png?ref_type=heads" width="500" />
 
 
 <br /><br />
@@ -210,45 +210,45 @@ gif 넣고 기술 설명
 
 ### 요구사항 정의서
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C4.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/%EC%9A%94%EA%B5%AC%EC%82%AC%ED%95%AD%EB%AA%85%EC%84%B8%EC%84%9C4.png?ref_type=heads" width="700" />
 
 <br /><br />
 
 ### 와이어프레임
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/wireframe.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/wireframe.png?ref_type=heads" width="700" />
 
 <br /><br />
 
 ### ERD 다이어그램
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/erd.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/erd.png?ref_type=heads" width="700" />
 
 
 <br /><br />
 
 ### 시스템 아키텍처
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%8B%9C%EC%8A%A4%ED%85%9C%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/%EC%8B%9C%EC%8A%A4%ED%85%9C%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/%EC%8B%9C%EC%8A%A4%ED%85%9C2D%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/%EC%8B%9C%EC%8A%A4%ED%85%9C2D%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png?ref_type=heads" width="700" />
 
 
 <br /><br />
 
 ### API 명세서
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/api%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C1.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/api%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C2.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/api%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/api%EB%AA%85%EC%84%B8%EC%84%9C3.png?ref_type=heads" width="700" />
 
 <br />
 <br /><br />
@@ -260,22 +260,22 @@ gif 넣고 기술 설명
 
 ### Notion
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/notion1.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/notion1.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/notion2.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/notion2.png?ref_type=heads" width="700" />
 
 <br />
 <br />
 
 ### Jira
 ### Git
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/jira.gif" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/jira.gif" width="700" />
 
 <br />
 <br />
 
 ### Git
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/sourceTree.gif" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/sourceTree.gif" width="700" />
 
 <br />
 <br />
@@ -288,11 +288,11 @@ gif 넣고 기술 설명
 
 prometheus, grafana, locust 사용
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/grafana.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/grafana.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/locust1.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/locust1.png?ref_type=heads" width="700" />
 
-<img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/locust2.png?ref_type=heads" width="700" />
+<img src="https://github.com/sweethyom/peachpitch/blob/release/img/locust2.png?ref_type=heads" width="700" />
 
 <br />
 
@@ -424,32 +424,32 @@ prometheus, grafana, locust 사용
   <tr>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/migyeng.png?ref_type=heads" alt="김미경 프로필" />
+        <img src="https://github.com/sweethyom/peachpitch/blob/release/img/migyeng.png?ref_type=heads" alt="김미경 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/minju.png?ref_type=heads" alt="김민주 프로필" />
+        <img src="https://github.com/sweethyom/peachpitch/blob/release/img/minju.png?ref_type=heads" alt="김민주 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/hanna.png?ref_type=heads" alt="이한나 프로필" />
+        <img src="https://github.com/sweethyom/peachpitch/blob/release/img/hanna.png?ref_type=heads" alt="이한나 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/hyomy.png?ref_type=heads" alt="이효미 프로필" />
+        <img src="https://github.com/sweethyom/peachpitch/blob/release/img/hyomy.png?ref_type=heads" alt="이효미 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/yuseon.png?ref_type=heads" alt="정유선 프로필" />
+        <img src="https://github.com/sweethyom/peachpitch/blob/release/img/yuseon.png?ref_type=heads" alt="정유선 프로필" />
       </a>
     </td>
     <td align="center" width="150px">
       <a href="https://github.com/" target="_blank">
-        <img src="https://lab.ssafy.com/s12-webmobile1-sub1/S12P11D201/-/raw/master/img/jiwon.png?ref_type=heads" alt="최지원 프로필" />
+        <img src="https://github.com/sweethyom/peachpitch/blob/release/img/jiwon.png?ref_type=heads" alt="최지원 프로필" />
       </a>
     </td>
   </tr>
